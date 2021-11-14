@@ -1,0 +1,10 @@
+google_creds.json
+node_modules/*
+permission_list.json
+slack_settings.json
+translation_object.json
+plans.json
+npm-debug.log
+.DS_Store
+/*.env
+ngrok

@@ -1,6 +1,8 @@
 // Require the Bolt package (github.com/slackapi/bolt)
-const { App } = require("@slack/bolt");
-require('dotenv').config();
+import { App } from "@slack/bolt";
+import dotenv from 'dotenv';
+dotenv.config();
+import { updateMessage } from './util/slackHelpers.js';
 
 console.log('process: ', process.env.SLACK_BOT_TOKEN, process.env.SLACK_SIGNING_SECRET);
 
@@ -10,6 +12,21 @@ const app = new App({
 });
 
 
+app.event('message', async ({ message, context, client }) => {
+  console.log('message received: ', message, context, client);
+  let token = context.botToken;
+  updateMessage(message, 'Cool', token, client);
+})
+
+// NOTE: Won't be able to authorize app this way, need to do auth via Oauth https://api.slack.com/authentication/oauth-v2
+// Similar to the way it was done in v1 of the app
+// Should be able to put a block in a message to the user when they are posting in a channel and haven't given their permission yet
+app.action('authorize_app', async (props) => {
+  props.ack();
+
+  console.log('respond to action ', props);
+
+})
 
 
 app.event('app_home_opened', async ({ event, client, context }) => {
@@ -43,6 +60,14 @@ app.event('app_home_opened', async ({ event, client, context }) => {
             "text": {
               "type": "mrkdwn",
               "text": "Testing! `actions()` method and passing its unique `action_id`. See an example in the `examples` folder within your Bolt app."
+            },
+            accessory: {
+              type: "button",
+              action_id: "authorize_app",
+              text: {
+                type: "plain_text",
+                text: "Authorize App"
+              }
             }
           },
           {
@@ -50,6 +75,9 @@ app.event('app_home_opened', async ({ event, client, context }) => {
             "elements": [
               {
                 "type": "button",
+                // TODO: Add an action_id here as per: https://api.slack.com/tutorials/app-home-with-modal
+                // Should be able to listen for that action id in app.js
+                // Then, can get the user Authorization there, store it in Firebase
                 "text": {
                   "type": "plain_text",
                   "text": "Click me!"
@@ -65,6 +93,7 @@ app.event('app_home_opened', async ({ event, client, context }) => {
     console.error(error);
   }
 });
+
 
 
 

@@ -3,6 +3,7 @@
   "version": "0.0.1",
   "description": "A basic template to spin up a Bolt app for Slack",
   "main": "app.js",
+  "type": "module",
   "scripts": {
     "start": "node app.js",
     "dev": "nodemon app.js"
@@ -10,6 +11,7 @@
   "dependencies": {
     "@slack/bolt": "^2.0",
     "dotenv": "^10.0.0",
+    "firebase": "^9.5.0",
     "nodemon": "^2.0.15"
   },
   "engines": {

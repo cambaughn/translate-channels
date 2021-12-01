@@ -13,7 +13,10 @@
     "@babel/preset-env": "^7.16.4",
     "@slack/bolt": "^2.0",
     "babel-jest": "^27.4.2",
+    "core-js": "^3.19.2",
     "dotenv": "^10.0.0",
+    "enzyme": "^3.11.0",
+    "enzyme-adapter-react-16": "^1.15.6",
     "firebase": "^9.5.0",
     "jest": "^27.4.2",
     "nodemon": "^2.0.15"
@@ -24,7 +27,11 @@
   "jest": {
     "transform": {
       "^.+\\.[t|j]sx?$": "babel-jest"
-    }
+    },
+    "verbose": true,
+    "setupFilesAfterEnv": [
+      "./setupTests.js"
+    ]
   },
   "repository": {
     "url": "https://glitch.com/edit/#!/bolt-app-template"
@@ -34,5 +41,8 @@
     "node",
     "glitch",
     "express"
-  ]
+  ],
+  "devDependencies": {
+    "regenerator-runtime": "^0.13.9"
+  }
 }

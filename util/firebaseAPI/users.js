@@ -1,4 +1,4 @@
-import { doc, setDoc, getDoc } from "firebase/firestore"; 
+import { doc, setDoc, getDoc, deleteDoc } from "firebase/firestore"; 
 import db from '../firebase/firebaseInit.js';
 import convertFromFirebase from '../firebase/converter.js';
 
@@ -6,12 +6,25 @@ const userDB = {};
 
 // Get single user document from Firebase
 userDB.getUser = async (id) => {
-  const userRef = usersDoc('UJfupE0S0amoXtzdzKMR');
+  const userRef = usersDoc(id);
   let user = await getDoc(userRef);
   user = convertFromFirebase(user);
-  console.log('user ', user );
+
   return Promise.resolve(user);
 }
+
+userDB.createUser = async (user) => {
+  let id = user.slack_id;
+  const userRef = usersDoc(id);
+  return setDoc(userRef, user, { merge: true });
+}
+
+userDB.deleteUser = async (id) => {
+  const userRef = usersDoc(id);
+  return deleteDoc(userRef);
+}
+
+
 
 // Helpers
 const usersDoc = (id) => {

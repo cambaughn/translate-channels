@@ -7,7 +7,7 @@ import userDB from './util/firebaseAPI/users.js';
 
 console.log('process: ', process.env.SLACK_BOT_TOKEN, process.env.SLACK_SIGNING_SECRET);
 
-userDB.getUser()
+userDB.getUser();
 
 const app = new App({
   token: process.env.SLACK_BOT_TOKEN,

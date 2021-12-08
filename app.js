@@ -5,10 +5,6 @@ dotenv.config();
 import { updateMessage } from './util/slackHelpers.js';
 import userDB from './util/firebaseAPI/users.js';
 
-console.log('process: ', process.env.SLACK_BOT_TOKEN, process.env.SLACK_SIGNING_SECRET);
-
-userDB.getUser();
-
 const app = new App({
   token: process.env.SLACK_BOT_TOKEN,
   signingSecret: process.env.SLACK_SIGNING_SECRET
@@ -24,17 +20,21 @@ app.event('message', async ({ message, context, client }) => {
 // NOTE: Won't be able to authorize app this way, need to do auth via Oauth https://api.slack.com/authentication/oauth-v2
 // Similar to the way it was done in v1 of the app
 // Should be able to put a block in a message to the user when they are posting in a channel and haven't given their permission yet
-app.action('authorize_app', async ({ ack, context, action }) => {
-  ack();
+// app.action('authorize_app', async ({ ack, context, action }) => {
+//   ack();
 
-  console.log('respond to action ', action);
+//   console.log('respond to action ', action);
 
-})
+// })
 
 
 app.event('app_home_opened', async ({ event, client, context }) => {
   try {
     console.log('opening app home ');
+    let redirect_uri = 'https://app.translatechannels.com/auth_redirect';
+    let auth_url = `https://slack.com/oauth/v2/authorize?user_scope=channels:history,chat:write&client_id=${process.env.CLIENT_ID}&redirect_uri=${redirect_uri}`;
+    console.log('auth url ', auth_url);
+
     /* view.publish is the method that your app uses to push a view to the Home tab */
     const result = await client.views.publish({
 
@@ -84,7 +84,8 @@ app.event('app_home_opened', async ({ event, client, context }) => {
                 "text": {
                   "type": "plain_text",
                   "text": "Click me!"
-                }
+                },
+                url: auth_url
               }
             ]
           }

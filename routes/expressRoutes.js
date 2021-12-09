@@ -13,18 +13,24 @@ const expressRoutes = (app, slackApp, dbConnector) => {
     const code = query.code;
     console.log('got code for auth ', code);
     // need to add <state> to make secure
-    // return slackApp.client.oauth.v2.access({
-    //   client_id: process.env.CLIENT_ID,
-    //   client_secret: process.env.SLACK_SIGNING_SECRET,
-    //   code: code,
-    //   redirect_uri: process.env.REDIRECT_URI
-    // }).then(async (result) => {
-    //   const enrich = await dbConnector.createNewWorkspace(result);
-    //   if (enrich) { await dbConnector.createStripeCustomer(result.team.id); }
-    //   res.redirect(`https://slack.com/app_redirect?app=${process.env.APP_ID}&team=${result.team.id}`);
-    // }).catch((error) => {
-    //   throw error;
-    // });
+    let accessDetails = {
+      client_id: process.env.CLIENT_ID,
+      client_secret: process.env.CLIENT_SECRET,
+      code: code,
+      redirect_uri: process.env.REDIRECT_URL
+    }
+
+    console.log('access details ', accessDetails);
+
+    return slackApp.client.oauth.v2.access(accessDetails)
+    .then(async (result) => {
+      console.log('result =>>> ', result);
+      // const enrich = await dbConnector.createNewWorkspace(result);
+      // if (enrich) { await dbConnector.createStripeCustomer(result.team.id); }
+      // res.redirect(`https://slack.com/app_redirect?app=${process.env.APP_ID}&team=${result.team.id}`);
+    }).catch((error) => {
+      throw error;
+    });
   });
 
   app.get('/usages', async (req, res) => {

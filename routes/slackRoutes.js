@@ -20,8 +20,8 @@ const slackRoutes = (app) => {
   app.event('app_home_opened', async ({ event, client, context }) => {
     try {
       console.log('opening app home ');
-      let redirect_uri = 'https://a3df-172-115-148-28.ngrok.io/auth_redirect' || 'https://app.translatechannels.com/auth_redirect';
-      let auth_url = `https://slack.com/oauth/v2/authorize?user_scope=channels:history,chat:write&client_id=${process.env.CLIENT_ID}&redirect_uri=${redirect_uri}`;
+      let redirect_url = process.env.REDIRECT_URL || 'https://app.translatechannels.com/auth_redirect';
+      let auth_url = `https://slack.com/oauth/v2/authorize?user_scope=channels:history,chat:write&client_id=${process.env.CLIENT_ID}&redirect_uri=${redirect_url}`;
       console.log('auth url ', auth_url);
 
       /* view.publish is the method that your app uses to push a view to the Home tab */

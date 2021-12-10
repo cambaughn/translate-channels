@@ -1,5 +1,6 @@
 // const stripeConnector = require('../stripe_engine/stripe_connector');
 import bodyParser from 'body-parser';
+import userDB from '../util/firebaseAPI/users.js';
 
 const expressRoutes = (app, slackApp, dbConnector) => {
   app.get('/direct_install', ({ query }, res) => {
@@ -11,8 +12,6 @@ const expressRoutes = (app, slackApp, dbConnector) => {
   // https://api.slack.com/authentication/oauth-v2#obtaining
   app.get('/auth_redirect', ({ query }, res) => {
     const code = query.code;
-    console.log('got code for auth ', code);
-    // need to add <state> to make secure
     let accessDetails = {
       client_id: process.env.CLIENT_ID,
       client_secret: process.env.CLIENT_SECRET,
@@ -20,14 +19,22 @@ const expressRoutes = (app, slackApp, dbConnector) => {
       redirect_uri: process.env.REDIRECT_URL
     }
 
-    console.log('access details ', accessDetails);
-
     return slackApp.client.oauth.v2.access(accessDetails)
     .then(async (result) => {
-      console.log('result =>>> ', result);
-      // const enrich = await dbConnector.createNewWorkspace(result);
-      // if (enrich) { await dbConnector.createStripeCustomer(result.team.id); }
-      // res.redirect(`https://slack.com/app_redirect?app=${process.env.APP_ID}&team=${result.team.id}`);
+      let { team, authed_user, app_id } = result;
+      let userInfo = {
+        access_token: authed_user.access_token,
+        team_id: team.id,
+        app_id: app_id
+      }
+
+      console.log('user info ', userInfo);
+      await userDB.createUser(authed_user.id, userInfo);
+
+      // Upon approval and new user creation, redirect back to app: https://api.slack.com/reference/deep-linking
+      res.redirect(`https://slack.com/app_redirect?app=${process.env.APP_ID}&team=${team.id}`);
+      // This version of the link works better in that it directs users back to the app's home page, but it leaves the auth request page hanging, which looks incorrect
+      // res.redirect(`slack://app?team=${team.id}&id=${process.env.APP_ID}&tab=home`);
     }).catch((error) => {
       throw error;
     });

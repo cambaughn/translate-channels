@@ -13,8 +13,7 @@ userDB.getUser = async (id) => {
   return Promise.resolve(user);
 }
 
-userDB.createUser = async (user) => {
-  let id = user.slack_id;
+userDB.createUser = async (id, user) => {
   const userRef = usersDoc(id);
   return setDoc(userRef, user, { merge: true });
 }

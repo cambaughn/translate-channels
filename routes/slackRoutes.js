@@ -10,7 +10,7 @@ const slackRoutes = (app) => {
 
     if (user.access_token) {
       updateMessage(message, 'Cool', user.access_token, client);
-    } else { // TODO: No
+    } else { // TODO: No access token available, should send a message with a button to approve translations - only if this is a channel with TC set up AND this is the user's first time encountering Translate Channels - no document in database
 
     }
   })

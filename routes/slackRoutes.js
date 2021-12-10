@@ -1,9 +1,18 @@
+import { updateMessage } from '../util/slackHelpers.js';
+import userDB from '../util/firebaseAPI/users.js';
+
 const slackRoutes = (app) => {
 
   app.event('message', async ({ message, context, client }) => {
-    console.log('message received: ', message, context, client);
-    let token = context.botToken;
-    updateMessage(message, 'Cool', token, client);
+    // console.log('message received: ', message, context);
+    // Get user from database so we can check if they have a valid token
+    let user = await userDB.getUser(message.user);
+
+    if (user.access_token) {
+      updateMessage(message, 'Cool', user.access_token, client);
+    } else { // TODO: No
+
+    }
   })
 
   // NOTE: Won't be able to authorize app this way, need to do auth via Oauth https://api.slack.com/authentication/oauth-v2

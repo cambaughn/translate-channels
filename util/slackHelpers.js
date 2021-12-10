@@ -1,6 +1,5 @@
 const updateMessage = (message, response, token, client) => {
   // finds message and edits it with the translated text (response) as blocks
-  console.log('testing app');
   const messageRequest = {
     token: token,
     channel: message.channel,
@@ -8,8 +7,10 @@ const updateMessage = (message, response, token, client) => {
     text: response
   };
 
-  client.chat.update(messageRequest, error => {
-    console.log(error);
+  console.log('testing app ', messageRequest);
+
+  return client.chat.update(messageRequest, error => {
+    console.log('errory =>>>>>>>>>>', error);
   });
 }
 

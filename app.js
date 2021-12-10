@@ -1,7 +1,6 @@
 import { App, ExpressReceiver } from "@slack/bolt";
 import dotenv from 'dotenv';
 dotenv.config();
-import { updateMessage } from './util/slackHelpers.js';
 import expressRoutes from './routes/expressRoutes.js';
 import slackRoutes from './routes/slackRoutes.js';
 

@@ -10,7 +10,7 @@ const updateMessage = (message, response, token, client) => {
   console.log('testing app ', messageRequest);
 
   return client.chat.update(messageRequest, error => {
-    console.log('errory =>>>>>>>>>>', error);
+    console.log(error);
   });
 }
 

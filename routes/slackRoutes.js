@@ -18,12 +18,12 @@ const slackRoutes = (app) => {
   // NOTE: Won't be able to authorize app this way, need to do auth via Oauth https://api.slack.com/authentication/oauth-v2
   // Similar to the way it was done in v1 of the app
   // Should be able to put a block in a message to the user when they are posting in a channel and haven't given their permission yet
-  // app.action('authorize_app', async ({ ack, context, action }) => {
-  //   ack();
+  app.action('authorize_app', async ({ ack, context, action }) => {
+    ack();
 
-  //   console.log('respond to action ', action);
+    console.log('respond to action ');
 
-  // })
+  })
 
 
   app.event('app_home_opened', async ({ event, client, context }) => {
@@ -50,7 +50,7 @@ const slackRoutes = (app) => {
               "type": "section",
               "text": {
                 "type": "mrkdwn",
-                "text": "*Welcome to your _App's Home_* :tada:"
+                "text": "*Welcome to Translate Channels* :tada:"
               }
             },
             {
@@ -60,7 +60,7 @@ const slackRoutes = (app) => {
               "type": "section",
               "text": {
                 "type": "mrkdwn",
-                "text": "Testing! `actions()` method and passing its unique `action_id`. See an example in the `examples` folder within your Bolt app."
+                "text": "Authorize the app to update your messages with translations :point_right: \n _(Each user must do this to enable automatic translation)_"
               },
               accessory: {
                 type: "button",
@@ -68,24 +68,12 @@ const slackRoutes = (app) => {
                 text: {
                   type: "plain_text",
                   text: "Authorize App"
-                }
+                },
+                url: auth_url
               }
             },
             {
-              "type": "actions",
-              "elements": [
-                {
-                  "type": "button",
-                  // TODO: Add an action_id here as per: https://api.slack.com/tutorials/app-home-with-modal
-                  // Should be able to listen for that action id in app.js
-                  // Then, can get the user Authorization there, store it in Firebase
-                  "text": {
-                    "type": "plain_text",
-                    "text": "Click me!"
-                  },
-                  url: auth_url
-                }
-              ]
+              "type": "divider"
             }
           ]
         }

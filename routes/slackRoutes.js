@@ -1,5 +1,6 @@
 import { updateMessage } from '../util/slackHelpers.js';
 import userDB from '../util/firebaseAPI/users.js';
+import buildHomeView from '../util/slack/home.js';
 
 const slackRoutes = (app) => {
 
@@ -30,54 +31,9 @@ const slackRoutes = (app) => {
     try {
       console.log('opening app home ');
       let redirect_url = process.env.REDIRECT_URL || 'https://app.translatechannels.com/auth_redirect';
-      let auth_url = `https://slack.com/oauth/v2/authorize?user_scope=channels:history,chat:write&client_id=${process.env.CLIENT_ID}&redirect_uri=${redirect_url}`;
-      console.log('auth url ', auth_url);
 
       /* view.publish is the method that your app uses to push a view to the Home tab */
-      const result = await client.views.publish({
-
-        /* the user that opened your app's app home */
-        user_id: event.user,
-
-        /* the view object that appears in the app home*/
-        view: {
-          type: 'home',
-          callback_id: 'home_view',
-
-          /* body of the view */
-          blocks: [
-            {
-              "type": "section",
-              "text": {
-                "type": "mrkdwn",
-                "text": "*Welcome to Translate Channels* :tada:"
-              }
-            },
-            {
-              "type": "divider"
-            },
-            {
-              "type": "section",
-              "text": {
-                "type": "mrkdwn",
-                "text": "Authorize the app to update your messages with translations :point_right: \n _(Each user must do this to enable automatic translation)_"
-              },
-              accessory: {
-                type: "button",
-                action_id: "authorize_app",
-                text: {
-                  type: "plain_text",
-                  text: "Authorize App"
-                },
-                url: auth_url
-              }
-            },
-            {
-              "type": "divider"
-            }
-          ]
-        }
-      });
+      const result = await client.views.publish(buildHomeView(event, redirect_url));
     }
     catch (error) {
       console.error(error);

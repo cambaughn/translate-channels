@@ -13,9 +13,9 @@ userDB.getUser = async (id) => {
   return Promise.resolve(user);
 }
 
-userDB.createUser = async (id, user) => {
+userDB.createUser = async (id, updates) => {
   const userRef = usersDoc(id);
-  return setDoc(userRef, user, { merge: true });
+  return setDoc(userRef, updates, { merge: true });
 }
 
 userDB.deleteUser = async (id) => {

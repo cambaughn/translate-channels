@@ -1,6 +1,6 @@
-import userDB from './users';
+import userDB from './users.js';
 
-describe('Read and update users collection in firebase', () => {
+describe.skip('Read and update users collection in firebase', () => {
   
   test('Can set user in database', async () => {
     await userDB.createUser({ name: 'Luke Skywalker', slack_id: '123' });
@@ -13,7 +13,7 @@ describe('Read and update users collection in firebase', () => {
     expect(user.name).toBe('Luke Skywalker');
   });
 
-  test('Can get user profile from database', async () => {
+  test('Can delete user profile from database', async () => {
     await userDB.deleteUser('123');
     let user = await userDB.getUser('123');
     expect(user.name).toBeUndefined();

@@ -1,6 +1,7 @@
 import { updateMessage } from '../util/slackHelpers.js';
 import userDB from '../util/firebaseAPI/users.js';
 import buildHomeView from '../util/slack/home.js';
+import { isAdmin } from '../util/slack/slackUser.js';
 
 const slackRoutes = (app) => {
 
@@ -31,9 +32,11 @@ const slackRoutes = (app) => {
     try {
       console.log('opening app home ');
       let redirect_url = process.env.REDIRECT_URL || 'https://app.translatechannels.com/auth_redirect';
-
+      let isSlackAdmin = await isAdmin(event.user, context.botToken, client);
+      console.log('is slack admin ', isSlackAdmin);
       /* view.publish is the method that your app uses to push a view to the Home tab */
-      const result = await client.views.publish(buildHomeView(event, redirect_url));
+      let homeView = await buildHomeView(event, redirect_url, isSlackAdmin);
+      const result = await client.views.publish(homeView);
     }
     catch (error) {
       console.error(error);

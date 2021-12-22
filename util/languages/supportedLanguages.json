@@ -1,0 +1,773 @@
+[
+  {
+    "languageName": "Afrikaans",
+    "languageCodes": ["af"],
+    "slackHeading": "flag-za",
+    "slackHeadingType": "emoji",
+    "selectable": true
+  },
+  {
+    "languageName": "Albanian",
+    "languageCodes": ["sq"],
+    "slackHeading": "flag-al",
+    "slackHeadingType": "emoji",
+    "selectable": true
+  },
+  {
+    "languageName": "Arabic",
+    "languageCodes": ["ar"],
+    "slackHeading": "اَلْعَرَبِيَّةُ",
+    "slackHeadingType": "text",
+    "selectable": true
+  },
+  {
+    "languageName": "Armenian",
+    "languageCodes": ["hy"],
+    "slackHeading": "flag-am",
+    "slackHeadingType": "emoji",
+    "selectable": true
+  },
+  {
+    "languageName": "Azerbaijani",
+    "languageCodes": ["az"],
+    "slackHeading": "flag-az",
+    "slackHeadingType": "emoji",
+    "selectable": true
+  },
+  {
+    "languageName": "Belarusian",
+    "languageCodes": ["be"],
+    "slackHeading": "flag-by",
+    "slackHeadingType": "emoji",
+    "selectable": true
+  },
+  {
+    "languageName": "Bengali",
+    "languageCodes": ["bn"],
+    "slackHeading": "flag-bd",
+    "slackHeadingType": "emoji",
+    "selectable": true
+  },
+  {
+    "languageName": "Bosnian",
+    "languageCodes": ["bs"],
+    "slackHeading": "flag-ba",
+    "slackHeadingType": "emoji",
+    "selectable": true
+  },
+  {
+    "languageName": "Bulgarian",
+    "languageCodes": ["bg"],
+    "slackHeading": "flag-bg",
+    "slackHeadingType": "emoji",
+    "selectable": true
+  },
+  {
+    "languageName": "Chinese (Simplified)",
+    "languageCodes": ["zh-CN", "cn"],
+    "slackHeading": "cn",
+    "slackHeadingType": "emoji",
+    "selectable": true
+  },
+  {
+    "languageName": "Chinese (Traditional)",
+    "languageCodes": ["zh-TW"],
+    "slackHeading": "flag-tw",
+    "slackHeadingType": "emoji",
+    "selectable": true
+  },
+  {
+    "languageName": "Croatian",
+    "languageCodes": ["hr"],
+    "slackHeading": "flag-hr",
+    "slackHeadingType": "emoji",
+    "selectable": true
+  },
+  {
+    "languageName": "Czech",
+    "languageCodes": ["cs"],
+    "slackHeading": "flag-cz",
+    "slackHeadingType": "emoji",
+    "selectable": true
+  },
+  {
+    "languageName": "Danish",
+    "languageCodes": ["da"],
+    "slackHeading": "flag-dk",
+    "slackHeadingType": "emoji",
+    "selectable": true
+  },
+  {
+    "languageName": "Dutch",
+    "languageCodes": ["nl"],
+    "slackHeading": "flag-nl",
+    "slackHeadingType": "emoji",
+    "selectable": true
+  },
+  {
+    "languageName": "English",
+    "languageCodes": ["en"],
+    "slackHeading": "gb",
+    "slackHeadingType": "emoji",
+    "selectable": true
+  },
+  {
+    "languageName": "Estonian",
+    "languageCodes": ["et"],
+    "slackHeading": "flag-ee",
+    "slackHeadingType": "emoji",
+    "selectable": true
+  },
+  {
+    "languageName": "Finnish",
+    "languageCodes": ["fi"],
+    "slackHeading": "flag-fi",
+    "slackHeadingType": "emoji",
+    "selectable": true
+  },
+  {
+    "languageName": "French",
+    "languageCodes": ["fr"],
+    "slackHeading": "fr",
+    "slackHeadingType": "emoji",
+    "selectable": true
+  },
+  {
+    "languageName": "Georgian",
+    "languageCodes": ["ka"],
+    "slackHeading": "flag-ge",
+    "slackHeadingType": "emoji",
+    "selectable": true
+  },
+  {
+    "languageName": "German",
+    "languageCodes": ["de"],
+    "slackHeading": "de",
+    "slackHeadingType": "emoji",
+    "selectable": true
+  },
+  {
+    "languageName": "Greek",
+    "languageCodes": ["el"],
+    "slackHeading": "flag-gr",
+    "slackHeadingType": "emoji",
+    "selectable": true
+  },
+  {
+    "languageName": "Haitian Creole",
+    "languageCodes": ["ht"],
+    "slackHeading": "flag-ht",
+    "slackHeadingType": "emoji",
+    "selectable": true
+  },
+  {
+    "languageName": "Hausa",
+    "languageCodes": ["ha"],
+    "slackHeading": "flag-ng",
+    "slackHeadingType": "emoji",
+    "selectable": true
+  },
+  {
+    "languageName": "Hawaiian",
+    "languageCodes": ["haw"],
+    "slackHeading": null,
+    "slackHeadingType": null,
+    "selectable": true
+  },
+  {
+    "languageName": "Hebrew",
+    "languageCodes": ["iw", "he"],
+    "slackHeading": "flag-il",
+    "slackHeadingType": "emoji",
+    "selectable": true
+  },
+  {
+    "languageName": "Hindi",
+    "languageCodes": ["hi"],
+    "slackHeading": "flag-in",
+    "slackHeadingType": "emoji",
+    "selectable": true
+  },
+  {
+    "languageName": "Hmong",
+    "languageCodes": ["hmn"],
+    "slackHeading": null,
+    "slackHeadingType": null,
+    "selectable": false
+  },
+  {
+    "languageName": "Hungarian",
+    "languageCodes": ["hu"],
+    "slackHeading": "flag-hu",
+    "slackHeadingType": "emoji",
+    "selectable": true
+  },
+  {
+    "languageName": "Icelandic",
+    "languageCodes": ["is"],
+    "slackHeading": "flag-is",
+    "slackHeadingType": "emoji",
+    "selectable": true
+  },
+  {
+    "languageName": "Igbo",
+    "languageCodes": ["ig"],
+    "slackHeading": "flag-ng",
+    "slackHeadingType": "emoji",
+    "selectable": true
+  },
+  {
+    "languageName": "Indonesian",
+    "languageCodes": ["id"],
+    "slackHeading": "flag-id",
+    "slackHeadingType": "emoji",
+    "selectable": true
+  },
+  {
+    "languageName": "Irish",
+    "languageCodes": ["ga"],
+    "slackHeading": "flag-ie",
+    "slackHeadingType": "emoji",
+    "selectable": true
+  },
+  {
+    "languageName": "Italian",
+    "languageCodes": ["it"],
+    "slackHeading": "it",
+    "slackHeadingType": "emoji",
+    "selectable": true
+  },
+  {
+    "languageName": "Japanese",
+    "languageCodes": ["ja"],
+    "slackHeading": "jp",
+    "slackHeadingType": "emoji",
+    "selectable": true
+  },
+  {
+    "languageName": "Javanese",
+    "languageCodes": ["jv"],
+    "slackHeading": null,
+    "slackHeadingType": null,
+    "selectable": false
+  },
+  {
+    "languageName": "Kannada",
+    "languageCodes": ["kn"],
+    "slackHeading": null,
+    "slackHeadingType": null,
+    "selectable": false
+  },
+  {
+    "languageName": "Kazakh",
+    "languageCodes": ["kk"],
+    "slackHeading": "flag-kz",
+    "slackHeadingType": "emoji",
+    "selectable": true
+  },
+  {
+    "languageName": "Khmer",
+    "languageCodes": ["km"],
+    "slackHeading": null,
+    "slackHeadingType": null,
+    "selectable": false
+  },
+  {
+    "languageName": "Kinyarwanda",
+    "languageCodes": ["rw"],
+    "slackHeading": "flag-rw",
+    "slackHeadingType": "emoji",
+    "selectable": true
+  },
+  {
+    "languageName": "Korean",
+    "languageCodes": ["ko"],
+    "slackHeading": "kr",
+    "slackHeadingType": "emoji",
+    "selectable": true
+  },
+  {
+    "languageName": "Kurdish",
+    "languageCodes": ["ku"],
+    "slackHeading": "کوردی‎",
+    "slackHeadingType": "text",
+    "selectable": true
+  },
+  {
+    "languageName": "Kyrgyz",
+    "languageCodes": ["ky"],
+    "slackHeading": "flag-kg",
+    "slackHeadingType": "emoji",
+    "selectable": true
+  },
+  {
+    "languageName": "Lao",
+    "languageCodes": ["lo"],
+    "slackHeading": null,
+    "slackHeadingType": null,
+    "selectable": true
+  },
+  {
+    "languageName": "Latin",
+    "languageCodes": ["la"],
+    "slackHeading": null,
+    "slackHeadingType": null,
+    "selectable": false
+  },
+  {
+    "languageName": "Latvian",
+    "languageCodes": ["lv"],
+    "slackHeading": "flag-lv",
+    "slackHeadingType": "emoji",
+    "selectable": true
+  },
+  {
+    "languageName": "Lithuanian",
+    "languageCodes": ["lt"],
+    "slackHeading": "flag-lt",
+    "slackHeadingType": "emoji",
+    "selectable": true
+  },
+  {
+    "languageName": "Luxembourgish",
+    "languageCodes": ["lb"],
+    "slackHeading": null,
+    "slackHeadingType": null,
+    "selectable": false
+  },
+  {
+    "languageName": "Macedonian",
+    "languageCodes": ["mk"],
+    "slackHeading": "flag-mk",
+    "slackHeadingType": "emoji",
+    "selectable": true
+  },
+  {
+    "languageName": "Malagasy",
+    "languageCodes": ["mg"],
+    "slackHeading": "flag-mg",
+    "slackHeadingType": "emoji",
+    "selectable": true
+  },
+  {
+    "languageName": "Malay",
+    "languageCodes": ["ms"],
+    "slackHeading": "flag-my",
+    "slackHeadingType": "emoji",
+    "selectable": true
+  },
+  {
+    "languageName": "Malayalam",
+    "languageCodes": ["ml"],
+    "slackHeading": null,
+    "slackHeadingType": null,
+    "selectable": true
+  },
+  {
+    "languageName": "Maltese",
+    "languageCodes": ["mt"],
+    "slackHeading": "flag-mt",
+    "slackHeadingType": "emoji",
+    "selectable": true
+  },
+  {
+    "languageName": "Maori",
+    "languageCodes": ["mi"],
+    "slackHeading": null,
+    "slackHeadingType": null,
+    "selectable": false
+  },
+  {
+    "languageName": "Marathi",
+    "languageCodes": ["mr"],
+    "slackHeading": null,
+    "slackHeadingType": null,
+    "selectable": false
+  },
+  {
+    "languageName": "Mongolian",
+    "languageCodes": ["mn"],
+    "slackHeading": "flag-mn",
+    "slackHeadingType": "emoji",
+    "selectable": true
+  },
+  {
+    "languageName": "Myanmar (Burmese)",
+    "languageCodes": ["my"],
+    "slackHeading": "flag-mm",
+    "slackHeadingType": "emoji",
+    "selectable": true
+  },
+  {
+    "languageName": "Nepali",
+    "languageCodes": ["ne"],
+    "slackHeading": null,
+    "slackHeadingType": null,
+    "selectable": false
+  },
+  {
+    "languageName": "Norwegian",
+    "languageCodes": ["no"],
+    "slackHeading": "flag-no",
+    "slackHeadingType": "emoji",
+    "selectable": true
+  },
+  {
+    "languageName": "Nyanja (Chichewa)",
+    "languageCodes": ["ny"],
+    "slackHeading": null,
+    "slackHeadingType": null,
+    "selectable": false
+  },
+  {
+    "languageName": "Odia (Oriya)",
+    "languageCodes": ["or"],
+    "slackHeading": null,
+    "slackHeadingType": null,
+    "selectable": false
+  },
+  {
+    "languageName": "Pashto",
+    "languageCodes": ["ps"],
+    "slackHeading": null,
+    "slackHeadingType": null,
+    "selectable": false
+  },
+  {
+    "languageName": "Farsi",
+    "languageCodes": ["fa"],
+    "slackHeading": "فارسی",
+    "slackHeadingType": "text",
+    "selectable": true
+  },
+  {
+    "languageName": "Polish",
+    "languageCodes": ["pl"],
+    "slackHeading": "flag-pl",
+    "slackHeadingType": "emoji",
+    "selectable": true
+  },
+  {
+    "languageName": "Portuguese",
+    "languageCodes": ["pt"],
+    "slackHeading": "flag-pt",
+    "slackHeadingType": "emoji",
+    "selectable": true
+  },
+  {
+    "languageName": "Punjabi",
+    "languageCodes": ["pa"],
+    "slackHeading": "flag-in",
+    "slackHeadingType": "emoji",
+    "selectable": true
+  },
+  {
+    "languageName": "Romanian",
+    "languageCodes": ["ro"],
+    "slackHeading": "flag-ro",
+    "slackHeadingType": "emoji",
+    "selectable": true
+  },
+  {
+    "languageName": "Russian",
+    "languageCodes": ["ru"],
+    "slackHeading": "flag-ru",
+    "slackHeadingType": "emoji",
+    "selectable": true
+  },
+  {
+    "languageName": "Samoan",
+    "languageCodes": ["sm"],
+    "slackHeading": null,
+    "slackHeadingType": null,
+    "selectable": false
+  },
+  {
+    "languageName": "Scots Gaelic",
+    "languageCodes": ["gd"],
+    "slackHeading": null,
+    "slackHeadingType": null,
+    "selectable": false
+  },
+  {
+    "languageName": "Serbian",
+    "languageCodes": ["sr"],
+    "slackHeading": "flag-rs",
+    "slackHeadingType": "emoji",
+    "selectable": true
+  },
+  {
+    "languageName": "Sesotho",
+    "languageCodes": ["st"],
+    "slackHeading": null,
+    "slackHeadingType": null,
+    "selectable": false
+  },
+  {
+    "languageName": "Shona",
+    "languageCodes": ["sn"],
+    "slackHeading": null,
+    "slackHeadingType": null,
+    "selectable": false
+  },
+  {
+    "languageName": "Sindhi",
+    "languageCodes": ["sd"],
+    "slackHeading": "flag-pk",
+    "slackHeadingType": "emoji",
+    "selectable": true
+  },
+  {
+    "languageName": "Sinhala (Sinhalese)",
+    "languageCodes": ["si"],
+    "slackHeading": null,
+    "slackHeadingType": null,
+    "selectable": false
+  },
+  {
+    "languageName": "Slovak",
+    "languageCodes": ["sk"],
+    "slackHeading": "flag-sk",
+    "slackHeadingType": "emoji",
+    "selectable": true
+  },
+  {
+    "languageName": "Slovenian",
+    "languageCodes": ["sl"],
+    "slackHeading": "flag-si",
+    "slackHeadingType": "emoji",
+    "selectable": true
+  },
+  {
+    "languageName": "Somali",
+    "languageCodes": ["so"],
+    "slackHeading": null,
+    "slackHeadingType": null,
+    "selectable": false
+  },
+  {
+    "languageName": "Spanish",
+    "languageCodes": ["es"],
+    "slackHeading": "es",
+    "slackHeadingType": "emoji",
+    "selectable": true
+  },
+  {
+    "languageName": "Sundanese",
+    "languageCodes": ["su"],
+    "slackHeading": null,
+    "slackHeadingType": null,
+    "selectable": false
+  },
+  {
+    "languageName": "Swahili",
+    "languageCodes": ["sw"],
+    "slackHeading": null,
+    "slackHeadingType": null,
+    "selectable": true
+  },
+  {
+    "languageName": "Swedish",
+    "languageCodes": ["sv"],
+    "slackHeading": "flag-se",
+    "slackHeadingType": "emoji",
+    "selectable": true
+  },
+  {
+    "languageName": "Tagalog (Filipino)",
+    "languageCodes": ["tl"],
+    "slackHeading": "flag-ph",
+    "slackHeadingType": "emoji",
+    "selectable": true
+  },
+  {
+    "languageName": "Tajik",
+    "languageCodes": ["tg"],
+    "slackHeading": null,
+    "slackHeadingType": null,
+    "selectable": false
+  },
+  {
+    "languageName": "Tamil",
+    "languageCodes": ["ta"],
+    "slackHeading": null,
+    "slackHeadingType": null,
+    "selectable": false
+  },
+  {
+    "languageName": "Tatar",
+    "languageCodes": ["tt"],
+    "slackHeading": null,
+    "slackHeadingType": null,
+    "selectable": false
+  },
+  {
+    "languageName": "Telugu",
+    "languageCodes": ["te"],
+    "slackHeading": null,
+    "slackHeadingType": null,
+    "selectable": false
+  },
+  {
+    "languageName": "Thai",
+    "languageCodes": ["th"],
+    "slackHeading": "flag-th",
+    "slackHeadingType": "emoji",
+    "selectable": true
+  },
+  {
+    "languageName": "Turkish",
+    "languageCodes": ["tr"],
+    "slackHeading": "flag-tr",
+    "slackHeadingType": "emoji",
+    "selectable": true
+  },
+  {
+    "languageName": "Turkmen",
+    "languageCodes": ["tk"],
+    "slackHeading": "flag-tm",
+    "slackHeadingType": "emoji",
+    "selectable": true
+  },
+  {
+    "languageName": "Ukrainian",
+    "languageCodes": ["uk"],
+    "slackHeading": "flag-ua",
+    "slackHeadingType": "emoji",
+    "selectable": true
+  },
+  {
+    "languageName": "Urdu",
+    "languageCodes": ["ur"],
+    "slackHeading": null,
+    "slackHeadingType": null,
+    "selectable": false
+  },
+  {
+    "languageName": "Uyghur",
+    "languageCodes": ["ug"],
+    "slackHeading": null,
+    "slackHeadingType": null,
+    "selectable": true
+  },
+  {
+    "languageName": "Uzbek",
+    "languageCodes": ["uz"],
+    "slackHeading": "flag-uz",
+    "slackHeadingType": "emoji",
+    "selectable": true
+  },
+  {
+    "languageName": "Vietnamese",
+    "languageCodes": ["vi"],
+    "slackHeading": "flag-vn",
+    "slackHeadingType": "emoji",
+    "selectable": true
+  },
+  {
+    "languageName": "Welsh",
+    "languageCodes": ["cy"],
+    "slackHeading": "flag-wales",
+    "slackHeadingType": "emoji",
+    "selectable": true
+  },
+  {
+    "languageName": "Yiddish",
+    "languageCodes": ["yi"],
+    "slackHeading": null,
+    "slackHeadingType": null,
+    "selectable": true
+  },
+  {
+    "languageName": "Yoruba",
+    "languageCodes": ["yo"],
+    "slackHeading": null,
+    "slackHeadingType": null,
+    "selectable": false
+  },
+  {
+    "languageName": "Zulu",
+    "languageCodes": ["zu"],
+    "slackHeading": null,
+    "slackHeadingType": null,
+    "selectable": true
+  },
+  {
+    "languageName": "Amharic",
+    "languageCodes": ["am"],
+    "slackHeading": null,
+    "slackHeadingType": null,
+    "selectable": false
+  },
+  {
+    "languageName": "Basque",
+    "languageCodes": ["eu"],
+    "slackHeading": null,
+    "slackHeadingType": null,
+    "selectable": false
+  },
+  {
+    "languageName": "Catalan",
+    "languageCodes": ["ca"],
+    "slackHeading": null,
+    "slackHeadingType": null,
+    "selectable": false
+  },
+  {
+    "languageName": "Cebuano",
+    "languageCodes": ["ceb"],
+    "slackHeading": null,
+    "slackHeadingType": null,
+    "selectable": false
+  },
+  {
+    "languageName": "Corsican",
+    "languageCodes": ["co"],
+    "slackHeading": null,
+    "slackHeadingType": null,
+    "selectable": false
+  },
+  {
+    "languageName": "Esperanto",
+    "languageCodes": ["eo"],
+    "slackHeading": null,
+    "slackHeadingType": null,
+    "selectable": false
+  },
+  {
+    "languageName": "Frisian",
+    "languageCodes": ["fy"],
+    "slackHeading": null,
+    "slackHeadingType": null,
+    "selectable": false
+  },
+  {
+    "languageName": "Galician",
+    "languageCodes": ["gl"],
+    "slackHeading": null,
+    "slackHeadingType": null,
+    "selectable": false
+  },
+  {
+    "languageName": "Gujarati",
+    "languageCodes": ["gu"],
+    "slackHeading": null,
+    "slackHeadingType": null,
+    "selectable": false
+  },
+  {
+    "languageName": "Persian",
+    "languageCodes": ["fa"],
+    "slackHeading": null,
+    "slackHeadingType": null,
+    "selectable": false
+  },
+  {
+    "languageName": "Xhosa",
+    "languageCodes": ["xh"],
+    "slackHeading": null,
+    "slackHeadingType": null,
+    "selectable": false
+  }
+ ]
+ 

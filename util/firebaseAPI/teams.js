@@ -19,6 +19,17 @@ teamsDB.updateTeam = async (id, updates) => {
   return setDoc(teamRef, updates, { merge: true });
 }
 
+teamsDB.createNew = async (id) => {
+  let defaultTeam = {
+    slack_team_id: id,
+    workspace_languages: [],
+    channel_language_settings: [],
+    admin_settings: {}
+  }
+
+  return teamsDB.updateTeam(id, defaultTeam);
+}
+
 // Delete team from Firebase - USE CAREFULLY - really shouldn't be used outside of testing
 teamsDB.deleteTeam = async (id) => {
   const teamRef = teamsDoc(id);

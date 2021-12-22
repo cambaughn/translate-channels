@@ -5,8 +5,8 @@
   "main": "app.js",
   "type": "module",
   "scripts": {
-    "start": "node app.js",
-    "dev": "nodemon app.js",
+    "start": "node --experimental-json-modules app.js",
+    "dev": "nodemon --experimental-json-modules app.js",
     "test": "jest"
   },
   "dependencies": {

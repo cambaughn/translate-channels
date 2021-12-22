@@ -1,9 +1,17 @@
 import teamsDB from "../firebaseAPI/teams.js";
+import { getSettingsString } from '../languages/languageHelpers.js';
 
-const buildHomeView = async (event, settings = { channel: [] }, redirect_url) => {
+const buildHomeView = async (event, redirect_url, userIsAdmin, nonAdminAllowSettings) => {
   let auth_url = `https://slack.com/oauth/v2/authorize?user_scope=channels:history,chat:write&client_id=${process.env.CLIENT_ID}&redirect_uri=${redirect_url}`;
-  let team = await teamsDB.getTeam('123');
-  console.log('got team =====> ', team);
+  // console.log('event ', event);
+  
+  let team_id = event.view.team_id;
+  let team = await teamsDB.getTeam(team_id);
+  if (!team.slack_team_id && team_id) { // if the team doesn't exist yet, we need to create it
+    await teamsDB.createNew(team_id);
+    team = await teamsDB.getTeam(team_id);
+  }
+
 
   let home = {
     /* the user that opened your app's app home */
@@ -58,24 +66,34 @@ const buildHomeView = async (event, settings = { channel: [] }, redirect_url) =>
     }
   });
 
-  const printableSettings = [{ name: 'every_channel', id: 'any_channel', languages: settings?.workspace?.outputLanguages || [] }];
-  for (const channelSetting of settings.channel) {
-    printableSettings.push(
-      { name: channelSetting.name, id: channelSetting.id, languages: channelSetting.outputLanguages }
+
+  const settings = [
+    // Set overall workspace settings that apply to every channel
+    {
+      name: 'every_channel', 
+      id: 'any_channel', 
+      languages: team?.workspace_languages || []
+    }
+  ];
+
+  // Go through the custom settings defined for each channel and push those to the settings array
+  for (const channelSetting of team.channel_language_settings) {
+    settings.push(
+      { name: channelSetting.name, id: channelSetting.id, languages: channelSetting.languages }
     );
   }
 
-  for (const setting of printableSettings) {
+  for (const setting of settings) {
     // the languages length of 0 should be only possible for workspace settings which must exist by schema
     if (!setting.languages || setting.languages.length === 0) {
       const settingsBlock = {
         type: 'section',
         text: {
           type: 'mrkdwn',
-          text: `\`${setting.name}\` DO NOT TRANSLATE`
+          text: `\`${setting.name}\` Do not translate`
         }
       };
-      if (isAdminUser || nonAdminAllowSettings) {
+      if (userIsAdmin || nonAdminAllowSettings) {
         settingsBlock.accessory = {
           type: 'button',
           text: {
@@ -90,8 +108,13 @@ const buildHomeView = async (event, settings = { channel: [] }, redirect_url) =>
       continue;
     }
 
-    let languagesString = '';
-    // for (const lang of setting.languages) { languagesString += languageOperations.getSettingsString(lang); }
+    // Map language strings to array
+    let languages = setting.languages.map(language => getSettingsString(language));
+    // Pop the last item, so we can add "and" before it
+    let lastLanguage = languages.pop();
+    // Format the full string correctly
+    // Need trailing space for Slack to render flag emoji properly
+    let languagesString = `${languages.join(', ')}${languages.length > 1 ? ',' : ''} & ${lastLanguage} `;
 
     const settingsBlock = {
       type: 'section',
@@ -100,17 +123,18 @@ const buildHomeView = async (event, settings = { channel: [] }, redirect_url) =>
         text: `\`${setting.name}\` translate any language into -> ${languagesString.slice(0, -1)}`
       }
     };
-    // if (isAdminUser || nonAdminAllowSettings) {
-    //   settingsBlock.accessory = {
-    //     type: 'button',
-    //     text: {
-    //       type: 'plain_text',
-    //       text: 'Edit'
-    //     },
-    //     action_id: 'edit_setting_modal_open',
-    //     value: JSON.stringify({ id: setting.id, lang: setting.languages })
-    //   };
-    // }
+
+    if (userIsAdmin || nonAdminAllowSettings) {
+      settingsBlock.accessory = {
+        type: 'button',
+        text: {
+          type: 'plain_text',
+          text: 'Edit'
+        },
+        action_id: 'edit_setting_modal_open',
+        value: JSON.stringify({ id: setting.id, lang: setting.languages })
+      };
+    }
     home.view.blocks.push(settingsBlock);
   }
 

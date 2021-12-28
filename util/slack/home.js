@@ -120,7 +120,7 @@ const buildHomeView = async (event, redirect_url, userIsAdmin, nonAdminAllowSett
       type: 'section',
       text: {
         type: 'mrkdwn',
-        text: `\`${setting.name}\` translate any language into -> ${languagesString.slice(0, -1)}`
+        text: `\`${setting.name}\` translate any language :arrow_right: ${languagesString.slice(0, -1)}`
       }
     };
 

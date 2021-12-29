@@ -138,8 +138,37 @@ const buildHomeView = async (event, redirect_url, userIsAdmin, nonAdminAllowSett
     home.view.blocks.push(settingsBlock);
   }
 
+  if (userIsAdmin || nonAdminAllowSettings) {
+    home.view.blocks.push(
+      {
+        type: 'section',
+        text: {
+          type: 'mrkdwn',
+          text: 'You can add translation settings for any channel'
+        },
+        accessory: {
+          type: 'button',
+          style: 'primary',
+          text: {
+            type: 'plain_text',
+            text: 'Add Setting'
+          },
+          action_id: 'edit_setting_modal_open',
+          value: JSON.stringify({ id: 'none', lang: [] })
+        }
+      });
+  }
+
   // Slash Commands
-  home.view.blocks.push(
+  let slashCommands = configureSlashCommandsSection();
+  home.view.blocks.push(...slashCommands);
+
+  return home;
+}
+
+
+const configureSlashCommandsSection = () => {
+  return [
     {
       type: 'divider'
     },
@@ -164,9 +193,7 @@ const buildHomeView = async (event, redirect_url, userIsAdmin, nonAdminAllowSett
         text: "`/nt help` or `DIRECT MESSAGE the app above 👆` for FAQs & How-to's"
       }
     }
-  );
-
-  return home;
+  ]
 }
 
 export default buildHomeView;

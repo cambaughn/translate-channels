@@ -71,7 +71,7 @@ const homeView = ({ authUser, authUrl, settings, isAdminUser, nonAdminAllowSetti
               type: 'plain_text',
               text: 'Edit'
             },
-            action_id: 'edit_setting_modal_open',
+            action_id: 'open_settings_modal',
             value: JSON.stringify({ id: setting.id, lang: setting.languages })
           };
         }
@@ -94,7 +94,7 @@ const homeView = ({ authUser, authUrl, settings, isAdminUser, nonAdminAllowSetti
             type: 'plain_text',
             text: 'Edit'
           },
-          action_id: 'edit_setting_modal_open',
+          action_id: 'open_settings_modal',
           value: JSON.stringify({ id: setting.id, lang: setting.languages })
         };
       }
@@ -115,7 +115,7 @@ const homeView = ({ authUser, authUrl, settings, isAdminUser, nonAdminAllowSetti
               type: 'plain_text',
               text: 'Add Setting'
             },
-            action_id: 'edit_setting_modal_open',
+            action_id: 'open_settings_modal',
             value: JSON.stringify({ id: 'none', lang: [] })
           }
         });

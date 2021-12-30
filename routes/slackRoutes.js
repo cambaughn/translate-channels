@@ -1,7 +1,10 @@
-import { updateMessage } from '../util/slackHelpers.js';
+import { updateMessage } from '../util/slack/slackHelpers.js';
 import userDB from '../util/firebaseAPI/users.js';
-import buildHomeView from '../util/slack/home.js';
+import buildHomeView from '../views/home.js';
+import buildSettingsModal from '../views/settingsModal.js';
 import { isAdmin } from '../util/slack/slackUser.js';
+import { getInfoForChannels } from '../util/slack/slackHelpers.js';
+
 
 const slackRoutes = (app) => {
 
@@ -22,11 +25,50 @@ const slackRoutes = (app) => {
   // Similar to the way it was done in v1 of the app
   // Should be able to put a block in a message to the user when they are posting in a channel and haven't given their permission yet
   app.action('authorize_app', async ({ ack, context, action }) => {
+    // We just need ack() here to respond to the action, even though we're redirecting to a url
     ack();
-
-    console.log('respond to action ');
-
   })
+
+
+  app.action('settings_modal_opened', async ({ ack, action, body, context }) => {
+    await ack();
+    const homeViewId = body.container.view_id;
+    // await dbConnector.saveHomeViewId(context.teamId, homeViewId);
+    const settingsModal = await buildSettingsModal(action.value);
+    try {
+      // Opens the modal itself
+      await app.client.views.open({
+        token: context.botToken,
+        trigger_id: body.trigger_id,
+        view: settingsModal
+      });
+    } catch (error) {
+      console.error(error);
+    }
+  });
+
+
+  app.view('settings_modal_submitted', async ({ ack, view, context, body, client }) => {
+    await ack();
+    const settingsModal = view.state.values;
+    const languages = settingsModal.select_lang_block.select_lang.selected_options.map(x => x.value);
+    const channelIds = settingsModal.select_channel_block.select_channel.selected_channels;
+    const channels = await getInfoForChannels(channelIds, client, context);
+    console.log('channels ', channels);
+    // await dbConnector.updateSettings(channels, languages, context);
+    // const user = body.user.id;
+    // const homeView = await buildHomeView(context, user, client);
+    // const homeViewId = await dbConnector.getHomeViewId(context.teamId);
+    // try {
+    //   await slackApp.client.views.update({
+    //     token: context.botToken,
+    //     view: homeView,
+    //     view_id: homeViewId
+    //   });
+    // } catch (error) {
+    //   console.error(error);
+    // }
+  });
 
 
   app.event('app_home_opened', async ({ event, client, context }) => {

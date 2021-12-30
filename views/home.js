@@ -1,5 +1,5 @@
-import teamsDB from "../firebaseAPI/teams.js";
-import { getSettingsString } from '../languages/languageHelpers.js';
+import teamsDB from "../util/firebaseAPI/teams.js";
+import { getSettingsString } from '../util/languages/languageHelpers.js';
 
 const buildHomeView = async (event, redirect_url, userIsAdmin, nonAdminAllowSettings) => {
   let auth_url = `https://slack.com/oauth/v2/authorize?user_scope=channels:history,chat:write&client_id=${process.env.CLIENT_ID}&redirect_uri=${redirect_url}`;
@@ -100,7 +100,7 @@ const buildHomeView = async (event, redirect_url, userIsAdmin, nonAdminAllowSett
             type: 'plain_text',
             text: 'Edit'
           },
-          action_id: 'edit_setting_modal_open',
+          action_id: 'settings_modal_opened',
           value: JSON.stringify({ id: setting.id, lang: setting.languages })
         };
       }
@@ -131,7 +131,7 @@ const buildHomeView = async (event, redirect_url, userIsAdmin, nonAdminAllowSett
           type: 'plain_text',
           text: 'Edit'
         },
-        action_id: 'edit_setting_modal_open',
+        action_id: 'settings_modal_opened',
         value: JSON.stringify({ id: setting.id, lang: setting.languages })
       };
     }
@@ -144,7 +144,7 @@ const buildHomeView = async (event, redirect_url, userIsAdmin, nonAdminAllowSett
         type: 'section',
         text: {
           type: 'mrkdwn',
-          text: 'You can add translation settings for any channel'
+          text: 'You can add translation settings for any channel :point_right:'
         },
         accessory: {
           type: 'button',
@@ -153,7 +153,7 @@ const buildHomeView = async (event, redirect_url, userIsAdmin, nonAdminAllowSett
             type: 'plain_text',
             text: 'Add Setting'
           },
-          action_id: 'edit_setting_modal_open',
+          action_id: 'settings_modal_opened',
           value: JSON.stringify({ id: 'none', lang: [] })
         }
       });

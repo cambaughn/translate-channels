@@ -31,7 +31,12 @@ const buildSettingsModal = (valueString) => {
         element: {
           type: 'multi_channels_select',
           action_id: 'select_channel',
-          initial_channels: []
+          initial_channels: [],
+          placeholder: {
+            type: 'plain_text',
+            text: 'Select channels',
+            emoji: true
+          },
         }
       },
       { type: 'divider' },
@@ -48,7 +53,7 @@ const buildSettingsModal = (valueString) => {
           max_selected_items: 7,
           placeholder: {
             type: 'plain_text',
-            text: 'Select from 70+ languages',
+            text: 'Select languages',
             emoji: true
           },
           options: []

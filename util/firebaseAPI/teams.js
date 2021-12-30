@@ -37,6 +37,24 @@ teamsDB.deleteTeam = async (id) => {
 }
 
 
+// Update team's language settings
+teamsDB.updateSettings = async (channels, languages, context) => {
+  const action = languages.includes('none') ? 'delete' : 'update';
+
+  console.log('action ', action);
+  // TODO: Go through each of these options and figure out exactly what they're doing - then implement updaters in Firebase
+  // if (channels.length > 0) {
+  //   // Channel settings
+  //   if (action === 'delete') { for (const channel of channels) { await this.deleteChannelSettings(channel, context); } }
+  //   if (action === 'update/create') { for (const channel of channels) { await this.changeChannelSettings(channel, languages, context); } }
+  // } else {
+  //   // workspace settings
+  //   if (action === 'delete') { await this.disableWorkspaceTranslation(context); }
+  //   if (action === 'update/create') {await this.changeWorkspaceSettings(languages, context); }
+  // }
+}
+
+
 // Helpers
 const teamsDoc = (id) => {
   return doc(db, 'teams', id);

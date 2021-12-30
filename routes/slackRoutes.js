@@ -4,6 +4,7 @@ import buildHomeView from '../views/home.js';
 import buildSettingsModal from '../views/settingsModal.js';
 import { isAdmin } from '../util/slack/slackUser.js';
 import { getInfoForChannels } from '../util/slack/slackHelpers.js';
+import teamsDB from '../util/firebaseAPI/teams.js';
 
 
 const slackRoutes = (app) => {
@@ -55,7 +56,8 @@ const slackRoutes = (app) => {
     const channelIds = settingsModal.select_channel_block.select_channel.selected_channels;
     const channels = await getInfoForChannels(channelIds, client, context);
     console.log('channels ', channels);
-    // await dbConnector.updateSettings(channels, languages, context);
+    console.log('languages ', languages);
+    await teamsDB.updateSettings(channels, languages, context);
     // const user = body.user.id;
     // const homeView = await buildHomeView(context, user, client);
     // const homeViewId = await dbConnector.getHomeViewId(context.teamId);

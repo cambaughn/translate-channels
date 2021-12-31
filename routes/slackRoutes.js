@@ -35,6 +35,7 @@ const slackRoutes = (app) => {
     await ack();
     const homeViewId = body.container.view_id;
     // await dbConnector.saveHomeViewId(context.teamId, homeViewId);
+    console.log('action ', action.value);
     const settingsModal = await buildSettingsModal(action.value);
     try {
       // Opens the modal itself
@@ -55,8 +56,7 @@ const slackRoutes = (app) => {
     const languages = settingsModal.select_lang_block.select_lang.selected_options.map(x => x.value);
     const channelIds = settingsModal.select_channel_block.select_channel.selected_channels;
     const channels = await getInfoForChannels(channelIds, client, context);
-    console.log('channels ', channels);
-    console.log('languages ', languages);
+
     await teamsDB.updateLanguageSettings(channels, languages, context.teamId);
     // const user = body.user.id;
     // const homeView = await buildHomeView(context, user, client);

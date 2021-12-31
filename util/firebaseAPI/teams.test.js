@@ -1,4 +1,4 @@
-import teamsDB from './teams.js';
+import teamsDB, { mergeSettings } from './teams.js';
 
 describe.skip('Read and update teams collection in firebase', () => {
   
@@ -19,4 +19,56 @@ describe.skip('Read and update teams collection in firebase', () => {
     expect(team.name).toBeUndefined();
   });
 
+})
+
+
+describe('Teams firebase helper functions', () => {
+  test('Can merge channel language settings', () => {
+    let existing = [
+      {
+        name: 'random',
+        id: '123',
+        languages: [ 'en' ]
+      },
+      {
+        name: 'general',
+        id: 'abc',
+        languages: [ 'ja' ]
+      }
+    ]
+
+    let updates = [
+      {
+        name: 'random',
+        id: '123',
+        languages: [ 'en', 'ja' ]
+      },
+      {
+        name: 'faq',
+        id: 'xyz',
+        languages: [ 'es', 'ja' ]
+      }
+    ]
+
+    let result = [
+      {
+        name: 'random',
+        id: '123',
+        languages: [ 'en', 'ja' ]
+      },
+      {
+        name: 'general',
+        id: 'abc',
+        languages: [ 'ja' ]
+      },
+      {
+        name: 'faq',
+        id: 'xyz',
+        languages: [ 'es', 'ja' ]
+      }
+    ]
+
+    expect(mergeSettings(existing, updates)).toEqual(result);
+
+  })
 })

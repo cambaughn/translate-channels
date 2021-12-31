@@ -49,7 +49,18 @@ teamsDB.updateLanguageSettings = async (channels, languages, teamId) => {
   if (channels.length > 0) { // Channel
     // Get team so we can update only the necessary objects in the channel_language_settings array
     const team = await teamsDB.getTeam(teamId);
-    // return Promise.all(channels.map(channel => ))
+    const updatedChannels = channels.map(channel => {
+      return {
+        id: channel.id,
+        name: channel.name,
+        languages
+      }
+    })
+
+    const updatedSettings = mergeSettings(team.channel_language_settings, updatedChannels);
+    console.log('updates ', updatedSettings);
+
+    return teamsDB.updateTeam(teamId, { channel_language_settings: updatedSettings });
   } else { // Workspace as a whole
     return teamsDB.updateTeam(teamId, { workspace_languages: languages });
   }
@@ -61,4 +72,29 @@ const teamsDoc = (id) => {
   return doc(db, 'teams', id);
 }
 
+
+const mergeSettings = (existing, updates) => {
+  const settingsLookup = {};
+  const ids = [];
+  // For each existing setting, add it to the lookup object and push it's id to the ids array (to keep correct order)
+  existing.forEach(setting => {
+    settingsLookup[setting.id] = setting;
+    ids.push(setting.id);
+  })
+
+  // For each update
+  updates.forEach(setting => {
+    // Only add it to the ids array if it didn't already exist (we don't want duplicates)
+    if (!settingsLookup[setting.id]) {
+      ids.push(setting.id);
+    }
+    // Then, update the entry in the settingsLookup
+    settingsLookup[setting.id] = setting;
+  })
+
+  // Return the settings mapped to the correct position in the ids array
+  return ids.map(id => settingsLookup[id]);
+}
+
+export { mergeSettings };
 export default teamsDB;

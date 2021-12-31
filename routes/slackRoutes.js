@@ -57,7 +57,7 @@ const slackRoutes = (app) => {
     const channels = await getInfoForChannels(channelIds, client, context);
     console.log('channels ', channels);
     console.log('languages ', languages);
-    await teamsDB.updateSettings(channels, languages, context);
+    await teamsDB.updateLanguageSettings(channels, languages, context.teamId);
     // const user = body.user.id;
     // const homeView = await buildHomeView(context, user, client);
     // const homeViewId = await dbConnector.getHomeViewId(context.teamId);

@@ -38,20 +38,21 @@ teamsDB.deleteTeam = async (id) => {
 
 
 // Update team's language settings
-teamsDB.updateSettings = async (channels, languages, context) => {
-  const action = languages.includes('none') ? 'delete' : 'update';
+teamsDB.updateLanguageSettings = async (channels, languages, teamId) => {
+  const do_not_translate = languages.includes('do_not_translate');
+  if (do_not_translate) {
+    // set languages array to be empty
+    languages = [];
+  }
 
-  console.log('action ', action);
-  // TODO: Go through each of these options and figure out exactly what they're doing - then implement updaters in Firebase
-  // if (channels.length > 0) {
-  //   // Channel settings
-  //   if (action === 'delete') { for (const channel of channels) { await this.deleteChannelSettings(channel, context); } }
-  //   if (action === 'update/create') { for (const channel of channels) { await this.changeChannelSettings(channel, languages, context); } }
-  // } else {
-  //   // workspace settings
-  //   if (action === 'delete') { await this.disableWorkspaceTranslation(context); }
-  //   if (action === 'update/create') {await this.changeWorkspaceSettings(languages, context); }
-  // }
+  // Then, depending on whether it's a bunch of channels or the workspace, we update the correct language array
+  if (channels.length > 0) { // Channel
+    // Get team so we can update only the necessary objects in the channel_language_settings array
+    const team = await teamsDB.getTeam(teamId);
+    // return Promise.all(channels.map(channel => ))
+  } else { // Workspace as a whole
+    return teamsDB.updateTeam(teamId, { workspace_languages: languages });
+  }
 }
 
 

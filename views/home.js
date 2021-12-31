@@ -114,7 +114,7 @@ const buildHomeView = async (event, redirect_url, userIsAdmin, nonAdminAllowSett
     let lastLanguage = languages.pop();
     // Format the full string correctly
     // Need trailing space for Slack to render flag emoji properly
-    let languagesString = `${languages.join(', ')}${languages.length > 1 ? ',' : ''} & ${lastLanguage} `;
+    let languagesString = languages.length > 0 ? `${languages.join(', ')}${languages.length > 1 ? ',' : ''} & ${lastLanguage} ` : `${lastLanguage} `;
 
     const settingsBlock = {
       type: 'section',

@@ -69,7 +69,7 @@ const buildSettingsModal = (valueString) => {
       text: '(Do Not Translate)',
       emoji: true
     },
-    value: 'none'
+    value: 'do_not_translate'
   });
   if (preselectedChannel.length > 0) {
     modal.blocks[0].element.initial_channels = preselectedChannel;

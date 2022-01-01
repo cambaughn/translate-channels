@@ -22,9 +22,7 @@ const slackRoutes = (app) => {
     }
   })
 
-  // NOTE: Won't be able to authorize app this way, need to do auth via Oauth https://api.slack.com/authentication/oauth-v2
-  // Similar to the way it was done in v1 of the app
-  // Should be able to put a block in a message to the user when they are posting in a channel and haven't given their permission yet
+  // This action only needs to acknowledge the button click - auth is otherwise handled with oAuth redirect url
   app.action('authorize_app', async ({ ack, context, action }) => {
     // We just need ack() here to respond to the action, even though we're redirecting to a url
     ack();

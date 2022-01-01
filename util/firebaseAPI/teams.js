@@ -74,26 +74,12 @@ const teamsDoc = (id) => {
 
 
 const mergeSettings = (existing, updates) => {
-  const settingsLookup = {};
-  const ids = [];
-  // For each existing setting, add it to the lookup object and push it's id to the ids array (to keep correct order)
-  existing.forEach(setting => {
-    settingsLookup[setting.id] = setting;
-    ids.push(setting.id);
-  })
+  let updatedSettings = { ...existing };
+  for (let key in updates) {
+    updatedSettings[key] = updates[key];
+  }
 
-  // For each update
-  updates.forEach(setting => {
-    // Only add it to the ids array if it didn't already exist (we don't want duplicates)
-    if (!settingsLookup[setting.id]) {
-      ids.push(setting.id);
-    }
-    // Then, update the entry in the settingsLookup
-    settingsLookup[setting.id] = setting;
-  })
-
-  // Return the settings mapped to the correct position in the ids array
-  return ids.map(id => settingsLookup[id]);
+  return updatedSettings;
 }
 
 export { mergeSettings };

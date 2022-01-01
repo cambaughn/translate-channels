@@ -24,49 +24,49 @@ describe.skip('Read and update teams collection in firebase', () => {
 
 describe('Teams firebase helper functions', () => {
   test('Can merge channel language settings', () => {
-    let existing = [
-      {
+    let existing = {
+      '123': {
         name: 'random',
         id: '123',
         languages: [ 'en' ]
       },
-      {
+      'abc': {
         name: 'general',
         id: 'abc',
         languages: [ 'ja' ]
       }
-    ]
+    }
 
-    let updates = [
-      {
+    let updates = {
+      '123': {
         name: 'random',
         id: '123',
         languages: [ 'en', 'ja' ]
       },
-      {
+      'xyz': {
         name: 'faq',
         id: 'xyz',
         languages: [ 'es', 'ja' ]
       }
-    ]
+    }
 
-    let result = [
-      {
+    let result = {
+      '123': {
         name: 'random',
         id: '123',
         languages: [ 'en', 'ja' ]
       },
-      {
+      'abc': {
         name: 'general',
         id: 'abc',
         languages: [ 'ja' ]
       },
-      {
+      'xyz': {
         name: 'faq',
         id: 'xyz',
         languages: [ 'es', 'ja' ]
       }
-    ]
+    }
 
     expect(mergeSettings(existing, updates)).toEqual(result);
 

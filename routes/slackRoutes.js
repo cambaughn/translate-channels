@@ -1,26 +1,55 @@
 import { updateMessage } from '../util/slack/slackHelpers.js';
-import userDB from '../util/firebaseAPI/users.js';
 import buildHomeView from '../views/home.js';
 import buildSettingsModal from '../views/settingsModal.js';
 import { isAdmin } from '../util/slack/slackUser.js';
 import { getInfoForChannels } from '../util/slack/slackHelpers.js';
+// Firebase API
 import teamsDB from '../util/firebaseAPI/teams.js';
+import userDB from '../util/firebaseAPI/users.js';
 
 
 const slackRoutes = (app) => {
 
+  // app.event('message', async ({ message, context, client }) => {
+  //   // console.log('message received: ', message, context);
+  //   // Get user from database so we can check if they have a valid token
+  //   let user = await userDB.getUser(message.user);
+
+  //   if (user.access_token) {
+  //     console.log('message ', message);
+  //     updateMessage(message, 'Cool', user.access_token, client);
+  //   } else { // TODO: No access token available, should send a message with a button to approve translations - only if this is a channel with TC set up AND this is the user's first time encountering Translate Channels - no document in database
+
+  //   }
+  // })
+
   app.event('message', async ({ message, context, client }) => {
-    // console.log('message received: ', message, context);
-    // Get user from database so we can check if they have a valid token
-    let user = await userDB.getUser(message.user);
+    console.log('receiving message to app ', message);
+    // if the message comes from a bot OR the message has been edited manually, don't translate
+    if (message.bot_id || message.subtype === 'message_changed') { 
+      return null; 
+    } 
+    // TODO: re-enable the provide help functionality (along with slash command /nt)
+    // if (message.channel_type === 'im') { await provideHelp(context.botToken, message.channel, client); return null; }
+    const teamInfo = await teamsDB.getTeam(context.teamId);
+    const user = await userDB.getUser(message.user);
+    const token = user.access_token;
+    console.log('got token :', token);
+    if (!token) { return null; }
 
-    if (user.access_token) {
-      console.log('message ', message);
-      updateMessage(message, 'Cool', user.access_token, client);
-    } else { // TODO: No access token available, should send a message with a button to approve translations - only if this is a channel with TC set up AND this is the user's first time encountering Translate Channels - no document in database
+    // TODO: Implement Stripe connection to check subscription status - will involve more work - currently getting translation working without subscription
+    // const allowanceStatus = await dbConnector.planAllowanceExceeded(context.teamId, workspaceData);
+    // const allowanceStatusResponse = `${message.text}\n\n\n:earth_africa: _Sorry, you've reached your ${allowanceStatus.reason} limit. Please upgrade your plan._`;
+    // if (allowanceStatus.exceeded) { respond(message, allowanceStatusResponse, token); return null; }
 
-    }
-  })
+    const requiredLanguages = await dbConnector.getSettings(context.teamId, message.channel, workspaceData);
+    const translator = new translationEngine.Translator(message, requiredLanguages);
+    const translation = await translator.getTranslatedData();
+    if (!translation) { return null; }
+    if (allowanceStatus.msg) { translation.response += allowanceStatus.msg }
+    dbConnector.saveTranslation(context.teamId, message.ts, message.channel, translation.targetLanguages, translation.inputLanguage, translation.characterCount);
+    respond(message, translation.response, token, client);
+  });
 
   // This action only needs to acknowledge the button click - auth is otherwise handled with oAuth redirect url
   app.action('authorize_app', async ({ ack, context, action }) => {

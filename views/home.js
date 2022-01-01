@@ -77,7 +77,8 @@ const buildHomeView = async (event, redirect_url, userIsAdmin, nonAdminAllowSett
   ];
 
   // Go through the custom settings defined for each channel and push those to the settings array
-  for (const channelSetting of team.channel_language_settings) {
+  for (const key in team.channel_language_settings) {
+    let channelSetting = team.channel_language_settings[key];
     settings.push(
       { name: channelSetting.name, id: channelSetting.id, languages: channelSetting.languages }
     );

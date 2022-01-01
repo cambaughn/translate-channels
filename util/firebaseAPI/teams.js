@@ -49,8 +49,10 @@ teamsDB.updateLanguageSettings = async (channels, languages, teamId) => {
   if (channels.length > 0) { // Channel
     // Get team so we can update only the necessary objects in the channel_language_settings array
     const team = await teamsDB.getTeam(teamId);
-    const updatedChannels = channels.map(channel => {
-      return {
+    let updatedChannels = {};
+
+    channels.forEach(channel => {
+      updatedChannels[channel.id] = {
         id: channel.id,
         name: channel.name,
         languages

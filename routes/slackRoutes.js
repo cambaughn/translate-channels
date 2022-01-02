@@ -6,6 +6,8 @@ import { getInfoForChannels } from '../util/slack/slackHelpers.js';
 // Firebase API
 import teamsDB from '../util/firebaseAPI/teams.js';
 import userDB from '../util/firebaseAPI/users.js';
+// Translation
+import { getTranslations } from '../util/languages/translate.js';
 
 
 const slackRoutes = (app) => {
@@ -24,7 +26,6 @@ const slackRoutes = (app) => {
   // })
 
   app.event('message', async ({ message, context, client }) => {
-    console.log('receiving message to app ', message);
     // if the message comes from a bot OR the message has been edited manually, don't translate
     if (message.bot_id || message.subtype === 'message_changed') { 
       return null; 
@@ -34,7 +35,6 @@ const slackRoutes = (app) => {
     const teamInfo = await teamsDB.getTeam(context.teamId);
     const user = await userDB.getUser(message.user);
     const token = user.access_token;
-    console.log('got token :', token);
     if (!token) { return null; }
 
     // TODO: Implement Stripe connection to check subscription status - will involve more work - currently getting translation working without subscription
@@ -42,13 +42,18 @@ const slackRoutes = (app) => {
     // const allowanceStatusResponse = `${message.text}\n\n\n:earth_africa: _Sorry, you've reached your ${allowanceStatus.reason} limit. Please upgrade your plan._`;
     // if (allowanceStatus.exceeded) { respond(message, allowanceStatusResponse, token); return null; }
 
-    const requiredLanguages = await dbConnector.getSettings(context.teamId, message.channel, workspaceData);
-    const translator = new translationEngine.Translator(message, requiredLanguages);
-    const translation = await translator.getTranslatedData();
+    // Determine which languages we need for this channel
+    // If the channel has languages set, use those
+    const channelLanguages = teamInfo.channel_language_settings[message.channel]?.languages || [];
+    // Otherwise, use the workspace languages
+    const workspaceLanguages = teamInfo.workspace_languages || [];
+    const requiredLanguages = channelLanguages.length > 0 ? channelLanguages : workspaceLanguages;
+    // TODO: implement the translator
+    const translation = await getTranslations(message, requiredLanguages);
     if (!translation) { return null; }
-    if (allowanceStatus.msg) { translation.response += allowanceStatus.msg }
-    dbConnector.saveTranslation(context.teamId, message.ts, message.channel, translation.targetLanguages, translation.inputLanguage, translation.characterCount);
-    respond(message, translation.response, token, client);
+    // if (allowanceStatus.msg) { translation.response += allowanceStatus.msg }
+    // dbConnector.saveTranslation(context.teamId, message.ts, message.channel, translation.targetLanguages, translation.inputLanguage, translation.characterCount);
+    updateMessage(message, translation, token, client);
   });
 
   // This action only needs to acknowledge the button click - auth is otherwise handled with oAuth redirect url
@@ -62,7 +67,6 @@ const slackRoutes = (app) => {
     await ack();
     const homeViewId = body.container.view_id;
     // await dbConnector.saveHomeViewId(context.teamId, homeViewId);
-    console.log('action ', action.value);
     const settingsModal = await buildSettingsModal(action.value);
     try {
       // Opens the modal itself
@@ -102,10 +106,8 @@ const slackRoutes = (app) => {
 
   app.event('app_home_opened', async ({ event, client, context }) => {
     try {
-      console.log('opening app home ');
       let redirect_url = process.env.REDIRECT_URL || 'https://app.translatechannels.com/auth_redirect';
       let isSlackAdmin = await isAdmin(event.user, context.botToken, client);
-      console.log('is slack admin ', isSlackAdmin);
       /* view.publish is the method that your app uses to push a view to the Home tab */
       let homeView = await buildHomeView(event, redirect_url, isSlackAdmin);
       const result = await client.views.publish(homeView);

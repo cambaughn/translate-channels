@@ -5,6 +5,7 @@ const { Translate } = GoogleTranslate.v2;
 import stringOperator from './stringHelpers.js';
 const translate = new Translate({projectId: 'slack-app-1590561953103', key: 'AIzaSyDMBqVhH_5u-jpMpMDWCoKjbf_EwoQl8yQ'});
 
+// NOTE: Translator doesn't handle italics - leaves untranslated. It does handle bolding, which is odd. Probably don't need to handle unless users complain.
 class Translator {
   constructor (slackMessage, targetLanguagesArray) {
     // slackMessage should be full message object, not message.text
@@ -53,12 +54,13 @@ class Translator {
 
   constructTextOutput () {
     this.response = '';
+    // Need to place 
     Object.keys(this.translations).forEach(language => {
       const slackHeading = languageOperations.getSlackHeading(language);
       const rebuiltText = this.stringOperator.rebuildString(this.translations[language]);
-      const source = (language === this.inputLanguage) ? ' *' : '';
-      this.response += `${slackHeading + source} > ${rebuiltText}`;
-      const divider = '\n\n\n';
+      const source = (language === this.inputLanguage) ? ' >' : '';
+      this.response += `${slackHeading + source} ${rebuiltText}`;
+      const divider = '\n\n';
       this.response += divider;
     });
   }
@@ -72,7 +74,6 @@ class Translator {
     this.translatableString = this.stringOperator.getTranslateString();
     if (this.translatableString == null) { return undefinedResponse; }
     this.inputLanguage = await this.detectInputLanguage();
-    console.log('testing =========== ');    
     if (this.inputLanguage === 'und') { return undefinedResponse; }
     this.prepareTranslations();
     const toBeTranslated = this.textsToBeTranslated();

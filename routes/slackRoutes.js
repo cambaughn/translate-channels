@@ -7,7 +7,8 @@ import { getInfoForChannels } from '../util/slack/slackHelpers.js';
 import teamsDB from '../util/firebaseAPI/teams.js';
 import userDB from '../util/firebaseAPI/users.js';
 // Translation
-import { getTranslations } from '../util/languages/translate.js';
+import { getTranslations } from '../util/languages/translatev2.js';
+import Translator from '../util/languages/translate.js';
 
 
 const slackRoutes = (app) => {
@@ -49,8 +50,15 @@ const slackRoutes = (app) => {
     const workspaceLanguages = teamInfo.workspace_languages || [];
     const requiredLanguages = channelLanguages.length > 0 ? channelLanguages : workspaceLanguages;
     // TODO: implement the translator
-    const translation = await getTranslations(message, requiredLanguages);
+    const translator = new Translator(message, requiredLanguages);
+    const translation = await translator.getTranslatedData();
+    console.log('translation -> ', translation);
     if (!translation) { return null; }
+
+    // V2 translator
+    // const translation = await getTranslations(message, requiredLanguages);
+    // if (!translation) { return null; }
+
     // if (allowanceStatus.msg) { translation.response += allowanceStatus.msg }
     // dbConnector.saveTranslation(context.teamId, message.ts, message.channel, translation.targetLanguages, translation.inputLanguage, translation.characterCount);
     updateMessage(message, translation, token, client);

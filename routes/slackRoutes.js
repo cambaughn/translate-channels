@@ -61,7 +61,7 @@ const slackRoutes = (app) => {
 
     // if (allowanceStatus.msg) { translation.response += allowanceStatus.msg }
     // dbConnector.saveTranslation(context.teamId, message.ts, message.channel, translation.targetLanguages, translation.inputLanguage, translation.characterCount);
-    updateMessage(message, translation, token, client);
+    updateMessage(message, translation.response, token, client);
   });
 
   // This action only needs to acknowledge the button click - auth is otherwise handled with oAuth redirect url

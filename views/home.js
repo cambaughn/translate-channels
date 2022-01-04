@@ -1,21 +1,20 @@
 import teamsDB from "../util/firebaseAPI/teams.js";
 import { getSettingsString } from '../util/languages/languageHelpers.js';
 
-const buildHomeView = async (event, redirect_url, userIsAdmin, nonAdminAllowSettings) => {
+const buildHomeView = async (userId, teamId, redirect_url, userIsAdmin, nonAdminAllowSettings) => {
   let auth_url = `https://slack.com/oauth/v2/authorize?user_scope=channels:history,chat:write&client_id=${process.env.CLIENT_ID}&redirect_uri=${redirect_url}`;
   // console.log('event ', event);
   
-  let team_id = event.view.team_id;
-  let team = await teamsDB.getTeam(team_id);
-  if (!team.slack_team_id && team_id) { // if the team doesn't exist yet, we need to create it
-    await teamsDB.createNew(team_id);
-    team = await teamsDB.getTeam(team_id);
+  let team = await teamsDB.getTeam(teamId);
+  if (!team.slack_team_id && teamId) { // if the team doesn't exist yet, we need to create it
+    await teamsDB.createNew(teamId);
+    team = await teamsDB.getTeam(teamId);
   }
 
 
   let home = {
     /* the user that opened your app's app home */
-    user_id: event.user,
+    user_id: userId,
 
     /* the view object that appears in the app home*/
     view: {

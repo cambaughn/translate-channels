@@ -96,9 +96,12 @@ const slackRoutes = (app) => {
     const channelIds = settingsModal.select_channel_block.select_channel.selected_channels;
     const channels = await getInfoForChannels(channelIds, client, context);
 
-    await teamsDB.updateLanguageSettings(channels, languages, context.teamId);
-    // const user = body.user.id;
-    // const homeView = await buildHomeView(context, user, client);
+    const teamId = context.teamId;
+    const userId = body.user.id;
+    // await teamsDB.updateLanguageSettings(channels, languages, context.teamId);
+    let isSlackAdmin = await isAdmin(userId, context.botToken, client);
+    let redirect_url = process.env.REDIRECT_URL || 'https://app.translatechannels.com/auth_redirect';
+    let homeView = await buildHomeView(userId, teamId, redirect_url, isSlackAdmin);
     // const homeViewId = await dbConnector.getHomeViewId(context.teamId);
     // try {
     //   await slackApp.client.views.update({
@@ -114,10 +117,12 @@ const slackRoutes = (app) => {
 
   app.event('app_home_opened', async ({ event, client, context }) => {
     try {
-      let redirect_url = process.env.REDIRECT_URL || 'https://app.translatechannels.com/auth_redirect';
       let isSlackAdmin = await isAdmin(event.user, context.botToken, client);
+      let redirect_url = process.env.REDIRECT_URL || 'https://app.translatechannels.com/auth_redirect';
       /* view.publish is the method that your app uses to push a view to the Home tab */
-      let homeView = await buildHomeView(event, redirect_url, isSlackAdmin);
+      let teamId = event.view.team_id;
+      let userId = event.user;
+      let homeView = await buildHomeView(userId, teamId, redirect_url, isSlackAdmin);
       const result = await client.views.publish(homeView);
     }
     catch (error) {

@@ -66,7 +66,7 @@ const buildSettingsModal = (valueString) => {
   selectableLanguages.unshift({
     text: {
       type: 'plain_text',
-      text: '(Do Not Translate)',
+      text: '(No translation)',
       emoji: true
     },
     value: 'do_not_translate'

@@ -31,30 +31,37 @@ const buildHomeView = async (userId, teamId, redirect_url, userIsAdmin, nonAdmin
         },
         {
           "type": "divider"
-        },
-        {
-          "type": "section",
-          "text": {
-            "type": "mrkdwn",
-            "text": "Authorize the app to update your messages with translations :point_right: \n _(Each user must do this to enable automatic translation)_"
-          },
-          accessory: {
-            type: "button",
-            action_id: "authorize_app",
-            text: {
-              type: "plain_text",
-              text: "Authorize App"
-            },
-            url: auth_url
-          }
-        },
-        {
-          "type": "divider"
         }
       ]
     }
   }
   // TODO: Need to conditionally render the AUTH button depending on whether user has authorized yet or not
+  const authBlock = [
+    {
+      "type": "section",
+      "text": {
+        "type": "mrkdwn",
+        "text": "Authorize the app to update your messages with translations :point_right: \n _(Each user must do this to enable automatic translation)_"
+      },
+      accessory: {
+        type: "button",
+        action_id: "authorize_app",
+        text: {
+          type: "plain_text",
+          text: "Authorize App"
+        },
+        url: auth_url
+      }
+    },
+
+  ];
+
+  home.view.blocks.push(
+    ...authBlock,     
+    {
+      "type": "divider"
+    }
+  )
 
   // Channel Translation Settings
   home.view.blocks.push({
@@ -77,9 +84,11 @@ const buildHomeView = async (userId, teamId, redirect_url, userIsAdmin, nonAdmin
   // Go through the custom settings defined for each channel and push those to the settings array
   for (const key in team.channel_language_settings) {
     let channelSetting = team.channel_language_settings[key];
-    settings.push(
-      { name: channelSetting.name, id: channelSetting.id, languages: channelSetting.languages }
-    );
+    if (channelSetting.languages?.length > 0) {
+      settings.push(
+        { name: channelSetting.name, id: channelSetting.id, languages: channelSetting.languages }
+      );
+    }
   }
 
   // Sort channels alphabetically
@@ -102,7 +111,7 @@ const buildHomeView = async (userId, teamId, redirect_url, userIsAdmin, nonAdmin
         type: 'section',
         text: {
           type: 'mrkdwn',
-          text: `\`${setting.name}\` Do not translate`
+          text: `\`${setting.name}\` No translation set`
         }
       };
       if (userIsAdmin || nonAdminAllowSettings) {

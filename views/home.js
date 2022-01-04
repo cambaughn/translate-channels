@@ -1,4 +1,5 @@
 import teamsDB from "../util/firebaseAPI/teams.js";
+import userDB from "../util/firebaseAPI/users.js";
 import { getSettingsString } from '../util/languages/languageHelpers.js';
 
 const buildHomeView = async (userId, teamId, redirect_url, userIsAdmin, nonAdminAllowSettings) => {
@@ -6,6 +7,7 @@ const buildHomeView = async (userId, teamId, redirect_url, userIsAdmin, nonAdmin
   // console.log('event ', event);
   
   let team = await teamsDB.getTeam(teamId);
+  let user = await userDB.getUser(userId);
   if (!team.slack_team_id && teamId) { // if the team doesn't exist yet, we need to create it
     await teamsDB.createNew(teamId);
     team = await teamsDB.getTeam(teamId);
@@ -35,29 +37,32 @@ const buildHomeView = async (userId, teamId, redirect_url, userIsAdmin, nonAdmin
       ]
     }
   }
-  // TODO: Need to conditionally render the AUTH button depending on whether user has authorized yet or not
-  const authBlock = [
-    {
-      "type": "section",
-      "text": {
-        "type": "mrkdwn",
-        "text": "Authorize the app to update your messages with translations :point_right: \n _(Each user must do this to enable automatic translation)_"
-      },
-      accessory: {
-        type: "button",
-        action_id: "authorize_app",
-        text: {
-          type: "plain_text",
-          text: "Authorize App"
-        },
-        url: auth_url
-      }
-    },
 
-  ];
+  const userAuthenticated = !!user && !!user.access_token;
+  // TODO: Need to conditionally render the AUTH button depending on whether user has authorized yet or not
+  const authBlock = {
+    "type": "section",
+    "text": {
+      "type": "mrkdwn",
+      "text": userAuthenticated ? "You've authenticated the app :thumbsup: " : "Authorize the app to update your messages with translations :point_right: \n _(Each user must do this to enable automatic translation)_"
+    }
+  }
+
+  if (!user || !user.access_token) {
+    authBlock.accessory = {
+      type: "button",
+      action_id: "authorize_app",
+      text: {
+        type: "plain_text",
+        text: "Authorize App"
+      },
+      url: auth_url
+    }
+  }
+
 
   home.view.blocks.push(
-    ...authBlock,     
+    authBlock,
     {
       "type": "divider"
     }

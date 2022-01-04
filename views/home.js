@@ -65,24 +65,35 @@ const buildHomeView = async (userId, teamId, redirect_url, userIsAdmin, nonAdmin
     }
   });
 
+  // Overall workspace settings that apply to every channel - holding it here until after sorting the channel settings alphabetically
+  let everyChannel = {
+    name: 'every_channel', 
+    id: 'any_channel', 
+    languages: team?.workspace_languages || []
+  }
 
-  const settings = [
-    // Set overall workspace settings that apply to every channel
-    {
-      name: 'every_channel', 
-      id: 'any_channel', 
-      languages: team?.workspace_languages || []
-    }
-  ];
+  let settings = [];
 
   // Go through the custom settings defined for each channel and push those to the settings array
   for (const key in team.channel_language_settings) {
-    // TODO: Sort channels alphabetically by name
     let channelSetting = team.channel_language_settings[key];
     settings.push(
       { name: channelSetting.name, id: channelSetting.id, languages: channelSetting.languages }
     );
   }
+
+  // Sort channels alphabetically
+  settings = settings.sort((a, b) => {
+    if (a.name < b.name) {
+      return -1;
+    } else if (a.name > b.name) {
+      return 1;
+    } else {
+      return 0;
+    }
+  })
+
+  settings.unshift(everyChannel);
 
   for (const setting of settings) {
     // the languages length of 0 should be only possible for workspace settings which must exist by schema

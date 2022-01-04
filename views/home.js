@@ -15,7 +15,6 @@ const buildHomeView = async (userId, teamId, redirect_url, userIsAdmin, nonAdmin
   let home = {
     /* the user that opened your app's app home */
     user_id: userId,
-
     /* the view object that appears in the app home*/
     view: {
       type: 'home',
@@ -55,6 +54,7 @@ const buildHomeView = async (userId, teamId, redirect_url, userIsAdmin, nonAdmin
       ]
     }
   }
+  // TODO: Need to conditionally render the AUTH button depending on whether user has authorized yet or not
 
   // Channel Translation Settings
   home.view.blocks.push({
@@ -77,6 +77,7 @@ const buildHomeView = async (userId, teamId, redirect_url, userIsAdmin, nonAdmin
 
   // Go through the custom settings defined for each channel and push those to the settings array
   for (const key in team.channel_language_settings) {
+    // TODO: Sort channels alphabetically by name
     let channelSetting = team.channel_language_settings[key];
     settings.push(
       { name: channelSetting.name, id: channelSetting.id, languages: channelSetting.languages }

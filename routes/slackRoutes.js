@@ -98,20 +98,11 @@ const slackRoutes = (app) => {
 
     const teamId = context.teamId;
     const userId = body.user.id;
-    // await teamsDB.updateLanguageSettings(channels, languages, context.teamId);
+    await teamsDB.updateLanguageSettings(channels, languages, context.teamId);
     let isSlackAdmin = await isAdmin(userId, context.botToken, client);
     let redirect_url = process.env.REDIRECT_URL || 'https://app.translatechannels.com/auth_redirect';
     let homeView = await buildHomeView(userId, teamId, redirect_url, isSlackAdmin);
-    // const homeViewId = await dbConnector.getHomeViewId(context.teamId);
-    // try {
-    //   await slackApp.client.views.update({
-    //     token: context.botToken,
-    //     view: homeView,
-    //     view_id: homeViewId
-    //   });
-    // } catch (error) {
-    //   console.error(error);
-    // }
+    const result = await client.views.publish(homeView);
   });
 
 

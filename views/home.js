@@ -44,7 +44,7 @@ const buildHomeView = async (userId, teamId, redirect_url, userIsAdmin, nonAdmin
     "type": "section",
     "text": {
       "type": "mrkdwn",
-      "text": userAuthenticated ? "You've authenticated the app :thumbsup: " : "Authorize the app to update your messages with translations :point_right: \n _(Each user must do this to enable automatic translation)_"
+      "text": userAuthenticated ? "You've authenticated the app :thumbsup: " : "Authorize the app to update your messages with translations :point_right: \n _(Each user must do this once to enable automatic translation)_"
     }
   }
 

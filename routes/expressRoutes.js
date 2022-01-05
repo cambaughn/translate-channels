@@ -1,5 +1,6 @@
 // const stripeConnector = require('../stripe_engine/stripe_connector');
 import bodyParser from 'body-parser';
+import teamsDB from '../util/firebaseAPI/teams.js';
 import userDB from '../util/firebaseAPI/users.js';
 
 const expressRoutes = (app, slackApp, dbConnector) => {
@@ -10,8 +11,9 @@ const expressRoutes = (app, slackApp, dbConnector) => {
   // Handle authentication button press
   // Slack url redirects to here with a code that we then send in to oauth for an auth token
   // https://api.slack.com/authentication/oauth-v2#obtaining
-  app.get('/auth_redirect', ({ query }, res) => {
-    const code = query.code;
+  app.get('/auth_redirect', (props, res) => {
+    console.log('props ==== ', props);
+    const code = props.query.code;
     let accessDetails = {
       client_id: process.env.CLIENT_ID,
       client_secret: process.env.CLIENT_SECRET,
@@ -28,8 +30,10 @@ const expressRoutes = (app, slackApp, dbConnector) => {
         app_id: app_id
       }
 
-      console.log('user info ', userInfo);
+      console.log('result ===> ', result);
+      console.log('testing ', result.team.bot_user_id, result.team.access_token);
       await userDB.createUser(authed_user.id, userInfo);
+      // await teamsDB.updateTeam(team_id, );
 
       // Upon approval and new user creation, redirect back to app: https://api.slack.com/reference/deep-linking
       res.redirect(`https://slack.com/app_redirect?app=${process.env.APP_ID}&team=${team.id}`);

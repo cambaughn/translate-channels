@@ -60,6 +60,10 @@ const expressRoutes = (app, slackApp, dbConnector) => {
     if (token !== process.env.UKHIRED_TOKEN) { res.sendStatus(401); return; }
     const result = await dbConnector.getUsageData();
     res.json(result);
+  });  
+  
+  app.get('/test', async (req, res) => {
+    res.send('app is up and running');
   });
 
   // app.get('/portal', async ({ query }, res) => {

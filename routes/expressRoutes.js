@@ -12,6 +12,7 @@ const expressRoutes = (app, slackApp, dbConnector) => {
   // Slack url redirects to here with a code that we then send in to oauth for an auth token
   // https://api.slack.com/authentication/oauth-v2#obtaining
   app.get('/auth_redirect', ({ query }, res) => {
+    console.log('auth redirect =========');
     const code = query.code;
     let accessDetails = {
       client_id: process.env.CLIENT_ID,

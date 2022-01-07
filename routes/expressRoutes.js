@@ -5,15 +5,14 @@ import userDB from '../util/firebaseAPI/users.js';
 
 const expressRoutes = (app, slackApp, dbConnector) => {
   app.get('/direct_install', ({ query }, res) => {
-    res.redirect(process.env.DIRECT_INSTALL_SLACK_URI);
+    res.redirect(`https://slack.com/oauth/v2/authorize?client_id=${process.env.CLIENT_ID}&scope=channels:read,commands,users:read,chat:write,im:history&user_scope=channels:history,chat:write`);
   });
 
   // Handle authentication button press
   // Slack url redirects to here with a code that we then send in to oauth for an auth token
   // https://api.slack.com/authentication/oauth-v2#obtaining
-  app.get('/auth_redirect', (props, res) => {
-    console.log('props ==== ', props);
-    const code = props.query.code;
+  app.get('/auth_redirect', ({ query }, res) => {
+    const code = query.code;
     let accessDetails = {
       client_id: process.env.CLIENT_ID,
       client_secret: process.env.CLIENT_SECRET,
@@ -30,10 +29,21 @@ const expressRoutes = (app, slackApp, dbConnector) => {
         app_id: app_id
       }
 
-      console.log('result ===> ', result);
-      console.log('testing ', result.team.bot_user_id, result.team.access_token);
+      // console.log('result ===> ', result);
+      console.log('testing ', result.bot_user_id, result.access_token);
+      // Create new user in firebase - this is the first time we're seeing them
       await userDB.createUser(authed_user.id, userInfo);
-      // await teamsDB.updateTeam(team_id, );
+
+      // If we're getting the team tokens from them as well, update/create the team in the database
+      if (result.bot_user_id && result.access_token) {
+        let teamUpdates = { 
+          slack_team_id: team.id,
+          bot_user_id: result.bot_user_id,
+          team_access_token: result.access_token
+        }
+        
+        await teamsDB.updateTeam(team.id, teamUpdates);
+      }
 
       // Upon approval and new user creation, redirect back to app: https://api.slack.com/reference/deep-linking
       res.redirect(`https://slack.com/app_redirect?app=${process.env.APP_ID}&team=${team.id}`);

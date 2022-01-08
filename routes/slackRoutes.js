@@ -13,19 +13,6 @@ import Translator from '../util/languages/translate.js';
 
 const slackRoutes = (app) => {
 
-  // app.event('message', async ({ message, context, client }) => {
-  //   // console.log('message received: ', message, context);
-  //   // Get user from database so we can check if they have a valid token
-  //   let user = await userDB.getUser(message.user);
-
-  //   if (user.access_token) {
-  //     console.log('message ', message);
-  //     updateMessage(message, 'Cool', user.access_token, client);
-  //   } else { // TODO: No access token available, should send a message with a button to approve translations - only if this is a channel with TC set up AND this is the user's first time encountering Translate Channels - no document in database
-
-  //   }
-  // })
-
   app.event('message', async ({ message, context, client }) => {
     // if the message comes from a bot OR the message has been edited manually, don't translate
     if (message.bot_id || message.subtype === 'message_changed') { 
@@ -55,13 +42,20 @@ const slackRoutes = (app) => {
     console.log('translation -> ', translation);
     if (!translation) { return null; }
 
-    // V2 translator
-    // const translation = await getTranslations(message, requiredLanguages);
-    // if (!translation) { return null; }
-
     // if (allowanceStatus.msg) { translation.response += allowanceStatus.msg }
     // dbConnector.saveTranslation(context.teamId, message.ts, message.channel, translation.targetLanguages, translation.inputLanguage, translation.characterCount);
     updateMessage(message, translation.response, token, client);
+  });
+
+
+  app.command('/nt', async ({ ack, command, context, client }) => {
+    await ack();
+    if (command.text === 'help') {
+      // TODO: Implement provideHelp
+      provideHelp(context.botToken, command.user_id, client); return null; 
+    }
+      // TODO: Implement postMessageAsUser
+    await postMessageAsUser(command.text, command.team_id, command.channel_id, command.user_id, client);
   });
 
   // This action only needs to acknowledge the button click - auth is otherwise handled with oAuth redirect url
@@ -74,7 +68,6 @@ const slackRoutes = (app) => {
   app.action('settings_modal_opened', async ({ ack, action, body, context }) => {
     await ack();
     const homeViewId = body.container.view_id;
-    // await dbConnector.saveHomeViewId(context.teamId, homeViewId);
     const settingsModal = await buildSettingsModal(action.value);
     try {
       // Opens the modal itself

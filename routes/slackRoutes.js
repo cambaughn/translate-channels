@@ -100,7 +100,7 @@ const slackRoutes = (app) => {
     const userId = body.user.id;
     await teamsDB.updateLanguageSettings(channels, languages, context.teamId);
     let isSlackAdmin = await isAdmin(userId, context.botToken, client);
-    let redirect_url = process.env.REDIRECT_URL || 'https://app.translatechannels.com/auth_redirect';
+    let redirect_url = process.env.REDIRECT_URL || 'https://translate-channels.herokuapp.com/auth_redirect';
     let homeView = await buildHomeView(userId, teamId, redirect_url, isSlackAdmin);
     const result = await client.views.publish(homeView);
   });

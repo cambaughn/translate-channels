@@ -52,7 +52,7 @@ const buildHomeView = async (userId, teamId, redirect_url, userIsAdmin, nonAdmin
     }
   }
 
-  // if (!user || !user.access_token) {
+  if (!user || !user.access_token) {
     authBlock.accessory = {
       type: "button",
       action_id: "authorize_app",
@@ -62,7 +62,7 @@ const buildHomeView = async (userId, teamId, redirect_url, userIsAdmin, nonAdmin
       },
       url: auth_url
     }
-  // }
+  }
 
 
   home.view.blocks.push(

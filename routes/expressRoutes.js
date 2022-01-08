@@ -63,6 +63,7 @@ const expressRoutes = (app, slackApp, dbConnector) => {
   });  
   
   app.get('/test', async (req, res) => {
+    console.log('test received --------');
     res.send('app is up and running');
   });
 

@@ -1,3 +1,5 @@
+import helpMessage from "../../views/helpMessage.js";
+
 const updateMessage = (message, response, token, client) => {
   // finds message and edits it with the translated text (response) as blocks
   const messageRequest = {
@@ -32,4 +34,17 @@ const getChannelInfo = async (channel, client, context) => {
   }
 };
 
-export { updateMessage, getInfoForChannels, getChannelInfo }
+
+const provideHelp = (botToken, channel, client) => {
+  const messageRequest = {
+    token: botToken,
+    channel: channel,
+    text: helpMessage()
+  };
+
+  client.chat.postMessage(messageRequest, (error) => {
+    console.log(error);
+  });
+}
+
+export { updateMessage, getInfoForChannels, getChannelInfo, provideHelp }

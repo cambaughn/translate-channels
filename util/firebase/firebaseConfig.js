@@ -10,5 +10,4 @@ const firebaseConfig = {
   appId: process.env.FIREBASE_APP_ID
 };
 
-console.log('firebase config ', firebaseConfig);
 export default firebaseConfig;

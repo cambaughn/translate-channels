@@ -1,8 +1,9 @@
-import { updateMessage } from '../util/slack/slackHelpers.js';
+// Views
 import buildHomeView from '../views/home.js';
 import buildSettingsModal from '../views/settingsModal.js';
+// Slack Helpers
 import { isAdmin } from '../util/slack/slackUser.js';
-import { getInfoForChannels } from '../util/slack/slackHelpers.js';
+import { updateMessage, getInfoForChannels, provideHelp } from '../util/slack/slackHelpers.js';
 // Firebase API
 import teamsDB from '../util/firebaseAPI/teams.js';
 import userDB from '../util/firebaseAPI/users.js';
@@ -36,7 +37,6 @@ const slackRoutes = (app) => {
     // Otherwise, use the workspace languages
     const workspaceLanguages = teamInfo.workspace_languages || [];
     const requiredLanguages = channelLanguages.length > 0 ? channelLanguages : workspaceLanguages;
-    // TODO: implement the translator
     const translator = new Translator(message, requiredLanguages);
     const translation = await translator.getTranslatedData();
     console.log('translation -> ', translation);
@@ -52,9 +52,10 @@ const slackRoutes = (app) => {
     await ack();
     if (command.text === 'help') {
       // TODO: Implement provideHelp
-      provideHelp(context.botToken, command.user_id, client); return null; 
+      provideHelp(context.botToken, command.user_id, client); 
+      return null; 
     }
-      // TODO: Implement postMessageAsUser
+    // TODO: Implement postMessageAsUser
     await postMessageAsUser(command.text, command.team_id, command.channel_id, command.user_id, client);
   });
 

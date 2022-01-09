@@ -2,6 +2,8 @@
 import bodyParser from 'body-parser';
 import teamsDB from '../util/firebaseAPI/teams.js';
 import userDB from '../util/firebaseAPI/users.js';
+import { createCustomer } from '../util/stripe/stripe.js';
+
 
 const expressRoutes = (app, slackApp, dbConnector) => {
   app.get('/direct_install', ({ query }, res) => {

@@ -3,7 +3,7 @@ import buildHomeView from '../views/home.js';
 import buildSettingsModal from '../views/settingsModal.js';
 // Slack Helpers
 import { isAdmin } from '../util/slack/slackUser.js';
-import { updateMessage, getInfoForChannels, provideHelp } from '../util/slack/slackHelpers.js';
+import { updateMessage, getInfoForChannels, provideHelp, postMessageAsUser } from '../util/slack/slackHelpers.js';
 // Firebase API
 import teamsDB from '../util/firebaseAPI/teams.js';
 import userDB from '../util/firebaseAPI/users.js';
@@ -39,7 +39,6 @@ const slackRoutes = (app) => {
     const requiredLanguages = channelLanguages.length > 0 ? channelLanguages : workspaceLanguages;
     const translator = new Translator(message, requiredLanguages);
     const translation = await translator.getTranslatedData();
-    console.log('translation -> ', translation);
     if (!translation) { return null; }
 
     // if (allowanceStatus.msg) { translation.response += allowanceStatus.msg }
@@ -50,13 +49,17 @@ const slackRoutes = (app) => {
 
   app.command('/nt', async ({ ack, command, context, client }) => {
     await ack();
-    if (command.text === 'help') {
-      // TODO: Implement provideHelp
+    if (command.text === 'help' || !command.text) {
+      // provideHelp sends a private message to the user with FAQs
       provideHelp(context.botToken, command.user_id, client); 
       return null; 
     }
-    // TODO: Implement postMessageAsUser
-    await postMessageAsUser(command.text, command.team_id, command.channel_id, command.user_id, client);
+
+    // If the user is not requesting help, just post their message directly as it is
+    const user = await userDB.getUser(command.user_id);
+    if (command.text) { // not an empty message
+      await postMessageAsUser(command.text, command.channel_id, user.access_token, client);
+    }
   });
 
   // This action only needs to acknowledge the button click - auth is otherwise handled with oAuth redirect url

@@ -9,12 +9,25 @@ const updateMessage = (message, response, token, client) => {
     text: response
   };
 
-  console.log('testing app ', messageRequest);
-
   return client.chat.update(messageRequest, error => {
     console.log(error);
   });
 }
+
+const postMessageAsUser = (text, channel, token, client) => {
+  // finds message and edits it with the translated text (response) as blocks
+  const messageRequest = {
+    token: token,
+    channel: channel,
+    text: text,
+    as_user: true
+  };
+
+  client.chat.postMessage(messageRequest, (error) => {
+    console.log(error);
+  });
+}
+
 
 const getInfoForChannels = async (channelIds, client, context) => {
   return Promise.all(channelIds.map(channel => getChannelInfo(channel, client, context)));
@@ -47,4 +60,10 @@ const provideHelp = (botToken, channel, client) => {
   });
 }
 
-export { updateMessage, getInfoForChannels, getChannelInfo, provideHelp }
+export { 
+  updateMessage, 
+  getInfoForChannels, 
+  getChannelInfo, 
+  provideHelp,
+  postMessageAsUser
+}

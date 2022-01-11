@@ -5,6 +5,15 @@ const createCustomer = async () => {
 
 }
 
+const createPortalSession = async (stripeId) => {
+  return await stripe.billingPortal.sessions.create(
+    {
+      customer: stripeId
+    }
+  );
+};
+
 export {
-  createCustomer
+  createCustomer,
+  createPortalSession
 }

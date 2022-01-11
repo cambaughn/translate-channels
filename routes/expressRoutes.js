@@ -2,7 +2,7 @@
 import bodyParser from 'body-parser';
 import teamsDB from '../util/firebaseAPI/teams.js';
 import userDB from '../util/firebaseAPI/users.js';
-import { createCustomer } from '../util/stripe/stripe.js';
+import { createCustomer, createPortalSession } from '../util/stripe/stripe.js';
 
 
 const expressRoutes = (app, slackApp, dbConnector) => {
@@ -57,12 +57,16 @@ const expressRoutes = (app, slackApp, dbConnector) => {
     });
   });
 
-  app.get('/usages', async (req, res) => {
-    const token = req.header('Token');
-    if (token !== process.env.UKHIRED_TOKEN) { res.sendStatus(401); return; }
-    const result = await dbConnector.getUsageData();
-    res.json(result);
-  });  
+
+  app.get('/portal', async ({ query }, res) => {
+    const teamId = query.teamId;
+    // NOTE: Instead of creating StripeId earlier, we're going to create the Stripe customer just before starting the portal
+    const stripeId = await createCustomer(teamId);
+
+    const portalSession = await createPortalSession(stripeId);
+    return res.redirect(portalSession.url);
+  });
+
   
   app.get('/test', async (req, res) => {
     console.log('test received --------');

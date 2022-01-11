@@ -193,6 +193,29 @@ const buildHomeView = async (userId, teamId, redirect_url, userIsAdmin, nonAdmin
   let slashCommands = configureSlashCommandsSection();
   home.view.blocks.push(...slashCommands);
 
+  const portalUrl = `${process.env.BASE_URL}/portal?teamId=${teamId}&redirect_url=${redirect_url}`
+  console.log('portal url ', portalUrl);
+
+  // Manage Plan
+  home.view.blocks.push(
+    {
+      type: 'section',
+      text: {
+        type: 'mrkdwn',
+        text: 'Update your plan'
+      },
+      accessory: {
+        type: 'button',
+        action_id: "manage_plan",
+        text: {
+          type: 'plain_text',
+          text: 'Manage Plan'
+        },
+        url: portalUrl
+      }
+    }
+  );
+
   return home;
 }
 

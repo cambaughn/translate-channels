@@ -63,7 +63,13 @@ const slackRoutes = (app) => {
   });
 
   // This action only needs to acknowledge the button click - auth is otherwise handled with oAuth redirect url
-  app.action('authorize_app', async ({ ack, context, action }) => {
+  app.action('authorize_app', async ({ ack }) => {
+    // We just need ack() here to respond to the action, even though we're redirecting to a url
+    ack();
+  })  
+  
+  // This action only needs to acknowledge the button click - auth is otherwise handled with a url
+  app.action('manage_plan', async ({ ack }) => {
     // We just need ack() here to respond to the action, even though we're redirecting to a url
     ack();
   })

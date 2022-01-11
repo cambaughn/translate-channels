@@ -59,11 +59,15 @@ const expressRoutes = (app, slackApp, dbConnector) => {
 
 
   app.get('/portal', async ({ query }, res) => {
-    const teamId = query.teamId;
+    const { teamId } = query;
+    const redirect_url = `https://slack.com/app_redirect?app=${process.env.APP_ID}&team=${teamId}`;
     // NOTE: Instead of creating StripeId earlier, we're going to create the Stripe customer just before starting the portal
-    const stripeId = await createCustomer(teamId);
+    // TODO: If no customer id, then create a new one
+    const customer = await createCustomer(teamId);
+    const stripeId = customer.id;
+    console.log('stripeId ', stripeId);
 
-    const portalSession = await createPortalSession(stripeId);
+    const portalSession = await createPortalSession(stripeId, redirect_url);
     return res.redirect(portalSession.url);
   });
 
@@ -73,12 +77,6 @@ const expressRoutes = (app, slackApp, dbConnector) => {
     res.send('app is up and running');
   });
 
-  // app.get('/portal', async ({ query }, res) => {
-  //   const teamId = query.teamId;
-  //   const stripeId = await dbConnector.getStripeId(teamId);
-  //   const portalSession = await stripeConnector.createPortalSession(stripeId, teamId);
-  //   return res.redirect(portalSession.url);
-  // });
 
   app.post('/stripe-webhook', bodyParser.raw({ type: 'application/json' }), (request, response) => {
     let event;

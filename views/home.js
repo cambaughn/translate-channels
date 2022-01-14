@@ -193,8 +193,8 @@ const buildHomeView = async (userId, teamId, redirect_url, userIsAdmin, nonAdmin
   let slashCommands = configureSlashCommandsSection();
   home.view.blocks.push(...slashCommands);
 
-  const portalUrl = `${process.env.BASE_URL}/portal?teamId=${teamId}&redirect_url=${redirect_url}`
-  console.log('portal url ', portalUrl);
+  const portalUrl = `${process.env.BASE_URL}/portal?teamId=${teamId}`
+  const checkoutUrl = `${process.env.BASE_URL}/checkout?teamId=${teamId}`
 
   // Manage Plan
   home.view.blocks.push(
@@ -211,7 +211,7 @@ const buildHomeView = async (userId, teamId, redirect_url, userIsAdmin, nonAdmin
           type: 'plain_text',
           text: 'Manage Plan'
         },
-        url: portalUrl
+        url: checkoutUrl
       }
     }
   );

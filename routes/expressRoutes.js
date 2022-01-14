@@ -2,7 +2,7 @@
 import bodyParser from 'body-parser';
 import teamsDB from '../util/firebaseAPI/teams.js';
 import userDB from '../util/firebaseAPI/users.js';
-import { createCustomer, createPortalSession } from '../util/stripe/stripe.js';
+import { createCustomer, createPortalSession, createCheckoutSession } from '../util/stripe/stripe.js';
 
 
 const expressRoutes = (app, slackApp, dbConnector) => {
@@ -69,6 +69,31 @@ const expressRoutes = (app, slackApp, dbConnector) => {
 
     const portalSession = await createPortalSession(stripeId, redirect_url);
     return res.redirect(portalSession.url);
+  });
+
+  app.get('/checkout', async ({ query }, res) => {
+    const { teamId } = query;
+    const isProd = process.env.ENVIRONMENT !== 'development';
+    const redirect_url = `https://slack.com/app_redirect?app=${process.env.APP_ID}&team=${teamId}`;
+    // NOTE: Instead of creating StripeId earlier, we're going to create the Stripe customer just before starting the checkout session
+    
+    const team = await teamsDB.getTeam(teamId);
+    let customerId = isProd ? team.stripe_customer_id : team.test_stripe_customer_id;
+
+    if (!customerId) {
+      console.log('');
+      const customer = await createCustomer(teamId);
+      let teamUpdate = {};
+      // if in prod, assign to stripe_customer_id
+      // if development, assign to test_stripe_customer_id
+      teamUpdate[isProd ? 'stripe_customer_id' : 'test_stripe_customer_id'] = customer.id;
+      customerId = customer.id;
+      // Update team in Firebase
+      await teamsDB.updateTeam(teamId, teamUpdate);
+    }
+
+    const checkoutSession = await createCheckoutSession(customerId, redirect_url);
+    return res.redirect(checkoutSession.url);
   });
 
   

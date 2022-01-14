@@ -185,7 +185,7 @@ const buildHomeView = async (userId, teamId, redirect_url, userIsAdmin, nonAdmin
           },
           action_id: 'settings_modal_opened',
           value: JSON.stringify({ id: 'none', lang: [] })
-        }
+        },
       });
   }
 
@@ -199,10 +199,20 @@ const buildHomeView = async (userId, teamId, redirect_url, userIsAdmin, nonAdmin
   // Manage Plan
   home.view.blocks.push(
     {
+      type: 'divider'
+    },
+    {
       type: 'section',
       text: {
         type: 'mrkdwn',
-        text: 'Update your plan'
+        text: '*Plan & Usage*'
+      }
+    },
+    {
+      type: 'section',
+      text: {
+        type: 'mrkdwn',
+        text: 'Update your plan :point_right: '
       },
       accessory: {
         type: 'button',

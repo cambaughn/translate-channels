@@ -4,8 +4,10 @@ import teamsDB from '../util/firebaseAPI/teams.js';
 import userDB from '../util/firebaseAPI/users.js';
 
 const expressRoutes = (app, slackApp, dbConnector) => {
-  app.get('/direct_install', ({ query }, res) => {
-    res.redirect(`https://slack.com/oauth/v2/authorize?client_id=${process.env.CLIENT_ID}&scope=channels:read,commands,users:read,chat:write,im:history&user_scope=channels:history,chat:write`);
+  app.get('/direct_install', ({ query }, response) => {
+    let redirect_url = process.env.REDIRECT_URL || 'https://translate-channels.herokuapp.com/auth_redirect';
+
+    response.redirect(`https://slack.com/oauth/v2/authorize?client_id=${process.env.CLIENT_ID}&scope=channels:read,commands,users:read,chat:write,im:history&user_scope=channels:history,chat:write&redirect_uri=${redirect_url}`);
   });
 
   // Handle authentication button press

@@ -30,6 +30,16 @@ teamsDB.createNew = async (id) => {
   return teamsDB.updateTeam(id, defaultTeam);
 }
 
+// Deactivate team by removing Slack app keys - when uninstalling
+teamsDB.deactivateTeam = async (id) => {
+  let updates = {
+    bot_user_id: null,
+    team_access_token: null
+  }
+
+  return teamsDB.updateTeam(id, updates);
+}
+
 // Delete team from Firebase - USE CAREFULLY - really shouldn't be used outside of testing
 teamsDB.deleteTeam = async (id) => {
   const teamRef = teamsDoc(id);

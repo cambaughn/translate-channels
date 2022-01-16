@@ -11,6 +11,7 @@ const expressReceiver = new ExpressReceiver({
 
 const authorizeFn = async ({ userId, teamId }) => {
   // let user = await teamD.getUser(userId);
+  console.log('team id ', teamId);
   let team = await teamsDB.getTeam(teamId);
   if (team) {
     return {

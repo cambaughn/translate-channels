@@ -35,7 +35,6 @@ const createCheckoutSession = async (stripeId, returnUrl) => {
 };
 
 const getSubscriptionData = async (stripeId) => {
-  console.log('stripe id ', stripeId);
   const subscription = await stripe.subscriptions.list(
     {
       customer: stripeId,

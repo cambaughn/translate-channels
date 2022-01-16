@@ -200,7 +200,9 @@ const buildHomeView = async (userId, teamId, redirect_url, userIsAdmin, nonAdmin
   const checkoutUrl = `${process.env.BASE_URL}/checkout?teamId=${teamId}`;
   const customerId = isProd ? team.stripe_customer_id : team.test_stripe_customer_id;
   const subscriptionData = customerId ? await getSubscriptionData(customerId) : null;
+  const subscriptionActive = subscriptionData?.status === 'active' || subscriptionData?.status === 'trialing';
   console.log('subscription data ', subscriptionData);
+  console.log('subscription active ', subscriptionActive);
 
   home.view.blocks.push(
     {
@@ -217,14 +219,14 @@ const buildHomeView = async (userId, teamId, redirect_url, userIsAdmin, nonAdmin
       type: 'section',
       text: {
         type: 'mrkdwn',
-        text: !subscriptionData ? "Set up your subscription to begin getting translations for your team :point_right: " : "Your subscription is active, and you have unlimited messages."
+        text: !subscriptionActive ? "Set up your subscription to begin getting translations for your team :point_right: " : "Your subscription is active, and you have unlimited messages."
       },
       accessory: {
         type: 'button',
         action_id: 'manage_plan',
         text: {
           type: 'plain_text',
-          text: !subscriptionData ? 'Get Started' : 'Manage Plan'
+          text: !subscriptionActive ? 'Get Started' : 'Manage Plan'
         },
         url: checkoutUrl
       }

@@ -20,7 +20,11 @@ const slackRoutes = (app) => {
       return null; 
     } 
     // TODO: re-enable the provide help functionality (along with slash command /nt)
-    // if (message.channel_type === 'im') { await provideHelp(context.botToken, message.channel, client); return null; }
+    if (message.channel_type === 'im') { 
+      console.log(message);
+      // provideHelp(context.botToken, message.user, client); 
+      return null; 
+    }
     const teamInfo = await teamsDB.getTeam(context.teamId);
     const user = await userDB.getUser(message.user);
     const token = user.access_token;

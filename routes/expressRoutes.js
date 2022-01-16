@@ -7,6 +7,7 @@ import { createCustomer, createCheckoutSession, getSubscriptionData } from '../u
 
 const expressRoutes = (app, slackApp, dbConnector) => {
   app.get('/direct_install', ({ query }, res) => {
+    console.log('direct install ', query);
     res.redirect(`https://slack.com/oauth/v2/authorize?client_id=${process.env.CLIENT_ID}&scope=channels:read,commands,users:read,chat:write,im:history&user_scope=channels:history,chat:write`);
   });
 
@@ -57,6 +58,19 @@ const expressRoutes = (app, slackApp, dbConnector) => {
     });
   });
 
+
+  app.get('/portal', async ({ query }, res) => {
+    const { teamId } = query;
+    const redirect_url = `https://slack.com/app_redirect?app=${process.env.APP_ID}&team=${teamId}`;
+    // NOTE: Instead of creating StripeId earlier, we're going to create the Stripe customer just before starting the portal
+    // TODO: If no customer id, then create a new one
+    const customer = await createCustomer(teamId);
+    const stripeId = customer.id;
+    console.log('stripeId ', stripeId);
+
+    const portalSession = await createPortalSession(stripeId, redirect_url);
+    return res.redirect(portalSession.url);
+  });
 
   app.get('/checkout', async ({ query }, res) => {
     const { teamId } = query;

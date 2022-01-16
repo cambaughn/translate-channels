@@ -25,11 +25,30 @@ const createCheckoutSession = async (stripeId, returnUrl) => {
     ],
     mode: 'subscription',
     success_url: returnUrl,
+    customer: stripeId,
     cancel_url: returnUrl,
+    subscription_data: {
+      trial_period_days: 7
+    }
   });
 
 };
 
+const getSubscriptionData = async (stripeId) => {
+  console.log('stripe id ', stripeId);
+  const subscription = await stripe.subscriptions.list(
+    {
+      customer: stripeId,
+      limit: 1
+    }
+  );
+
+  console.log('subscription ', subscription);
+  return Promise.resolve(subscription.data[0]);
+};
+
+
+// Portal doesn't work for metered billing
 const createPortalSession = async (stripeId, returnUrl) => {
   return await stripe.billingPortal.sessions.create(
     {
@@ -41,6 +60,6 @@ const createPortalSession = async (stripeId, returnUrl) => {
 
 export {
   createCustomer,
-  createPortalSession,
-  createCheckoutSession
+  createCheckoutSession,
+  getSubscriptionData
 }

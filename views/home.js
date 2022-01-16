@@ -1,6 +1,7 @@
 import teamsDB from "../util/firebaseAPI/teams.js";
 import userDB from "../util/firebaseAPI/users.js";
 import { getSettingsString } from '../util/languages/languageHelpers.js';
+import { getSubscriptionData } from "../util/stripe/stripe.js";
 
 const buildHomeView = async (userId, teamId, redirect_url, userIsAdmin, nonAdminAllowSettings) => {
   let auth_url = `https://slack.com/oauth/v2/authorize?scope=channels:read,chat:write,commands,im:history,users:read&user_scope=channels:history,chat:write&client_id=${process.env.CLIENT_ID}&redirect_uri=${redirect_url}`;
@@ -193,10 +194,14 @@ const buildHomeView = async (userId, teamId, redirect_url, userIsAdmin, nonAdmin
   let slashCommands = configureSlashCommandsSection();
   home.view.blocks.push(...slashCommands);
 
-  const portalUrl = `${process.env.BASE_URL}/portal?teamId=${teamId}`
-  const checkoutUrl = `${process.env.BASE_URL}/checkout?teamId=${teamId}`
-
+  
   // Manage Plan
+  const isProd = process.env.ENVIRONMENT !== 'development';
+  const checkoutUrl = `${process.env.BASE_URL}/checkout?teamId=${teamId}`;
+  const customerId = isProd ? team.stripe_customer_id : team.test_stripe_customer_id;
+  const subscriptionData = customerId ? await getSubscriptionData(customerId) : null;
+  console.log('subscription data ', subscriptionData);
+
   home.view.blocks.push(
     {
       type: 'divider'
@@ -212,14 +217,14 @@ const buildHomeView = async (userId, teamId, redirect_url, userIsAdmin, nonAdmin
       type: 'section',
       text: {
         type: 'mrkdwn',
-        text: 'Update your plan :point_right: '
+        text: !subscriptionData ? "Set up your subscription to begin getting translations for your team :point_right: " : "Your subscription is active, and you have unlimited messages."
       },
       accessory: {
         type: 'button',
-        action_id: "manage_plan",
+        action_id: 'manage_plan',
         text: {
           type: 'plain_text',
-          text: 'Manage Plan'
+          text: !subscriptionData ? 'Get Started' : 'Manage Plan'
         },
         url: checkoutUrl
       }

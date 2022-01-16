@@ -15,8 +15,6 @@ class Translator {
     this.characterCount = 0;
     this.stringOperator = new stringOperator(this.originalMessage.text);
     autoBind(this);
-
-    console.log('testing translations ');
   }
 
   async detectInputLanguage () {

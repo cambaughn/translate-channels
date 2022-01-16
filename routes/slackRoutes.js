@@ -19,16 +19,19 @@ const slackRoutes = (app) => {
     if (message.bot_id || message.subtype === 'message_changed') { 
       return null; 
     } 
-    // TODO: re-enable the provide help functionality (along with slash command /nt)
+
+    // If the message is in an IM to the app bot, just return the help message
     if (message.channel_type === 'im') { 
-      console.log(message);
-      // provideHelp(context.botToken, message.user, client); 
+      await provideHelp(context.botToken, message.user, client); 
       return null; 
     }
+    
     const teamInfo = await teamsDB.getTeam(context.teamId);
     const user = await userDB.getUser(message.user);
     const token = user.access_token;
-    if (!token) { return null; }
+    if (!token) { 
+      return null; 
+    }
 
     // TODO: Implement Stripe connection to check subscription status - will involve more work - currently getting translation working without subscription
     // const allowanceStatus = await dbConnector.planAllowanceExceeded(context.teamId, workspaceData);

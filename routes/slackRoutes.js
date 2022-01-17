@@ -10,6 +10,8 @@ import userDB from '../util/firebaseAPI/users.js';
 // Translation
 import { getTranslations } from '../util/languages/translatev2.js';
 import Translator from '../util/languages/translate.js';
+// Subscription
+import { getSubscriptionData } from '../util/stripe/stripe.js';
 
 
 const slackRoutes = (app) => {
@@ -26,23 +28,28 @@ const slackRoutes = (app) => {
       return null; 
     }
     
-    const teamInfo = await teamsDB.getTeam(context.teamId);
+    const team = await teamsDB.getTeam(context.teamId);
     const user = await userDB.getUser(message.user);
     const token = user.access_token;
     if (!token) { 
       return null; 
     }
 
-    // TODO: Implement Stripe connection to check subscription status - will involve more work - currently getting translation working without subscription
-    // const allowanceStatus = await dbConnector.planAllowanceExceeded(context.teamId, workspaceData);
-    // const allowanceStatusResponse = `${message.text}\n\n\n:earth_africa: _Sorry, you've reached your ${allowanceStatus.reason} limit. Please upgrade your plan._`;
-    // if (allowanceStatus.exceeded) { respond(message, allowanceStatusResponse, token); return null; }
+    // Check for active subscription in Stripe
+    const isProd = process.env.ENVIRONMENT !== 'development';
+    const customerId = isProd ? team.stripe_customer_id : team.test_stripe_customer_id;
+    const subscriptionData = customerId ? await getSubscriptionData(customerId) : null;
+    const subscriptionActive = subscriptionData?.status === 'active' || subscriptionData?.status === 'trialing';
+    // If subscription is not active, do nothing
+    if (!subscriptionActive) {
+      return null; 
+    }
 
     // Determine which languages we need for this channel
     // If the channel has languages set, use those
-    const channelLanguages = teamInfo.channel_language_settings[message.channel]?.languages || [];
+    const channelLanguages = team.channel_language_settings[message.channel]?.languages || [];
     // Otherwise, use the workspace languages
-    const workspaceLanguages = teamInfo.workspace_languages || [];
+    const workspaceLanguages = team.workspace_languages || [];
     const requiredLanguages = channelLanguages.length > 0 ? channelLanguages : workspaceLanguages;
     const translator = new Translator(message, requiredLanguages);
     const translation = await translator.getTranslatedData();

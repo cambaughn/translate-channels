@@ -2,7 +2,7 @@
 import bodyParser from 'body-parser';
 import teamsDB from '../util/firebaseAPI/teams.js';
 import userDB from '../util/firebaseAPI/users.js';
-import { createCustomer, createCheckoutSession, getSubscriptionData } from '../util/stripe/stripe.js';
+import { createCustomer, createCheckoutSession, createPortalSession } from '../util/stripe/stripe.js';
 
 
 const expressRoutes = (app, slackApp, dbConnector) => {
@@ -63,13 +63,12 @@ const expressRoutes = (app, slackApp, dbConnector) => {
   app.get('/portal', async ({ query }, res) => {
     const { teamId } = query;
     const redirect_url = `https://slack.com/app_redirect?app=${process.env.APP_ID}&team=${teamId}`;
-    // NOTE: Instead of creating StripeId earlier, we're going to create the Stripe customer just before starting the portal
-    // TODO: If no customer id, then create a new one
-    const customer = await createCustomer(teamId);
-    const stripeId = customer.id;
-    console.log('stripeId ', stripeId);
+    const isProd = process.env.ENVIRONMENT !== 'development';
+    const team = await teamsDB.getTeam(teamId);
+    let customerId = isProd ? team.stripe_customer_id : team.test_stripe_customer_id;
 
-    const portalSession = await createPortalSession(stripeId, redirect_url);
+    console.log('launching portal');
+    const portalSession = await createPortalSession(customerId, redirect_url);
     return res.redirect(portalSession.url);
   });
 

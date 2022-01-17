@@ -42,7 +42,6 @@ const getSubscriptionData = async (stripeId) => {
     }
   );
 
-  console.log('subscription ', subscription);
   return Promise.resolve(subscription.data[0]);
 };
 
@@ -60,5 +59,6 @@ const createPortalSession = async (stripeId, returnUrl) => {
 export {
   createCustomer,
   createCheckoutSession,
-  getSubscriptionData
+  getSubscriptionData,
+  createPortalSession
 }

@@ -197,6 +197,7 @@ const buildHomeView = async (userId, teamId, redirect_url, userIsAdmin, nonAdmin
   
   // Manage Plan
   const isProd = process.env.ENVIRONMENT !== 'development';
+  const portalUrl = `${process.env.BASE_URL}/portal?teamId=${teamId}`;
   const checkoutUrl = `${process.env.BASE_URL}/checkout?teamId=${teamId}`;
   const customerId = isProd ? team.stripe_customer_id : team.test_stripe_customer_id;
   const subscriptionData = customerId ? await getSubscriptionData(customerId) : null;
@@ -228,7 +229,7 @@ const buildHomeView = async (userId, teamId, redirect_url, userIsAdmin, nonAdmin
           type: 'plain_text',
           text: !subscriptionActive ? 'Get Started' : 'Manage Plan'
         },
-        url: checkoutUrl
+        url: !subscriptionActive ? checkoutUrl : portalUrl
       }
     }
   );

@@ -31,7 +31,6 @@ const createCheckoutSession = async (stripeId, returnUrl) => {
       trial_period_days: 7
     }
   });
-
 };
 
 const getSubscriptionData = async (stripeId) => {
@@ -55,6 +54,19 @@ const createPortalSession = async (stripeId, returnUrl) => {
     }
   );
 };
+
+
+// Report usage for subscription
+const reportSubscriptionUsage = async (subscriptionId) => {
+  return await stripe.subscriptionItems.createUsageRecord(
+    subscriptionId,
+    {
+      quantity: 100,
+      timestamp: 1641956119,
+      action: 'increment',
+    }
+  );
+}
 
 export {
   createCustomer,

@@ -11,7 +11,7 @@ import userDB from '../util/firebaseAPI/users.js';
 import { getTranslations } from '../util/languages/translatev2.js';
 import Translator from '../util/languages/translate.js';
 // Subscription
-import { getSubscriptionData } from '../util/stripe/stripe.js';
+import { getSubscriptionData, reportSubscriptionUsage } from '../util/stripe/stripe.js';
 
 
 const slackRoutes = (app) => {
@@ -30,8 +30,8 @@ const slackRoutes = (app) => {
     
     const team = await teamsDB.getTeam(context.teamId);
     const user = await userDB.getUser(message.user);
-    const token = user.access_token;
-    if (!token) { 
+    const token = user?.access_token;
+    if (!token) {  // if there is no access token for the user
       return null; 
     }
 
@@ -45,6 +45,12 @@ const slackRoutes = (app) => {
       return null; 
     }
 
+    // Log metered usage for per-seat subscription
+    // TODO: Only log usage after trial period
+    if (subscriptionData?.status === 'active') {
+      let subscriptionReport = await reportSubscriptionUsage(subscriptionData, user);
+    }
+
     // Determine which languages we need for this channel
     // If the channel has languages set, use those
     const channelLanguages = team.channel_language_settings[message.channel]?.languages || [];
@@ -53,10 +59,10 @@ const slackRoutes = (app) => {
     const requiredLanguages = channelLanguages.length > 0 ? channelLanguages : workspaceLanguages;
     const translator = new Translator(message, requiredLanguages);
     const translation = await translator.getTranslatedData();
-    if (!translation) { return null; }
+    if (!translation) { // if the translation didn't return anything
+      return null; 
+    }
 
-    // if (allowanceStatus.msg) { translation.response += allowanceStatus.msg }
-    // dbConnector.saveTranslation(context.teamId, message.ts, message.channel, translation.targetLanguages, translation.inputLanguage, translation.characterCount);
     updateMessage(message, translation.response, token, client);
   });
 

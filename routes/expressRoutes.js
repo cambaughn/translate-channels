@@ -37,7 +37,7 @@ const expressRoutes = (app, slackApp, dbConnector) => {
       // console.log('result ===> ', result);
       console.log('testing ', result.bot_user_id, result.access_token);
       // Create new user in firebase - this is the first time we're seeing them
-      await userDB.createUser(authed_user.id, userInfo);
+      await userDB.updateUser(authed_user.id, userInfo);
 
       // If we're getting the team tokens from them as well, update/create the team in the database
       if (result.bot_user_id && result.access_token) {

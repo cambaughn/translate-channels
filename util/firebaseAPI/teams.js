@@ -33,8 +33,12 @@ teamsDB.createNew = async (id) => {
 // Deactivate team by removing Slack app keys - when uninstalling
 teamsDB.deactivateTeam = async (id) => {
   let updates = {
+    // Remove Slack details
     bot_user_id: null,
-    team_access_token: null
+    team_access_token: null,
+    // Remove Stripe details - subscription only - will leave customer_id so they can sign up again if they ever want to, and it will keep their payment info and history
+    stripe_subscription_id: null,
+    test_stripe_subscription_id: null
   }
 
   return teamsDB.updateTeam(id, updates);

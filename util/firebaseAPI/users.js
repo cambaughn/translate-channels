@@ -13,7 +13,7 @@ userDB.getUser = async (id) => {
   return Promise.resolve(user);
 }
 
-userDB.createUser = async (id, updates) => {
+userDB.updateUser = async (id, updates) => {
   const userRef = usersDoc(id);
   return setDoc(userRef, updates, { merge: true });
 }

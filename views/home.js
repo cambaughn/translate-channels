@@ -204,7 +204,8 @@ const buildHomeView = async (userId, teamId, redirect_url, userIsAdmin, nonAdmin
   const subscriptionActive = subscriptionData?.status === 'active' || subscriptionData?.status === 'trialing';
   const subscriptionKey = isProd ? 'stripe_subscription_id' : 'test_stripe_subscription_id';
 
-  if (!team[subscriptionKey] && subscriptionData?.id) {
+  if ((!team[subscriptionKey] || team[subscriptionKey] !== subscriptionData?.id) && subscriptionData?.id) {
+    console.log('updating subscription id')
     let updates = {};
     updates[subscriptionKey] = subscriptionData.id
     await teamsDB.updateTeam(teamId, updates);

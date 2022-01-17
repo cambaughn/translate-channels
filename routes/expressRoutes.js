@@ -82,7 +82,6 @@ const expressRoutes = (app, slackApp, dbConnector) => {
     let customerId = isProd ? team.stripe_customer_id : team.test_stripe_customer_id;
 
     if (!customerId) {
-      console.log('');
       const customer = await createCustomer(teamId);
       let teamUpdate = {};
       // if in prod, assign to stripe_customer_id

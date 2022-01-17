@@ -18,6 +18,7 @@ const expressRoutes = (app, slackApp, dbConnector) => {
   app.get('/auth_redirect', ({ query }, res) => {
     console.log('auth redirect =========');
     const code = query.code;
+    console.log('code ', code);
     let accessDetails = {
       client_id: process.env.CLIENT_ID,
       client_secret: process.env.CLIENT_SECRET,

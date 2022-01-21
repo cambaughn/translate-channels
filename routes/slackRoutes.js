@@ -12,6 +12,10 @@ import { getTranslations } from '../util/languages/translatev2.js';
 import Translator from '../util/languages/translate.js';
 // Subscription
 import { getSubscriptionData, reportSubscriptionUsage } from '../util/stripe/stripe.js';
+// Analytics
+import Mixpanel from 'mixpanel';
+// create an instance of the mixpanel client
+const mixpanel = Mixpanel.init(process.env.MIXPANEL_API_KEY);
 
 
 const slackRoutes = (app) => {
@@ -46,7 +50,6 @@ const slackRoutes = (app) => {
     }
 
     // Log metered usage for per-seat subscription
-    // TODO: Only log usage after trial period
     if (subscriptionData?.status === 'active') {
       let subscriptionReport = await reportSubscriptionUsage(subscriptionData, user);
     }
@@ -62,6 +65,10 @@ const slackRoutes = (app) => {
     if (!translation) { // if the translation didn't return anything
       return null; 
     }
+
+    mixpanel.track('Translate Message', {
+      "User ID": message.user
+    });
 
     updateMessage(message, translation.response, token, client);
   });

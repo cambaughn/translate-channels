@@ -3,6 +3,9 @@ import bodyParser from 'body-parser';
 import teamsDB from '../util/firebaseAPI/teams.js';
 import userDB from '../util/firebaseAPI/users.js';
 import { createCustomer, createCheckoutSession, createPortalSession } from '../util/stripe/stripe.js';
+import Mixpanel from 'mixpanel';
+// create an instance of the mixpanel client
+const mixpanel = Mixpanel.init(process.env.MIXPANEL_API_KEY);
 
 
 const expressRoutes = (app, slackApp, dbConnector) => {
@@ -49,6 +52,10 @@ const expressRoutes = (app, slackApp, dbConnector) => {
         }
         
         await teamsDB.updateTeam(team.id, teamUpdates);
+
+        mixpanel.track('Sign up', {
+          "Team ID": team.id 
+        });
       }
 
       // Upon approval and new user creation, redirect back to app: https://api.slack.com/reference/deep-linking

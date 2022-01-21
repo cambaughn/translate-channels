@@ -44,7 +44,6 @@ const buildHomeView = async (userId, teamId, redirect_url, userIsAdmin, nonAdmin
   }
 
   const userAuthenticated = !!user && !!user.access_token;
-  // TODO: Need to conditionally render the AUTH button depending on whether user has authorized yet or not
   const authBlock = {
     "type": "section",
     "text": {

@@ -13,7 +13,9 @@ const authorizeFn = async ({ userId, teamId }) => {
   // let user = await teamD.getUser(userId);
   console.log('team id ', teamId);
   let team = await teamsDB.getTeam(teamId);
-  if (team) {
+  console.log('team ', team);
+
+  if (team?.team_access_token && team?.bot_user_id && team?.id) {
     return {
       botToken: team.team_access_token,
       botId: team.bot_user_id,

@@ -138,7 +138,6 @@ const slackRoutes = (app) => {
 
   app.event('app_home_opened', async ({ event, client, context }) => {
     try {
-      console.log('opening home');
       let isSlackAdmin = await isAdmin(event.user, context.botToken, client);
       let redirect_url = process.env.REDIRECT_URL || 'https://app.translatechannels.com/auth_redirect';
       /* view.publish is the method that your app uses to push a view to the Home tab */

@@ -6,8 +6,6 @@ import { getSubscriptionData } from "../util/stripe/stripe.js";
 const buildHomeView = async (userId, teamId, redirect_url, userIsAdmin, nonAdminAllowSettings) => {
   let auth_url = `https://slack.com/oauth/v2/authorize?scope=channels:read,chat:write,commands,im:history,users:read&user_scope=channels:history,chat:write&client_id=${process.env.CLIENT_ID}&redirect_uri=${redirect_url}`;
 
-  // console.log('auth url ', auth_url);
-  
   let team = {};
   if (teamId) {
     team = await teamsDB.getTeam(teamId);
@@ -209,7 +207,7 @@ const buildHomeView = async (userId, teamId, redirect_url, userIsAdmin, nonAdmin
     updates[subscriptionKey] = subscriptionData.id
     await teamsDB.updateTeam(teamId, updates);
   }
-  console.log('subscription data ', subscriptionData);
+  // console.log('subscription data ', subscriptionData);
   console.log('subscription active ', subscriptionActive);
 
   home.view.blocks.push(

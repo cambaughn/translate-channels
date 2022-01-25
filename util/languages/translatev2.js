@@ -6,7 +6,6 @@ import stringOperator from './stringHelpers.js';
 
 
 const getTranslations = (message, targetLanguages) => {
-  console.log('message ', message);
   let stringHelper = new stringOperator(message.text);
   let translatableString = stringHelper.getTranslateString();
 

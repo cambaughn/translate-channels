@@ -10,7 +10,7 @@ const updateMessage = (message, response, token, client) => {
   };
 
   return client.chat.update(messageRequest, error => {
-    console.log(error);
+    console.error(error);
   });
 }
 
@@ -24,7 +24,7 @@ const postMessageAsUser = (text, channel, token, client) => {
   };
 
   client.chat.postMessage(messageRequest, (error) => {
-    console.log(error);
+    console.error(error);
   });
 }
 
@@ -42,7 +42,7 @@ const getChannelInfo = async (channel, client, context) => {
 
     return Promise.resolve({ name: result.channel.name, id: result.channel.id });
   } catch (error) {
-    console.log(error);
+    console.error(error);
     return Promise.resolve({});
   }
 };
@@ -56,7 +56,7 @@ const provideHelp = (botToken, channel, client) => {
   };
 
   client.chat.postMessage(messageRequest, (error) => {
-    console.log(error);
+    console.error(error);
   });
 }
 

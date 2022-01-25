@@ -21,7 +21,6 @@ const expressRoutes = (app, slackApp, dbConnector) => {
   app.get('/auth_redirect', ({ query }, res) => {
     console.log('auth redirect =========');
     const code = query.code;
-    console.log('code ', code);
     let accessDetails = {
       client_id: process.env.CLIENT_ID,
       client_secret: process.env.CLIENT_SECRET,
@@ -38,8 +37,6 @@ const expressRoutes = (app, slackApp, dbConnector) => {
         app_id: app_id
       }
 
-      // console.log('result ===> ', result);
-      console.log('testing ', result.bot_user_id, result.access_token);
       // Create new user in firebase - this is the first time we're seeing them
       await userDB.updateUser(authed_user.id, userInfo);
 

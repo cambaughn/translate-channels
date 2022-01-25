@@ -22,7 +22,7 @@ const authorizeFn = async ({ userId, teamId }) => {
       teamId: team.id
     };
   }
-  
+
   throw new Error('No matching authorizations');
 };
 
@@ -40,5 +40,7 @@ slackRoutes(slackApp);
 
 (async () => {
   await slackApp.start(process.env.PORT || 3000);
-  console.log('⚡️ Bolt app is running!');
+  if (process.env.ENVIRONMENT === 'development') {
+    console.log('⚡️ Bolt app is running!');
+  }
 })();

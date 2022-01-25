@@ -94,7 +94,7 @@ teamsDB.formatTeam = (team) => {
   let formattedTeam = {
     slack_team_id: team.slackTeamId,
     team_access_token: team.workspaceToken,
-    bot_user_token: team.botId,
+    bot_user_id: team.botId,
     workspace_languages: team.settings?.workspace?.outputLanguages || [],
     channel_language_settings: {}
   };

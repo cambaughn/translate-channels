@@ -21,6 +21,7 @@ const mixpanel = Mixpanel.init(process.env.MIXPANEL_API_KEY);
 const slackRoutes = (app) => {
 
   app.event('message', async ({ message, context, client }) => {
+    console.log('message event');
     // if the message comes from a bot OR the message has been edited manually, don't translate
     if (message.bot_id || message.subtype === 'message_changed') { 
       return null; 
@@ -75,6 +76,7 @@ const slackRoutes = (app) => {
 
 
   app.command('/nt', async ({ ack, command, context, client }) => {
+    console.log('/nt slash command');
     await ack();
     if (command.text === 'help' || !command.text) {
       // provideHelp sends a private message to the user with FAQs
@@ -91,18 +93,21 @@ const slackRoutes = (app) => {
 
   // This action only needs to acknowledge the button click - auth is otherwise handled with oAuth redirect url
   app.action('authorize_app', async ({ ack }) => {
+    console.log('authorize_app event');
     // We just need ack() here to respond to the action, even though we're redirecting to a url
     await ack();
   })  
   
   // This action only needs to acknowledge the button click - auth is otherwise handled with a url
   app.action('manage_plan', async ({ ack }) => {
+    console.log('manage_plan event');
     // We just need ack() here to respond to the action, even though we're redirecting to a url
     await ack();
   })
 
 
   app.action('settings_modal_opened', async ({ ack, action, body, context }) => {
+    console.log('settings_modal_opened event');
     await ack();
     const homeViewId = body.container.view_id;
     const settingsModal = await buildSettingsModal(action.value);
@@ -120,6 +125,7 @@ const slackRoutes = (app) => {
 
 
   app.view('settings_modal_submitted', async ({ ack, view, context, body, client }) => {
+    console.log('settings_modal_submitted event');
     await ack();
     const settingsModal = view.state.values;
     const languages = settingsModal.select_lang_block.select_lang.selected_options.map(x => x.value);
@@ -137,6 +143,7 @@ const slackRoutes = (app) => {
 
 
   app.event('app_home_opened', async ({ event, client, context }) => {
+    console.log('app_home_opened event');
     try {
       let isSlackAdmin = await isAdmin(event.user, context.botToken, client);
       let redirect_url = process.env.REDIRECT_URL || 'https://app.translatechannels.com/auth_redirect';
@@ -152,6 +159,7 @@ const slackRoutes = (app) => {
   });
 
   app.event('app_uninstalled', async ({ event, context }) => {
+    console.log('app_uninstalled event');
     await teamsDB.deactivateTeam(event.team_id)
   });
 }

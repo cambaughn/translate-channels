@@ -23,6 +23,17 @@ userDB.deleteUser = async (id) => {
   return deleteDoc(userRef);
 }
 
+// Mongodb
+userDB.migrateUsers = async (users) => {
+  let userRefs = users.map(user => {
+    let id = user.id;
+    delete user.id;
+    return userDB.updateUser(id, user);
+  })
+
+  return Promise.all(userRefs);
+}
+
 
 
 // Helpers

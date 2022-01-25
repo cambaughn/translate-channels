@@ -1,5 +1,7 @@
 import { MongoClient } from 'mongodb';
 import autoBind from 'auto-bind';
+import teamsDB from '../firebaseAPI/teams.js';
+import userDB from '../firebaseAPI/users.js';
 
 
 class dbConnector {
@@ -358,5 +360,48 @@ class dbConnector {
     return item;
   }
 }
+
+
+const migrateTeams = async () => {
+  // Testing mongodb connection in an attempt to transfer over team information
+  const db = new dbConnector();
+  await db.buildConnection();
+  
+  let teams = await db.getAllTeams();
+  let teamsWithUsers = teams.filter(team => team.userTokens?.length > 0);
+  let totalUserCount = teamsWithUsers.map(team => {
+    return team.userTokens.length;
+  }).reduce((a,b) => {
+    return a + b;
+  }, 0);
+
+  let allUsers = []
+  
+  teamsWithUsers.forEach(team => {
+    team.userTokens.forEach(user => {
+      let formattedUser = {
+        access_token: user.oauthToken,
+        team_id: team.slackTeamId,
+        id: user.slackId
+      }
+      allUsers.push(formattedUser);
+    })
+  })
+
+  console.log('got users ', allUsers.length, allUsers[0]);
+  await userDB.migrateUsers(allUsers);
+  console.log('uploaded all users!');
+  
+  // console.log(`total user count: ${totalUserCount} | teams with users: ${teamsWithUsers.length} | avg user count: ${Math.round(totalUserCount / teamsWithUsers.length)}`);
+  let formattedTeams = teams.map(teamsDB.formatTeam);
+  let teamsWithTokens = formattedTeams.filter(team => !!team.team_access_token && !!team.bot_user_id);
+  // console.log(`There are ${teams.length} total teams, and ${teamsWithTokens.length} teams with tokens`);
+  // console.log('team with token: ', teamsWithTokens[0]);
+  // await teamsDB.migrateTeams(teamsWithTokens);
+  // console.log('uploaded teams ---------');
+}
+
+migrateTeams()
+
 
 export default dbConnector;

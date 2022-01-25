@@ -5,26 +5,6 @@ import { getSubscriptionData } from "../util/stripe/stripe.js";
 import dbConnector from "../util/mongo/mongo.js";
 
 const buildHomeView = async (userId, teamId, redirect_url, userIsAdmin, nonAdminAllowSettings) => {
-  // Testing mongodb connection in an attempt to transfer over team information
-  // const db = new dbConnector();
-  // await db.buildConnection();
-
-  // let teams = await db.getAllTeams();
-  // let teamsWithUsers = teams.filter(team => team.userTokens?.length > 0);
-  // let totalUserCount = teamsWithUsers.map(team => {
-  //   return team.userTokens.length;
-  // }).reduce((a,b) => {
-  //   return a + b;
-  // }, 0);
-
-  // console.log(`total user count: ${totalUserCount} | teams with users: ${teamsWithUsers.length} | avg user count: ${Math.round(totalUserCount / teamsWithUsers.length)}`);
-  // let formattedTeams = teams.map(teamsDB.formatTeam);
-  // let teamsWithTokens = formattedTeams.filter(team => !!team.team_access_token && !!team.bot_user_id);
-  // console.log(`There are ${teams.length} total teams, and ${teamsWithTokens.length} teams with tokens`);
-  // console.log('team with token: ', teamsWithTokens[0]);
-  // await teamsDB.migrateTeams(teamsWithTokens);
-  // console.log('uploaded teams ---------');
-
   let auth_url = `https://slack.com/oauth/v2/authorize?scope=channels:read,chat:write,commands,im:history,users:read&user_scope=channels:history,chat:write&client_id=${process.env.CLIENT_ID}&redirect_uri=${redirect_url}`;
 
   // console.log('auth url ', auth_url);

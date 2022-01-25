@@ -96,7 +96,8 @@ teamsDB.formatTeam = (team) => {
     team_access_token: team.workspaceToken,
     bot_user_id: team.botId,
     workspace_languages: team.settings?.workspace?.outputLanguages || [],
-    channel_language_settings: {}
+    channel_language_settings: {},
+    v1_team: true
   };
 
   team.settings.channel.forEach(channel => {
@@ -112,6 +113,11 @@ teamsDB.formatTeam = (team) => {
   return formattedTeam;
 }
 
+teamsDB.migrateTeams = async (teams) => {
+  console.log('teams to upload ', teams.length);
+  let teamRefs = teams.map(team => teamsDB.updateTeam(team.slack_team_id, team));
+  return Promise.all(teamRefs);
+}
 
 // Helpers
 const teamsDoc = (id) => {

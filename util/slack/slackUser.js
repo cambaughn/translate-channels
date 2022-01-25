@@ -3,9 +3,11 @@ const isAdmin = async (user, workspaceToken, client) => {
     token: workspaceToken,
     user: user
   };
+
+  console.log('user ', user);
   
   const result = await client.users.info(infoRequest);
-  return result.user.is_admin;
+  return result.user?.is_admin;
 };
 
 export { isAdmin }

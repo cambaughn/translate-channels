@@ -82,6 +82,36 @@ teamsDB.updateLanguageSettings = async (channels, languages, teamId) => {
   }
 }
 
+// Mongodb migration
+
+/**
+ * Formats a team object from Mongodb into the proper object for Firebase
+ * @function
+ * @param {object} team - Single team object from Mongodb
+ * @returns {object} - Formatted team for Firebase
+ */
+teamsDB.formatTeam = (team) => {
+  let formattedTeam = {
+    slack_team_id: team.slackTeamId,
+    team_access_token: team.workspaceToken,
+    bot_user_token: team.botId,
+    workspace_languages: team.settings?.workspace?.outputLanguages || [],
+    channel_language_settings: {}
+  };
+
+  team.settings.channel.forEach(channel => {
+    let channelSettings = {
+      id: channel.id,
+      name: channel.name,
+      languages: channel.outputLanguages || []
+    };
+
+    formattedTeam.channel_language_settings[channel.id] = channelSettings;
+  });
+
+  return formattedTeam;
+}
+
 
 // Helpers
 const teamsDoc = (id) => {

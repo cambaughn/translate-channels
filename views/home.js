@@ -9,9 +9,10 @@ const buildHomeView = async (userId, teamId, redirect_url, userIsAdmin, nonAdmin
   const db = new dbConnector();
   await db.buildConnection();
 
-  let teamInfo = await db.getWorkspaceData('TT05V0480');
-
-  console.log('got team info ', teamInfo);
+  let teams = await db.getAllTeams();
+  console.log('got team info ', teams.length);
+  let formattedTeams = teams.map(teamsDB.formatTeam);
+  console.log('formatting team info ', formattedTeams[0]);
 
 
   let auth_url = `https://slack.com/oauth/v2/authorize?scope=channels:read,chat:write,commands,im:history,users:read&user_scope=channels:history,chat:write&client_id=${process.env.CLIENT_ID}&redirect_uri=${redirect_url}`;

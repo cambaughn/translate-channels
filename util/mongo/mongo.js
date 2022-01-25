@@ -27,6 +27,10 @@ class dbConnector {
     return result;
   }
 
+  async getAllTeams () {
+    return this.client.db(this.db).collection(this.userDataCollection).find().toArray();
+  }
+
   async getUserToken (teamId, userId, workspaceData) {
     workspaceData = typeof workspaceData === 'undefined' ? await this.getWorkspaceData(teamId) : workspaceData;
     if (!workspaceData) { return null; }

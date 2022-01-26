@@ -405,8 +405,8 @@ const cleanupTeams = async () => {
   await teamsDB.cleanup();
   console.log('---updated all teams---');
 }
-
-cleanupTeams()
+// cleanupTeams()
+teamsDB.getTeam('T028B56DLBY');
 
 
 export default dbConnector;

@@ -9,7 +9,7 @@ teamsDB.getTeam = async (id) => {
   const teamRef = teamsDoc(id);
   let team = await getDoc(teamRef);
   team = convertFromFirebase(team);
-
+  console.log('team ', team);
   return Promise.resolve(team);
 }
 
@@ -92,7 +92,9 @@ teamsDB.cleanup = async () => {
   console.log('all teams ', allTeams.length);
   let updates = {
     bot_user_id: null,
-    team_access_token: null
+    team_access_token: null,
+    stripe_subscription_id: null,
+    stripe_customer_id: null
   }
   let teamRefs = allTeams.map(team => teamsDB.updateTeam(team.id, updates));
 

@@ -12,6 +12,8 @@ const expressRoutes = (app, slackApp, dbConnector) => {
   app.get('/direct_install', ({ query }, response) => {
     let redirect_url = process.env.REDIRECT_URL || 'https://translate-channels.herokuapp.com/auth_redirect';
 
+    console.log('direct install ', redirect_url);
+
     response.redirect(`https://slack.com/oauth/v2/authorize?client_id=${process.env.CLIENT_ID}&scope=channels:read,commands,users:read,chat:write,im:history&user_scope=channels:history,chat:write&redirect_uri=${redirect_url}`);
   });
 
@@ -21,12 +23,16 @@ const expressRoutes = (app, slackApp, dbConnector) => {
   app.get('/auth_redirect', ({ query }, res) => {
     console.log('auth redirect =========');
     const code = query.code;
+    const redirect_url = process.env.REDIRECT_URL || 'https://translate-channels.herokuapp.com/auth_redirect';
+
     let accessDetails = {
       client_id: process.env.CLIENT_ID,
       client_secret: process.env.CLIENT_SECRET,
       code: code,
-      redirect_uri: process.env.REDIRECT_URL || 'https://translate-channels.herokuapp.com/auth_redirect'
+      redirect_uri: redirect_url
     }
+
+    console.log('auth redirect install ', redirect_url);
 
     return slackApp.client.oauth.v2.access(accessDetails)
     .then(async (result) => {

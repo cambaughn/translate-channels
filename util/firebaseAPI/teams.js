@@ -1,4 +1,4 @@
-import { doc, setDoc, getDoc, deleteDoc } from "firebase/firestore"; 
+import { collection, doc, setDoc, getDoc, getDocs, deleteDoc } from "firebase/firestore"; 
 import db from '../firebase/firebaseInit.js';
 import convertFromFirebase from '../firebase/converter.js';
 
@@ -82,6 +82,25 @@ teamsDB.updateLanguageSettings = async (channels, languages, teamId) => {
   }
 }
 
+// Clean up teams
+teamsDB.cleanup = async () => {
+  let teamQuery = await getDocs(teamsCollection());
+  let allTeams = [];
+  teamQuery.forEach(doc => {
+    allTeams.push(convertFromFirebase(doc));
+  })
+  console.log('all teams ', allTeams.length);
+  let updates = {
+    bot_user_id: null,
+    team_access_token: null
+  }
+  let teamRefs = allTeams.map(team => teamsDB.updateTeam(team.id, updates));
+
+  return Promise.all(teamRefs);
+}
+
+
+
 // Mongodb migration
 
 /**
@@ -122,6 +141,10 @@ teamsDB.migrateTeams = async (teams) => {
 // Helpers
 const teamsDoc = (id) => {
   return doc(db, 'teams', id);
+}
+
+const teamsCollection = () => {
+  return collection(db, 'teams');
 }
 
 

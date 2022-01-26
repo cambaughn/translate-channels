@@ -401,7 +401,12 @@ const migrateTeams = async () => {
   // console.log('uploaded teams ---------');
 }
 
-migrateTeams()
+const cleanupTeams = async () => {
+  await teamsDB.cleanup();
+  console.log('---updated all teams---');
+}
+
+cleanupTeams()
 
 
 export default dbConnector;

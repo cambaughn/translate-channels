@@ -226,7 +226,7 @@ const buildHomeView = async (userId, teamId, redirect_url, userIsAdmin, nonAdmin
       type: 'section',
       text: {
         type: 'mrkdwn',
-        text: !subscriptionActive ? "Set up your subscription to begin getting translations for your team :point_right: " : "Your subscription is active, and you have unlimited messages."
+        text: !subscriptionActive ? "Set up your subscription to begin getting translations for your team :point_right: " : ":white_check_mark: Your subscription is active, and you have unlimited messages."
       },
       accessory: {
         type: 'button',

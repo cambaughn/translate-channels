@@ -36,6 +36,7 @@ const expressRoutes = (app, slackApp, dbConnector) => {
 
     return slackApp.client.oauth.v2.access(accessDetails)
     .then(async (result) => {
+      console.log('got oauth back');
       let { team, authed_user, app_id } = result;
       let userInfo = {
         access_token: authed_user.access_token,
@@ -48,6 +49,7 @@ const expressRoutes = (app, slackApp, dbConnector) => {
 
       // If we're getting the team tokens from them as well, update/create the team in the database
       if (result.bot_user_id && result.access_token) {
+        console.log('got team: ', team.id, result.access_token, result.bot_user_id);
         let teamUpdates = { 
           slack_team_id: team.id,
           bot_user_id: result.bot_user_id,

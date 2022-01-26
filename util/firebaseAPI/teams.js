@@ -22,9 +22,9 @@ teamsDB.updateTeam = async (id, updates) => {
 teamsDB.createNew = async (id) => {
   let defaultTeam = {
     bot_user_id: null,
+    team_access_token: null,
     channel_language_settings: {},
     slack_team_id: id,
-    team_access_token: null,
     workspace_languages: []
   }
 

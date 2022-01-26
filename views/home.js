@@ -16,7 +16,8 @@ const buildHomeView = async (userId, teamId, redirect_url, userIsAdmin, nonAdmin
     team = await teamsDB.getTeam(teamId);
   }
 
-
+  console.log('got team ', team);
+  
   let home = {
     /* the user that opened your app's app home */
     user_id: userId,

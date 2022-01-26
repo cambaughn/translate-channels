@@ -407,6 +407,6 @@ const cleanupTeams = async () => {
 }
 // cleanupTeams()
 teamsDB.getTeam('T028B56DLBY');
-
+// teamsDB.deleteTeam('T028B56DLBY')
 
 export default dbConnector;

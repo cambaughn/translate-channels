@@ -26,7 +26,7 @@ const expressRoutes = (app, slackApp, dbConnector) => {
       client_id: process.env.CLIENT_ID,
       client_secret: process.env.CLIENT_SECRET,
       code: code,
-      redirect_uri: process.env.REDIRECT_URL
+      redirect_uri: process.env.REDIRECT_URL || 'https://translate-channels.herokuapp.com/auth_redirect'
     }
 
     return slackApp.client.oauth.v2.access(accessDetails)

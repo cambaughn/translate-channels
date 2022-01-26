@@ -158,11 +158,11 @@ const slackRoutes = (app) => {
     }
   });
 
-  app.event('app_uninstalled', async ({ event, context, ack }) => {
+  app.event('app_uninstalled', async ({ event, ack }) => {
+    console.log('app_uninstalled event');
     if (ack) {
       await ack();
     }
-    console.log('app_uninstalled event');
     await teamsDB.deactivateTeam(event.team_id)
   });
 }

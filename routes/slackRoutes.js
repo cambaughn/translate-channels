@@ -148,8 +148,9 @@ const slackRoutes = (app) => {
       let isSlackAdmin = await isAdmin(event.user, context.botToken, client);
       let redirect_url = process.env.REDIRECT_URL || 'https://translate-channels.herokuapp.com/auth_redirect';
       /* view.publish is the method that your app uses to push a view to the Home tab */
-      let teamId = event.view?.team_id;
+      let teamId = context.teamId;
       let userId = event.user;
+      console.log('team id in app_home_opened =>', teamId);
       let homeView = await buildHomeView(userId, teamId, redirect_url, isSlackAdmin);
       const result = await client.views.publish(homeView);
     } catch (error) {

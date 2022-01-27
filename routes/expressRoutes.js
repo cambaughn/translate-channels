@@ -44,6 +44,7 @@ const expressRoutes = (app, slackApp, dbConnector) => {
         app_id: app_id
       }
 
+      console.log('got user ', authed_user.id, userInfo);
       // Create new user in firebase - this is the first time we're seeing them
       await userDB.updateUser(authed_user.id, userInfo);
 

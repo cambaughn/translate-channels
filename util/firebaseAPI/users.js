@@ -14,6 +14,7 @@ userDB.getUser = async (id) => {
 }
 
 userDB.updateUser = async (id, updates) => {
+  console.log('updating user ', id, updates);
   const userRef = usersDoc(id);
   return setDoc(userRef, updates, { merge: true });
 }

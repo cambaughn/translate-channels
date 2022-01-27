@@ -11,10 +11,10 @@ const buildHomeView = async (userId, teamId, redirect_url, userIsAdmin, nonAdmin
     team = await teamsDB.getTeam(teamId);
   }
   let user = await userDB.getUser(userId);
-  if (!team.slack_team_id && teamId) { // if the team doesn't exist yet, we need to create it
-    await teamsDB.createNew(teamId);
-    team = await teamsDB.getTeam(teamId);
-  }
+  // if (!team.slack_team_id && teamId) { // if the team doesn't exist yet, we need to create it
+  //   await teamsDB.createNew(teamId);
+  //   team = await teamsDB.getTeam(teamId);
+  // }
 
   console.log('got team ', team);
   

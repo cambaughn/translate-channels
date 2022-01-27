@@ -150,8 +150,10 @@ const slackRoutes = (app) => {
       /* view.publish is the method that your app uses to push a view to the Home tab */
       let teamId = event.view?.team_id;
       let userId = event.user;
-      let homeView = await buildHomeView(userId, teamId, redirect_url, isSlackAdmin);
-      const result = await client.views.publish(homeView);
+      if (teamId) {
+        let homeView = await buildHomeView(userId, teamId, redirect_url, isSlackAdmin);
+        const result = await client.views.publish(homeView);
+      }
     }
     catch (error) {
       console.error(error);

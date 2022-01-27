@@ -6,10 +6,7 @@ import { getSubscriptionData } from "../util/stripe/stripe.js";
 const buildHomeView = async (userId, teamId, redirect_url, userIsAdmin, nonAdminAllowSettings) => {
   let auth_url = `https://slack.com/oauth/v2/authorize?scope=channels:read,chat:write,commands,im:history,users:read&user_scope=channels:history,chat:write&client_id=${process.env.CLIENT_ID}&redirect_uri=${redirect_url}`;
 
-  let team = {};
-  if (teamId) {
-    team = await teamsDB.getTeam(teamId);
-  }
+  let team = await teamsDB.getTeam(teamId);
   let user = await userDB.getUser(userId);
   // if (!team.slack_team_id && teamId) { // if the team doesn't exist yet, we need to create it
   //   await teamsDB.createNew(teamId);

@@ -11,10 +11,11 @@ const expressReceiver = new ExpressReceiver({
 
 const authorizeFn = async ({ userId, teamId }) => {
   // let user = await teamD.getUser(userId);
+  console.log('authorizing for team: ', teamId);
   let team = await teamsDB.getTeam(teamId);
 
   if (team.team_access_token && team.bot_user_id && team.id) {
-    console.log('authorizing for team: ', teamId);
+    console.log('team has access tokens: ', teamId);
     return {
       botToken: team.team_access_token,
       botId: team.bot_user_id,

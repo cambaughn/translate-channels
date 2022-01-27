@@ -15,11 +15,12 @@ teamsDB.getTeam = async (id) => {
 
 // Create (or update existing) team in Firebase
 teamsDB.updateTeam = async (id, updates) => {
+  console.log('updating team ', id);
   const teamRef = teamsDoc(id);
   return setDoc(teamRef, updates, { merge: true });
 }
 
-teamsDB.createNew = async (id) => {
+teamsDB.createNew = async (id, settings) => {
   let defaultTeam = {
     bot_user_id: null,
     team_access_token: null,
@@ -28,7 +29,12 @@ teamsDB.createNew = async (id) => {
     workspace_languages: []
   }
 
-  return teamsDB.updateTeam(id, defaultTeam);
+  let team = {
+    ...defaultTeam,
+    ...settings
+  }
+
+  return teamsDB.updateTeam(id, team);
 }
 
 // Deactivate team by removing Slack app keys - when uninstalling

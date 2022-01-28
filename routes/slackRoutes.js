@@ -21,7 +21,7 @@ const mixpanel = Mixpanel.init(process.env.MIXPANEL_API_KEY);
 const slackRoutes = (app) => {
 
   app.event('message', async ({ message, context, client }) => {
-    console.log('message event');
+    console.log('message event for user: ', message.user);
     // if the message comes from a bot OR the message has been edited manually, don't translate
     if (message.bot_id || message.subtype === 'message_changed') { 
       return null; 

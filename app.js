@@ -5,6 +5,8 @@ import expressRoutes from './routes/expressRoutes.js';
 import slackRoutes from './routes/slackRoutes.js';
 import teamsDB from "./util/firebaseAPI/teams.js";
 
+console.log('---running app---');
+
 const expressReceiver = new ExpressReceiver({
   signingSecret: process.env.SLACK_SIGNING_SECRET
 });

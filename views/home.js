@@ -33,7 +33,7 @@ const buildHomeView = async (userId, teamId, redirect_url, userIsAdmin, nonAdmin
           "type": "section",
           "text": {
             "type": "mrkdwn",
-            "text": "*Welcome to Translate Channels* :tada:"
+            "text": "*Welcome to Translate dsafjadsjkfljds* :tada:"
           }
         },
         {

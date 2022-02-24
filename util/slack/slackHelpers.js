@@ -1,6 +1,7 @@
 import helpMessage from "../../views/helpMessage.js";
 import { isAdmin } from "./slackUser.js";
 import buildHomeView from "../../views/home.js";
+import teamsDB from "../firebaseAPI/teams.js";
 
 const publishHomeView = async ({ event, context, client }) => {
   try {
@@ -20,8 +21,9 @@ const publishHomeView = async ({ event, context, client }) => {
 
 const publishHomeViewForAllUsers = async (client) => {
   try {
-    let users = await client.users.list();
-    console.log('publishing home view for all: ', users);
+    let allTeams = await teamsDB.getAllTeams();
+    // let users = await client.users.list();
+    // console.log('publishing home view for all: ', allTeams);
     // let isSlackAdmin = await isAdmin(event.user, context.botToken, client);
     // let redirect_url = process.env.REDIRECT_URL || 'https://translate-channels.herokuapp.com/auth_redirect';
     // /* view.publish is the method that your app uses to push a view to the Home tab */

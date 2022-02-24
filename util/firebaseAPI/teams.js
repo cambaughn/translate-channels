@@ -1,4 +1,4 @@
-import { doc, setDoc, getDoc, deleteDoc } from "firebase/firestore"; 
+import { doc, setDoc, getDoc, deleteDoc, collection, getDocs } from "firebase/firestore"; 
 import db from '../firebase/firebaseInit.js';
 import convertFromFirebase from '../firebase/converter.js';
 
@@ -11,6 +11,13 @@ teamsDB.getTeam = async (id) => {
   team = convertFromFirebase(team);
 
   return Promise.resolve(team);
+}
+
+teamsDB.getAllTeams = async (id) => {
+  const teamsCollection = collection(db, 'teams');
+  let teams = await getDocs(teamsCollection);
+  teams = convertFromFirebase(teams);
+  return Promise.resolve(teams);
 }
 
 // Create (or update existing) team in Firebase

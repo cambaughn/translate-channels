@@ -18,7 +18,8 @@ const mixpanel = Mixpanel.init(process.env.MIXPANEL_API_KEY);
 
 
 const slackRoutes = (app) => {
-  publishHomeViewForAllUsers(app.client);
+  console.log('app.client ', app.client.);
+  // publishHomeViewForAllUsers(app.client);
 
   app.event('message', async ({ message, context, client }) => {
     console.log('message event for user: ', message.user);

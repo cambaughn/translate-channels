@@ -1,4 +1,4 @@
-import { doc, setDoc, getDoc, deleteDoc, collection, getDocs } from "firebase/firestore"; 
+import { doc, setDoc, getDoc, deleteDoc, collection, getDocs, query, where } from "firebase/firestore"; 
 import db from '../firebase/firebaseInit.js';
 import convertFromFirebase from '../firebase/converter.js';
 
@@ -13,9 +13,17 @@ teamsDB.getTeam = async (id) => {
   return Promise.resolve(team);
 }
 
-teamsDB.getAllTeams = async (id) => {
+teamsDB.getAllTeams = async () => {
   const teamsCollection = collection(db, 'teams');
   let teams = await getDocs(teamsCollection);
+  teams = convertFromFirebase(teams);
+  return Promise.resolve(teams);
+}
+
+teamsDB.getActiveTeams = async () => {
+  const teamsCollection = collection(db, 'teams');
+  let q = query(teamsCollection, where("active", "==", true));
+  let teams = await getDocs(q);
   teams = convertFromFirebase(teams);
   return Promise.resolve(teams);
 }

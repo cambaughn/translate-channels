@@ -22,21 +22,57 @@ const publishHomeView = async ({ event, context, client }) => {
 const publishHomeViewForAllUsers = async (client) => {
   try {
     let allTeams = await teamsDB.getAllTeams();
-    // let users = await client.users.list();
-    // console.log('publishing home view for all: ', allTeams);
-    // let isSlackAdmin = await isAdmin(event.user, context.botToken, client);
-    // let redirect_url = process.env.REDIRECT_URL || 'https://translate-channels.herokuapp.com/auth_redirect';
+    allTeams = allTeams.slice(10,15)
+    let users = [];
+    // let allUsers = await Promise.all(allTeams.map(team => {
+    //   try {
+    //     client.users.list({ token: team.team_access_token })
+    //   } catch (error) {
+    //     return null;
+    //   }
+    // }));
+
+    for (let i = 0; i < allTeams.length; i++) {
+      let team = allTeams[i];
+      let teamToken = team.team_access_token;
+
+      if (teamToken && team.active !== false) {
+        try {
+          let teamUsers = await client.users.list({ token: teamToken });
+          users.push(teamUsers.members);
+          if (!team.active) {
+            await teamsDB.updateTeam(team.id, { active: true });
+          }
+        } catch(error) {
+          await teamsDB.updateTeam(team.id, { active: false });
+          console.log('error');
+        }
+      }
+    }
+
+    users = users.flat();
+
+    console.log('all users ', users.length);
+
+    for (let i = 0; i < users.length; i++) {
+      let user = users[i];
+      let isSlackAdmin = user.is_admin;
+      let redirect_url = process.env.REDIRECT_URL || 'https://translate-channels.herokuapp.com/auth_redirect';
     // /* view.publish is the method that your app uses to push a view to the Home tab */
-    // let teamId = context.teamId;
-    // let userId = event.user;
-    // let homeView = await buildHomeView(userId, teamId, redirect_url, isSlackAdmin);
-    // homeView.token = context.botToken;
-    // console.log('view config ', homeView.token, homeView.user_id);
-    // const result = await client.views.publish(homeView);
+      let teamId = user.team_id;
+      let userId = user.id;
+      let homeView = await buildHomeView(userId, teamId, redirect_url, isSlackAdmin);
+      // homeView.token = context.botToken;
+      console.log('view config ', homeView.token, homeView.user_id);
+      // const result = await client.views.publish(homeView);
+
+    }
+
   } catch (error) {
     console.error(error);
   }
 }
+
 
 const updateMessage = (message, response, token, client) => {
   // finds message and edits it with the translated text (response) as blocks

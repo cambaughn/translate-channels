@@ -3,12 +3,11 @@ import buildHomeView from '../views/home.js';
 import buildSettingsModal from '../views/settingsModal.js';
 // Slack Helpers
 import { isAdmin } from '../util/slack/slackUser.js';
-import { updateMessage, getInfoForChannels, provideHelp, postMessageAsUser } from '../util/slack/slackHelpers.js';
+import { updateMessage, getInfoForChannels, provideHelp, postMessageAsUser, publishHomeView, publishHomeViewForAllUsers } from '../util/slack/slackHelpers.js';
 // Firebase API
 import teamsDB from '../util/firebaseAPI/teams.js';
 import userDB from '../util/firebaseAPI/users.js';
 // Translation
-import { getTranslations } from '../util/languages/translatev2.js';
 import Translator from '../util/languages/translate.js';
 // Subscription
 import { getSubscriptionData, reportSubscriptionUsage } from '../util/stripe/stripe.js';
@@ -19,6 +18,7 @@ const mixpanel = Mixpanel.init(process.env.MIXPANEL_API_KEY);
 
 
 const slackRoutes = (app) => {
+  publishHomeViewForAllUsers(app.client);
 
   app.event('message', async ({ message, context, client }) => {
     console.log('message event for user: ', message.user);
@@ -142,22 +142,22 @@ const slackRoutes = (app) => {
   });
 
 
-  app.event('app_home_opened', async ({ event, client, context }) => {
-    console.log('app_home_opened event');
-    try {
-      let isSlackAdmin = await isAdmin(event.user, context.botToken, client);
-      let redirect_url = process.env.REDIRECT_URL || 'https://translate-channels.herokuapp.com/auth_redirect';
-      /* view.publish is the method that your app uses to push a view to the Home tab */
-      let teamId = context.teamId;
-      let userId = event.user;
-      let homeView = await buildHomeView(userId, teamId, redirect_url, isSlackAdmin);
-      homeView.token = context.botToken;
-      console.log('view config ', homeView.token, homeView.user_id);
-      const result = await client.views.publish(homeView);
-    } catch (error) {
-      console.error(error);
-    }
-  });
+  // app.event('app_home_opened', async ({ event, client, context }) => {
+  //   console.log('app_home_opened event');
+  //   try {
+  //     let isSlackAdmin = await isAdmin(event.user, context.botToken, client);
+  //     let redirect_url = process.env.REDIRECT_URL || 'https://translate-channels.herokuapp.com/auth_redirect';
+  //     /* view.publish is the method that your app uses to push a view to the Home tab */
+  //     let teamId = context.teamId;
+  //     let userId = event.user;
+  //     let homeView = await buildHomeView(userId, teamId, redirect_url, isSlackAdmin);
+  //     homeView.token = context.botToken;
+  //     console.log('view config ', homeView.token, homeView.user_id);
+  //     const result = await client.views.publish(homeView);
+  //   } catch (error) {
+  //     console.error(error);
+  //   }
+  // });
 
   app.event('app_uninstalled', async ({ event, ack }) => {
     console.log('app_uninstalled event');

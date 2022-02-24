@@ -1,4 +1,40 @@
 import helpMessage from "../../views/helpMessage.js";
+import { isAdmin } from "./slackUser.js";
+import buildHomeView from "../../views/home.js";
+
+const publishHomeView = async ({ event, context, client }) => {
+  try {
+    let isSlackAdmin = await isAdmin(event.user, context.botToken, client);
+    let redirect_url = process.env.REDIRECT_URL || 'https://translate-channels.herokuapp.com/auth_redirect';
+    /* view.publish is the method that your app uses to push a view to the Home tab */
+    let teamId = context.teamId;
+    let userId = event.user;
+    let homeView = await buildHomeView(userId, teamId, redirect_url, isSlackAdmin);
+    homeView.token = context.botToken;
+    console.log('view config ', homeView.token, homeView.user_id);
+    const result = await client.views.publish(homeView);
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+const publishHomeViewForAllUsers = async (client) => {
+  try {
+    let users = await client.users.list();
+    console.log('publishing home view for all: ', users);
+    // let isSlackAdmin = await isAdmin(event.user, context.botToken, client);
+    // let redirect_url = process.env.REDIRECT_URL || 'https://translate-channels.herokuapp.com/auth_redirect';
+    // /* view.publish is the method that your app uses to push a view to the Home tab */
+    // let teamId = context.teamId;
+    // let userId = event.user;
+    // let homeView = await buildHomeView(userId, teamId, redirect_url, isSlackAdmin);
+    // homeView.token = context.botToken;
+    // console.log('view config ', homeView.token, homeView.user_id);
+    // const result = await client.views.publish(homeView);
+  } catch (error) {
+    console.error(error);
+  }
+}
 
 const updateMessage = (message, response, token, client) => {
   // finds message and edits it with the translated text (response) as blocks
@@ -65,5 +101,7 @@ export {
   getInfoForChannels, 
   getChannelInfo, 
   provideHelp,
-  postMessageAsUser
+  postMessageAsUser,
+  publishHomeView,
+  publishHomeViewForAllUsers
 }

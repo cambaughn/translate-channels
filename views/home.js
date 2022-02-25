@@ -72,8 +72,72 @@ const buildHomeView = async (userId, teamId, redirect_url, userIsAdmin, nonAdmin
     }
   )
 
-  // Channel Translation Settings
-  home.view.blocks.push({
+  // Channel Translation Settings Section
+  let channelTranslationSettings = configureTranslationSettingsSection(team, userIsAdmin, nonAdminAllowSettings);
+  home.view.blocks.push(...channelTranslationSettings);
+
+
+  // Slash Commands Section
+  let slashCommands = configureSlashCommandsSection();
+  home.view.blocks.push(...slashCommands);
+
+  
+  // Manage Plan
+  if (team && team.id) {
+    const isProd = process.env.ENVIRONMENT !== 'development';
+    const portalUrl = `${process.env.BASE_URL}/portal?teamId=${teamId}`;
+    const checkoutUrl = `${process.env.BASE_URL}/checkout?teamId=${teamId}`;
+    const customerId = isProd ? team.stripe_customer_id : team.test_stripe_customer_id;
+    const subscriptionData = customerId ? await getSubscriptionData(customerId) : null;
+    const subscriptionActive = subscriptionData?.status === 'active' || subscriptionData?.status === 'trialing';
+    const subscriptionKey = isProd ? 'stripe_subscription_id' : 'test_stripe_subscription_id';
+  
+    if ((!team[subscriptionKey] || team[subscriptionKey] !== subscriptionData?.id) && subscriptionData?.id) {
+      console.log('updating subscription id')
+      let updates = {};
+      updates[subscriptionKey] = subscriptionData.id
+      await teamsDB.updateTeam(teamId, updates);
+    }
+    // console.log('subscription data ', subscriptionData);
+    console.log('subscription active ', subscriptionActive);
+  
+    home.view.blocks.push(
+      {
+        type: 'divider'
+      },
+      {
+        type: 'section',
+        text: {
+          type: 'mrkdwn',
+          text: '*Plan & Usage*'
+        }
+      },
+      {
+        type: 'section',
+        text: {
+          type: 'mrkdwn',
+          text: !subscriptionActive ? "Set up your subscription to begin getting translations for your team :point_right: " : ":white_check_mark: Your subscription is active, and you have unlimited messages."
+        },
+        accessory: {
+          type: 'button',
+          action_id: 'manage_plan',
+          text: {
+            type: 'plain_text',
+            text: !subscriptionActive ? 'Get Started' : 'Manage Plan'
+          },
+          url: !subscriptionActive ? checkoutUrl : portalUrl
+        }
+      }
+    );
+  }
+
+  return home;
+}
+
+const configureTranslationSettingsSection = (team, userIsAdmin, nonAdminAllowSettings) => {
+  let settingsSection = [];
+
+  settingsSection.push({
     type: 'section',
     text: {
       type: 'mrkdwn',
@@ -134,7 +198,7 @@ const buildHomeView = async (userId, teamId, redirect_url, userIsAdmin, nonAdmin
           value: JSON.stringify({ id: setting.id, lang: setting.languages })
         };
       }
-      home.view.blocks.push(settingsBlock);
+      settingsSection.push(settingsBlock);
       continue;
     }
 
@@ -165,11 +229,11 @@ const buildHomeView = async (userId, teamId, redirect_url, userIsAdmin, nonAdmin
         value: JSON.stringify({ id: setting.id, lang: setting.languages })
       };
     }
-    home.view.blocks.push(settingsBlock);
+    settingsSection.push(settingsBlock);
   }
 
   if (userIsAdmin || nonAdminAllowSettings) {
-    home.view.blocks.push(
+    settingsSection.push(
       {
         type: 'section',
         text: {
@@ -189,61 +253,7 @@ const buildHomeView = async (userId, teamId, redirect_url, userIsAdmin, nonAdmin
       });
   }
 
-  // Slash Commands
-  let slashCommands = configureSlashCommandsSection();
-  home.view.blocks.push(...slashCommands);
-
-  
-  // Manage Plan
-  if (team && team.id) {
-    const isProd = process.env.ENVIRONMENT !== 'development';
-    const portalUrl = `${process.env.BASE_URL}/portal?teamId=${teamId}`;
-    const checkoutUrl = `${process.env.BASE_URL}/checkout?teamId=${teamId}`;
-    const customerId = isProd ? team.stripe_customer_id : team.test_stripe_customer_id;
-    const subscriptionData = customerId ? await getSubscriptionData(customerId) : null;
-    const subscriptionActive = subscriptionData?.status === 'active' || subscriptionData?.status === 'trialing';
-    const subscriptionKey = isProd ? 'stripe_subscription_id' : 'test_stripe_subscription_id';
-  
-    if ((!team[subscriptionKey] || team[subscriptionKey] !== subscriptionData?.id) && subscriptionData?.id) {
-      console.log('updating subscription id')
-      let updates = {};
-      updates[subscriptionKey] = subscriptionData.id
-      await teamsDB.updateTeam(teamId, updates);
-    }
-    // console.log('subscription data ', subscriptionData);
-    console.log('subscription active ', subscriptionActive);
-  
-    home.view.blocks.push(
-      {
-        type: 'divider'
-      },
-      {
-        type: 'section',
-        text: {
-          type: 'mrkdwn',
-          text: '*Plan & Usage*'
-        }
-      },
-      {
-        type: 'section',
-        text: {
-          type: 'mrkdwn',
-          text: !subscriptionActive ? "Set up your subscription to begin getting translations for your team :point_right: " : ":white_check_mark: Your subscription is active, and you have unlimited messages."
-        },
-        accessory: {
-          type: 'button',
-          action_id: 'manage_plan',
-          text: {
-            type: 'plain_text',
-            text: !subscriptionActive ? 'Get Started' : 'Manage Plan'
-          },
-          url: !subscriptionActive ? checkoutUrl : portalUrl
-        }
-      }
-    );
-  }
-
-  return home;
+  return settingsSection;
 }
 
 

@@ -8,10 +8,7 @@ const buildHomeView = async (userId, teamId, redirect_url, userIsAdmin, nonAdmin
 
   let user = await userDB.getUser(userId);
   let team = {};
-  // if (!team.slack_team_id && teamId) { // if the team doesn't exist yet, we need to create it
-  //   await teamsDB.createNew(teamId);
-  //   team = await teamsDB.getTeam(teamId);
-  // }
+
   if (teamId) {
     console.log('getting team in homeview');
     team = await teamsDB.getTeam(teamId);
@@ -64,17 +61,25 @@ const buildHomeView = async (userId, teamId, redirect_url, userIsAdmin, nonAdmin
     }
   }
 
+  home.view.blocks.push(authBlock)
 
-  home.view.blocks.push(
-    authBlock,
-    {
-      "type": "divider"
-    }
-  )
+  // Subscription details
+  const isProd = process.env.ENVIRONMENT !== 'development';
+  const portalUrl = `${process.env.BASE_URL}/portal?teamId=${teamId}`;
+  const checkoutUrl = `${process.env.BASE_URL}/checkout?teamId=${teamId}`;
+  const customerId = isProd ? team.stripe_customer_id : team.test_stripe_customer_id;
+  const subscriptionData = customerId ? await getSubscriptionData(customerId) : null;
+  const subscriptionActive = subscriptionData?.status === 'active' || subscriptionData?.status === 'trialing';
+  const subscriptionKey = isProd ? 'stripe_subscription_id' : 'test_stripe_subscription_id';
+
 
   // Channel Translation Settings Section
-  let channelTranslationSettings = configureTranslationSettingsSection(team, userIsAdmin, nonAdminAllowSettings);
-  home.view.blocks.push(...channelTranslationSettings);
+  if (subscriptionActive) { // only show translation settings section if the team has an active subscription
+    home.view.blocks.push({ type: 'divider' });
+
+    let channelTranslationSettings = configureTranslationSettingsSection(team, userIsAdmin, nonAdminAllowSettings);
+    home.view.blocks.push(...channelTranslationSettings);
+  }
 
 
   // Slash Commands Section
@@ -84,14 +89,6 @@ const buildHomeView = async (userId, teamId, redirect_url, userIsAdmin, nonAdmin
   
   // Manage Plan
   if (team && team.id) {
-    const isProd = process.env.ENVIRONMENT !== 'development';
-    const portalUrl = `${process.env.BASE_URL}/portal?teamId=${teamId}`;
-    const checkoutUrl = `${process.env.BASE_URL}/checkout?teamId=${teamId}`;
-    const customerId = isProd ? team.stripe_customer_id : team.test_stripe_customer_id;
-    const subscriptionData = customerId ? await getSubscriptionData(customerId) : null;
-    const subscriptionActive = subscriptionData?.status === 'active' || subscriptionData?.status === 'trialing';
-    const subscriptionKey = isProd ? 'stripe_subscription_id' : 'test_stripe_subscription_id';
-  
     if ((!team[subscriptionKey] || team[subscriptionKey] !== subscriptionData?.id) && subscriptionData?.id) {
       console.log('updating subscription id')
       let updates = {};

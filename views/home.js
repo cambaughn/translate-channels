@@ -3,22 +3,19 @@ import userDB from "../util/firebaseAPI/users.js";
 import { getSettingsString } from '../util/languages/languageHelpers.js';
 import { getSubscriptionData } from "../util/stripe/stripe.js";
 
-const buildHomeView = async (userId, teamId, redirect_url, userIsAdmin, nonAdminAllowSettings) => {
+const buildHomeView = async (userId, teamId, redirect_url, userIsAdmin, nonAdminAllowSettings, teamData) => {
   let auth_url = `https://slack.com/oauth/v2/authorize?scope=channels:read,chat:write,commands,im:history,users:read&user_scope=channels:history,chat:write&client_id=${process.env.CLIENT_ID}&redirect_uri=${redirect_url}`;
 
   let user = await userDB.getUser(userId);
   let team = {};
-  // if (!team.slack_team_id && teamId) { // if the team doesn't exist yet, we need to create it
-  //   await teamsDB.createNew(teamId);
-  //   team = await teamsDB.getTeam(teamId);
-  // }
-  if (teamId) {
+
+  if (teamData) { // if we already have the team to pass in, no need to go out and get it again
+    team = teamData;
+  } else if (teamId) {
     console.log('getting team in homeview');
     team = await teamsDB.getTeam(teamId);
   }
 
-  console.log('got team in homeview', team);
-  
   let home = {
     /* the user that opened your app's app home */
     user_id: userId,
@@ -33,7 +30,7 @@ const buildHomeView = async (userId, teamId, redirect_url, userIsAdmin, nonAdmin
           "type": "section",
           "text": {
             "type": "mrkdwn",
-            "text": "*Welcome to Translate Channels* :tada:"
+            "text": "*Welcome to Translate Channel* :tada:"
           }
         },
         {

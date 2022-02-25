@@ -22,7 +22,11 @@ const publishHomeView = async ({ event, context, client }) => {
 const publishHomeViewForAllUsers = async (client) => {
   try {
     let allTeams = await teamsDB.getAllTeams();
-    allTeams = allTeams.slice(10,15)
+    // allTeams = allTeams.slice(10,15)
+    let teamsLookup = {};
+    allTeams.forEach(team => {
+      teamsLookup[team.id] = team;
+    })
     let users = [];
     // let allUsers = await Promise.all(allTeams.map(team => {
     //   try {
@@ -61,10 +65,11 @@ const publishHomeViewForAllUsers = async (client) => {
     // /* view.publish is the method that your app uses to push a view to the Home tab */
       let teamId = user.team_id;
       let userId = user.id;
-      let homeView = await buildHomeView(userId, teamId, redirect_url, isSlackAdmin);
-      // homeView.token = context.botToken;
+      let team = teamsLookup[teamId]
+      let homeView = await buildHomeView(userId, teamId, redirect_url, isSlackAdmin, false, team);
+      homeView.token = team.team_access_token;
       console.log('view config ', homeView.token, homeView.user_id);
-      // const result = await client.views.publish(homeView);
+      const result = await client.views.publish(homeView);
 
     }
 

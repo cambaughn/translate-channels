@@ -61,7 +61,8 @@ const expressRoutes = (app, slackApp, dbConnector) => {
         console.log('created new team');
         
         mixpanel.track('Sign up', {
-          "Team ID": team.id 
+          distinct_id: team.id,
+          "Team ID": team.id
         });
       }
 

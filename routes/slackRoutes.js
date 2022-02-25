@@ -68,6 +68,7 @@ const slackRoutes = (app) => {
     }
 
     mixpanel.track('Translate Message', {
+      distinct_id: message.user,
       "User ID": message.user
     });
 

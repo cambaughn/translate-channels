@@ -10,8 +10,12 @@ const buildHomeView = async (userId, teamId, redirect_url, userIsAdmin, nonAdmin
   let team = {};
 
   if (teamId) {
-    console.log('getting team in homeview');
+    console.log('getting team in homeview ', teamId);
     team = await teamsDB.getTeam(teamId);
+    // Record team viewing the homescreen for the first time
+    if (!team?.viewed_app_home) {
+      teamsDB.updateTeam(teamId, { viewed_app_home: true })
+    }
   }
 
   console.log('got team in homeview', team);

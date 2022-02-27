@@ -26,7 +26,8 @@ teamsDB.createNew = async (id, settings) => {
     team_access_token: null,
     channel_language_settings: {},
     slack_team_id: id,
-    workspace_languages: []
+    workspace_languages: [],
+    viewed_app_home: false
   }
 
   let team = {

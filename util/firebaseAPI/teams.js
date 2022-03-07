@@ -1,4 +1,4 @@
-import { doc, setDoc, getDoc, deleteDoc } from "firebase/firestore"; 
+import { doc, setDoc, getDoc, deleteDoc, query, collection, where, getDocs  } from "firebase/firestore"; 
 import db from '../firebase/firebaseInit.js';
 import convertFromFirebase from '../firebase/converter.js';
 
@@ -6,6 +6,14 @@ const teamsDB = {};
 
 // Get single team document from Firebase
 teamsDB.getTeam = async (id) => {
+  const teamRef = teamsDoc(id);
+  let team = await getDoc(teamRef);
+  team = convertFromFirebase(team);
+
+  return Promise.resolve(team);
+}
+
+teamsDB.getTeamsWhere = async (key, comparator, value) => {
   const teamRef = teamsDoc(id);
   let team = await getDoc(teamRef);
   team = convertFromFirebase(team);
@@ -104,6 +112,11 @@ const mergeSettings = (existing, updates) => {
   }
 
   return updatedSettings;
+}
+
+// Logging and analytics
+const getTeamsWithHomeviewBug = async () => {
+  let teams = await getTeamsWhere()
 }
 
 export { mergeSettings };

@@ -14,11 +14,11 @@ teamsDB.getTeam = async (id) => {
 }
 
 teamsDB.getTeamsWhere = async (key, comparator, value) => {
-  const teamRef = teamsDoc(id);
-  let team = await getDoc(teamRef);
-  team = convertFromFirebase(team);
-
-  return Promise.resolve(team);
+  const teamsCollection = collection(db, 'teams');
+  let q = query(teamsCollection, where("active", "==", true));
+  let teams = await getDocs(q);
+  teams = convertFromFirebase(teams);
+  return Promise.resolve(teams);
 }
 
 // Create (or update existing) team in Firebase

@@ -15,7 +15,7 @@ teamsDB.getTeam = async (id) => {
 
 teamsDB.getTeamsWhere = async (key, comparator, value) => {
   const teamsCollection = collection(db, 'teams');
-  let q = query(teamsCollection, where("active", "==", true));
+  let q = query(teamsCollection, where(key, comparator, value));
   let teams = await getDocs(q);
   teams = convertFromFirebase(teams);
   return Promise.resolve(teams);
@@ -115,9 +115,12 @@ const mergeSettings = (existing, updates) => {
 }
 
 // Logging and analytics
+// This function should only be used locally
 const getTeamsWithHomeviewBug = async () => {
-  let teams = await getTeamsWhere()
+  let teams = await teamsDB.getTeamsWhere('viewed_app_home', '==', false);
+  console.log('teams not able to access home: ', teams.length);
 }
+
 
 export { mergeSettings };
 export default teamsDB;

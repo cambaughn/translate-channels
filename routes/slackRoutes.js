@@ -51,7 +51,7 @@ const slackRoutes = (app) => {
     }
 
     // Log metered usage for per-seat subscription
-    if (subscriptionData?.status === 'active') {
+    if (subscriptionData?.status === 'active' || subscriptionData?.status === 'trialing') {
       let subscriptionReport = await reportSubscriptionUsage(subscriptionData, user);
     }
 

@@ -88,8 +88,9 @@ const buildHomeView = async (userId, teamId, redirect_url, userIsAdmin, nonAdmin
 
   // Slash Commands Section
   let slashCommands = configureSlashCommandsSection();
-  home.view.blocks.push(...slashCommands);
-
+  if (subscriptionActive) { // only show slash commands section if the team has an active subscription
+    home.view.blocks.push(...slashCommands);
+  }
   
   // Manage Plan
   if (team && team.id) {

@@ -105,6 +105,26 @@ const slackRoutes = (app) => {
     // We just need ack() here to respond to the action, even though we're redirecting to a url
     await ack();
   })
+  
+  app.action('small_plan_click', async ({ ack }) => {
+    // We just need ack() here to respond to the action, even though we're redirecting to a url
+    await ack();
+  })
+
+  app.action('medium_plan_click', async ({ ack }) => {
+    // We just need ack() here to respond to the action, even though we're redirecting to a url
+    await ack();
+  })
+
+  app.action('large_plan_click', async ({ ack }) => {
+    // We just need ack() here to respond to the action, even though we're redirecting to a url
+    await ack();
+  })
+
+  app.action('unlimited_plan_click', async ({ ack }) => {
+    // We just need ack() here to respond to the action, even though we're redirecting to a url
+    await ack();
+  })
 
 
   app.action('settings_modal_opened', async ({ ack, action, body, context }) => {

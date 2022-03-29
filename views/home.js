@@ -343,17 +343,40 @@ const buildGetStartedSection = (portalUrl) => {
 
 
 const buildPriceButtons = (portalUrl) => {
-  const buttons = [
+  const buttonInfo = [
     {
+      text: ':car:  Small - 5 users',
+      url: portalUrl,
+      action_id: 'small_plan_click'
+    },
+    {
+      text: ':boat:  Medium - 20 users',
+      url: portalUrl,
+      action_id: 'medium_plan_click'
+    },
+    {
+      text: ':small_airplane:  Large - 80 users',
+      url: portalUrl,
+      action_id: 'large_plan_click'
+    },
+    {
+      text: ':rocket:  Unlimited - ∞ users',
+      url: portalUrl,
+      action_id: 'unlimited_plan_click'
+    },
+  ]
+  const buttons = buttonInfo.map(info => {
+    return {
       type: 'button',
-      action_id: 'manage_plan',
+      action_id: info.action_id,
       text: {
         type: 'plain_text',
-        text: 'Get Started'
+        text: info.text
       },
-      url: portalUrl
+      url: info.url
     }
-  ]
+  })
+ 
   return buttons;
 }
 

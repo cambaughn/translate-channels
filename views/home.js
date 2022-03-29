@@ -28,6 +28,8 @@ const buildHomeView = async (userId, teamId, redirect_url, userIsAdmin, nonAdmin
   const subscriptionData = customerId ? await getSubscriptionData(customerId) : null;
   const subscriptionActive = subscriptionData?.status === 'active' || subscriptionData?.status === 'trialing';
   const subscriptionKey = isProd ? 'stripe_subscription_id' : 'test_stripe_subscription_id';
+  // Authentication
+  const userAuthenticated = !!user && !!user.access_token;
 
   console.log('subscription data ', subscriptionData);
 
@@ -57,30 +59,10 @@ const buildHomeView = async (userId, teamId, redirect_url, userIsAdmin, nonAdmin
   }
 
   // Authentication block
-  const userAuthenticated = !!user && !!user.access_token;
-  const authBlock = {
-    "type": "section",
-    "text": {
-      "type": "mrkdwn",
-      "text": userAuthenticated ? "You've authenticated the app :thumbsup: " : "Authorize the app to update your messages with translations :point_right: \n _(Each user must do this once to enable automatic translation)_"
-    }
-  }
-
-  if (!user || !user.access_token) {
-    authBlock.accessory = {
-      type: "button",
-      action_id: "authorize_app",
-      text: {
-        type: "plain_text",
-        text: "Authorize App"
-      },
-      url: auth_url
-    }
-  }
-
   // Only add the authentication block if the team has an active subscription AND the user has not yet authenticated
-  if (!userAuthenticated && !subscriptionActive) {
-    home.view.blocks.push(authBlock);
+  if (!userAuthenticated && subscriptionActive) {
+    const authSection = buildAuthSection(auth_url);
+    home.view.blocks.push(...authSection);
   }
 
 
@@ -107,7 +89,7 @@ const buildHomeView = async (userId, teamId, redirect_url, userIsAdmin, nonAdmin
       updates[subscriptionKey] = subscriptionData.id
       await teamsDB.updateTeam(teamId, updates);
     }
-
+    
     // console.log('subscription data ', subscriptionData);
     console.log('subscription active ', subscriptionActive);
   
@@ -149,6 +131,40 @@ const buildHomeView = async (userId, teamId, redirect_url, userIsAdmin, nonAdmin
 
   return home;
 }
+
+
+const buildAuthSection = (auth_url) => {
+  const authBlock = [
+    {
+      type: 'section',
+      text: {
+        type: 'mrkdwn',
+        text: ":u7a7a: *Approve Translation*"
+      }
+    },
+    {
+      "type": "section",
+      "text": {
+        "type": "mrkdwn",
+        "text": "Authorize the app to update your messages with translations :point_right: \n _(Each user must do this once to enable automatic translation)_"
+      },
+
+      "accessory": {
+        type: "button",
+        action_id: "authorize_app",
+        text: {
+          type: "plain_text",
+          text: "Authorize App"
+        },
+        url: auth_url
+      }
+    }
+]
+
+  return authBlock;
+}
+
+
 
 const configureTranslationSettingsSection = (team, userIsAdmin, nonAdminAllowSettings) => {
   let settingsSection = [];
@@ -304,9 +320,6 @@ const configureSlashCommandsSection = () => {
 
 const buildGetStartedSection = () => {
   return [
-    {
-      type: 'divider'
-    },
     {
       type: 'section',
       text: {

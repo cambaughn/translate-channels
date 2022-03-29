@@ -17,9 +17,21 @@ const buildHomeView = async (userId, teamId, redirect_url, userIsAdmin, nonAdmin
       teamsDB.updateTeam(teamId, { viewed_app_home: true })
     }
   }
-
   // console.log('got team in homeview', team);
-  
+
+
+  // Subscription details
+  const isProd = process.env.ENVIRONMENT !== 'development';
+  const portalUrl = `${process.env.BASE_URL}/portal?teamId=${teamId}`;
+  const checkoutUrl = `${process.env.BASE_URL}/checkout?teamId=${teamId}`;
+  const customerId = isProd ? team.stripe_customer_id : team.test_stripe_customer_id;
+  const subscriptionData = customerId ? await getSubscriptionData(customerId) : null;
+  const subscriptionActive = subscriptionData?.status === 'active' || subscriptionData?.status === 'trialing';
+  const subscriptionKey = isProd ? 'stripe_subscription_id' : 'test_stripe_subscription_id';
+
+  console.log('subscription data ', subscriptionData);
+
+  // Define base home object
   let home = {
     /* the user that opened your app's app home */
     user_id: userId,
@@ -44,6 +56,7 @@ const buildHomeView = async (userId, teamId, redirect_url, userIsAdmin, nonAdmin
     }
   }
 
+  // Authentication block
   const userAuthenticated = !!user && !!user.access_token;
   const authBlock = {
     "type": "section",
@@ -65,18 +78,10 @@ const buildHomeView = async (userId, teamId, redirect_url, userIsAdmin, nonAdmin
     }
   }
 
-  home.view.blocks.push(authBlock)
-
-  // Subscription details
-  const isProd = process.env.ENVIRONMENT !== 'development';
-  const portalUrl = `${process.env.BASE_URL}/portal?teamId=${teamId}`;
-  const checkoutUrl = `${process.env.BASE_URL}/checkout?teamId=${teamId}`;
-  const customerId = isProd ? team.stripe_customer_id : team.test_stripe_customer_id;
-  const subscriptionData = customerId ? await getSubscriptionData(customerId) : null;
-  const subscriptionActive = subscriptionData?.status === 'active' || subscriptionData?.status === 'trialing';
-  const subscriptionKey = isProd ? 'stripe_subscription_id' : 'test_stripe_subscription_id';
-
-  console.log('subscription data ', subscriptionData);
+  // Only add the authentication block if the team has an active subscription AND the user has not yet authenticated
+  if (!userAuthenticated && !subscriptionActive) {
+    home.view.blocks.push(authBlock);
+  }
 
 
   // Channel Translation Settings Section

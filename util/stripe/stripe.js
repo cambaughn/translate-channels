@@ -21,8 +21,9 @@ const createCheckoutSession = async (stripeId, returnUrl) => {
     line_items: [
       {
         // Provide the exact Price ID (for example, pr_1234) of the product you want to sell
-        price: process.env.STRIPE_PRICE_ID
-      },
+        price: process.env.STRIPE_PRICE_ID,
+        quantity: 1
+      }
     ],
     mode: 'subscription',
     success_url: returnUrl,

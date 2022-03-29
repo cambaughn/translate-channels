@@ -18,7 +18,7 @@ const buildHomeView = async (userId, teamId, redirect_url, userIsAdmin, nonAdmin
     }
   }
 
-  console.log('got team in homeview', team);
+  // console.log('got team in homeview', team);
   
   let home = {
     /* the user that opened your app's app home */
@@ -34,7 +34,7 @@ const buildHomeView = async (userId, teamId, redirect_url, userIsAdmin, nonAdmin
           "type": "section",
           "text": {
             "type": "mrkdwn",
-            "text": "*Welcome to Translate Channels* :tada:"
+            "text": ":tada: *Welcome to Translate Channels*"
           }
         },
         {
@@ -76,6 +76,8 @@ const buildHomeView = async (userId, teamId, redirect_url, userIsAdmin, nonAdmin
   const subscriptionActive = subscriptionData?.status === 'active' || subscriptionData?.status === 'trialing';
   const subscriptionKey = isProd ? 'stripe_subscription_id' : 'test_stripe_subscription_id';
 
+  console.log('subscription data ', subscriptionData);
+
 
   // Channel Translation Settings Section
   if (subscriptionActive) { // only show translation settings section if the team has an active subscription
@@ -94,43 +96,50 @@ const buildHomeView = async (userId, teamId, redirect_url, userIsAdmin, nonAdmin
   
   // Manage Plan
   if (team && team.id) {
-    if ((!team[subscriptionKey] || team[subscriptionKey] !== subscriptionData?.id) && subscriptionData?.id) {
+    if ((!team[subscriptionKey] || team[subscriptionKey] !== subscriptionData?.id) && subscriptionData?.id) { // add the Stripe subscription ID to firebase if it's not there yet
       console.log('updating subscription id')
       let updates = {};
       updates[subscriptionKey] = subscriptionData.id
       await teamsDB.updateTeam(teamId, updates);
     }
+
     // console.log('subscription data ', subscriptionData);
     console.log('subscription active ', subscriptionActive);
   
-    home.view.blocks.push(
-      {
-        type: 'divider'
-      },
-      {
-        type: 'section',
-        text: {
-          type: 'mrkdwn',
-          text: '*Plan & Usage*'
-        }
-      },
-      {
-        type: 'section',
-        text: {
-          type: 'mrkdwn',
-          text: !subscriptionActive ? "Set up your subscription to begin getting translations for your team :point_right: " : ":white_check_mark: Your subscription is active, and you have unlimited messages."
+    if (subscriptionActive) { // show plan & usage data if the subscription is active
+      home.view.blocks.push(
+        {
+          type: 'divider'
         },
-        accessory: {
-          type: 'button',
-          action_id: 'manage_plan',
+        {
+          type: 'section',
           text: {
-            type: 'plain_text',
-            text: !subscriptionActive ? 'Get Started' : 'Manage Plan'
+            type: 'mrkdwn',
+            text: '*Plan & Usage*'
+          }
+        },
+        {
+          type: 'section',
+          text: {
+            type: 'mrkdwn',
+            text: !subscriptionActive ? "Set up your subscription to begin getting translations for your team :point_right: " : ":white_check_mark: Your subscription is active, and you have unlimited messages."
           },
-          url: !subscriptionActive ? checkoutUrl : portalUrl
+          accessory: {
+            type: 'button',
+            action_id: 'manage_plan',
+            text: {
+              type: 'plain_text',
+              text: !subscriptionActive ? 'Get Started' : 'Manage Plan'
+            },
+            url: !subscriptionActive ? checkoutUrl : portalUrl
+          }
         }
-      }
-    );
+      );
+    } else { // if the team's subscription isn't active, show "Get Started" section
+      const getStartedSection = buildGetStartedSection();
+      home.view.blocks.push(...getStartedSection);
+    }
+
   }
 
   return home;
@@ -284,6 +293,37 @@ const configureSlashCommandsSection = () => {
         type: 'mrkdwn',
         text: "`/nt help` or `DIRECT MESSAGE the app above 👆` for FAQs & How-to's"
       }
+    }
+  ]
+}
+
+const buildGetStartedSection = () => {
+  return [
+    {
+      type: 'divider'
+    },
+    {
+      type: 'section',
+      text: {
+        type: 'mrkdwn',
+        text: ':sparkles: *Get Started*'
+      }
+    },
+    {
+      type: 'section',
+      text: {
+        type: 'mrkdwn',
+        text: "Set up your subscription to begin getting translations for your team :point_right: "
+      },
+      // accessory: {
+      //   type: 'button',
+      //   action_id: 'manage_plan',
+      //   text: {
+      //     type: 'plain_text',
+      //     text: 'Get Started'
+      //   },
+      //   url: !subscriptionActive ? checkoutUrl : portalUrl
+      // }
     }
   ]
 }

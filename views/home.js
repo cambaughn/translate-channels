@@ -123,7 +123,7 @@ const buildHomeView = async (userId, teamId, redirect_url, userIsAdmin, nonAdmin
         }
       );
     } else { // if the team's subscription isn't active, show "Get Started" section
-      const getStartedSection = buildGetStartedSection();
+      const getStartedSection = buildGetStartedSection(portalUrl);
       home.view.blocks.push(...getStartedSection);
     }
 
@@ -318,7 +318,7 @@ const configureSlashCommandsSection = () => {
   ]
 }
 
-const buildGetStartedSection = () => {
+const buildGetStartedSection = (portalUrl) => {
   return [
     {
       type: 'section',
@@ -331,19 +331,30 @@ const buildGetStartedSection = () => {
       type: 'section',
       text: {
         type: 'mrkdwn',
-        text: "Set up your subscription to begin getting translations for your team :point_right: "
-      },
-      // accessory: {
-      //   type: 'button',
-      //   action_id: 'manage_plan',
-      //   text: {
-      //     type: 'plain_text',
-      //     text: 'Get Started'
-      //   },
-      //   url: !subscriptionActive ? checkoutUrl : portalUrl
-      // }
+        text: "Choose a subscription to begin getting translations for your team :point_down: "
+      }
+    },
+    {
+      type: 'actions',
+      elements: buildPriceButtons(portalUrl)
     }
   ]
+}
+
+
+const buildPriceButtons = (portalUrl) => {
+  const buttons = [
+    {
+      type: 'button',
+      action_id: 'manage_plan',
+      text: {
+        type: 'plain_text',
+        text: 'Get Started'
+      },
+      url: portalUrl
+    }
+  ]
+  return buttons;
 }
 
 export default buildHomeView;

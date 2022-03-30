@@ -88,8 +88,10 @@ const expressRoutes = (app, slackApp, dbConnector) => {
     return res.redirect(portalSession.url);
   });
 
+  // Checkout - when first signing up for a plan
   app.get('/checkout', async ({ query }, res) => {
-    const { teamId } = query;
+    const { teamId, plan } = query;
+    console.log('got plan: ', plan);
     const isProd = process.env.ENVIRONMENT !== 'development';
     const redirect_url = `https://slack.com/app_redirect?app=${process.env.APP_ID}&team=${teamId}`;
     // NOTE: Instead of creating StripeId earlier, we're going to create the Stripe customer just before starting the checkout session
@@ -108,7 +110,7 @@ const expressRoutes = (app, slackApp, dbConnector) => {
       await teamsDB.updateTeam(teamId, teamUpdate);
     }
 
-    const checkoutSession = await createCheckoutSession(customerId, redirect_url);
+    const checkoutSession = await createCheckoutSession(customerId, redirect_url, plan);
     return res.redirect(checkoutSession.url);
   });
 

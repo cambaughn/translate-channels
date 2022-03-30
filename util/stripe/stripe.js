@@ -16,12 +16,15 @@ const createCustomer = async (teamId) => {
 };
 
 
-const createCheckoutSession = async (stripeId, returnUrl) => {
+const createCheckoutSession = async (stripeId, returnUrl, plan) => {
+  const priceId =  process.env[`STRIPE_PRICE_ID_${plan.toUpperCase()}`];
+  console.log('got price : ', priceId);
+
   return await stripe.checkout.sessions.create({
     line_items: [
       {
         // Provide the exact Price ID (for example, pr_1234) of the product you want to sell
-        price: process.env.STRIPE_PRICE_ID,
+        price: priceId,
         quantity: 1
       }
     ],

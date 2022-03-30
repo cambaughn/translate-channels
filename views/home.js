@@ -123,7 +123,7 @@ const buildHomeView = async (userId, teamId, redirect_url, userIsAdmin, nonAdmin
         }
       );
     } else { // if the team's subscription isn't active, show "Get Started" section
-      const getStartedSection = buildGetStartedSection(portalUrl);
+      const getStartedSection = buildGetStartedSection(checkoutUrl);
       home.view.blocks.push(...getStartedSection);
     }
 
@@ -318,7 +318,7 @@ const configureSlashCommandsSection = () => {
   ]
 }
 
-const buildGetStartedSection = (portalUrl) => {
+const buildGetStartedSection = (checkoutUrl) => {
   return [
     {
       type: 'section',
@@ -336,35 +336,37 @@ const buildGetStartedSection = (portalUrl) => {
     },
     {
       type: 'actions',
-      elements: buildPriceButtons(portalUrl)
+      elements: buildPriceButtons(checkoutUrl)
     }
   ]
 }
 
 
-const buildPriceButtons = (portalUrl) => {
+const buildPriceButtons = (checkoutUrl) => {
+
   const buttonInfo = [
     {
       text: ':car:  Small - 5 users',
-      url: portalUrl,
+      url: addPlanToCheckoutUrl(checkoutUrl, 'small'),
       action_id: 'small_plan_click'
     },
     {
       text: ':boat:  Medium - 20 users',
-      url: portalUrl,
+      url: addPlanToCheckoutUrl(checkoutUrl, 'medium'),
       action_id: 'medium_plan_click'
     },
     {
       text: ':small_airplane:  Large - 80 users',
-      url: portalUrl,
+      url: addPlanToCheckoutUrl(checkoutUrl, 'large'),
       action_id: 'large_plan_click'
     },
     {
       text: ':rocket:  Unlimited - ∞ users',
-      url: portalUrl,
+      url: addPlanToCheckoutUrl(checkoutUrl, 'unlimited'),
       action_id: 'unlimited_plan_click'
     },
   ]
+
   const buttons = buttonInfo.map(info => {
     return {
       type: 'button',
@@ -378,6 +380,10 @@ const buildPriceButtons = (portalUrl) => {
   })
  
   return buttons;
+}
+
+const addPlanToCheckoutUrl = (checkoutUrl, plan) => {
+  return `${checkoutUrl}&plan=${plan}`
 }
 
 export default buildHomeView;

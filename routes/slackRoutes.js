@@ -3,7 +3,7 @@ import buildHomeView from '../views/home.js';
 import buildSettingsModal from '../views/settingsModal.js';
 // Slack Helpers
 import { isAdmin } from '../util/slack/slackUser.js';
-import { updateMessage, getInfoForChannels, provideHelp, postMessageAsUser } from '../util/slack/slackHelpers.js';
+import { updateMessage, getInfoForChannels, provideHelp, postMessageAsUser, sendUpgradeMessage } from '../util/slack/slackHelpers.js';
 // Firebase API
 import teamsDB from '../util/firebaseAPI/teams.js';
 import userDB from '../util/firebaseAPI/users.js';
@@ -67,11 +67,13 @@ const slackRoutes = (app) => {
       if (!tierDetails.unlimited) { // Don't need to run this code for unlimited plans
         // Determine number of registered users
         const numRegisteredUsers = await userDB.getRegisteredUsersForTeam(context.teamId);
+        // const numRegisteredUsers = 10;
         console.log('registered users ', numRegisteredUsers, tierDetails);
         // Verify that number of users is within the current plan limits
         if (numRegisteredUsers > tierDetails.maxUsers) { // If there are more registered users than allowed on the current plan (don't run this code for unlimited plans)
           // TODO: send error message encouraging team to upgrade their plan
-          return null;
+        await sendUpgradeMessage(context.botToken, message.user, client, tierDetails, numRegisteredUsers); 
+        return null;
         }
       }
     }

@@ -17,16 +17,20 @@ const pricesToTiers = process.env.ENVIRONMENT === 'development' ? { // developme
 
 const subscriptionTierDetails = {
   small: {
-    maxUsers: 5
+    maxUsers: 5,
+    name: 'Small'
   },
   medium: {
-    maxUsers: 20
+    maxUsers: 20,
+    name: 'Medium'
   },
   large: {
-    maxUsers: 80
+    maxUsers: 80,
+    name: 'Large'
   },
   unlimited: {
-    unlimited: true
+    unlimited: true,
+    name: 'Unlimited'
   }
 }
 

@@ -1,4 +1,5 @@
 import helpMessage from "../../views/helpMessage.js";
+import upgradeMessage from "../../views/upgradeMessage.js";
 
 const updateMessage = (message, response, token, client) => {
   // finds message and edits it with the translated text (response) as blocks
@@ -60,10 +61,23 @@ const provideHelp = (botToken, channel, client) => {
   });
 }
 
+const sendUpgradeMessage = (botToken, channel, client, tierDetails, numUsers) => {
+  const messageRequest = {
+    token: botToken,
+    channel: channel,
+    text: upgradeMessage(tierDetails, numUsers)
+  };
+
+  client.chat.postMessage(messageRequest, (error) => {
+    console.error(error);
+  });
+}
+
 export { 
   updateMessage, 
   getInfoForChannels, 
   getChannelInfo, 
   provideHelp,
-  postMessageAsUser
+  postMessageAsUser,
+  sendUpgradeMessage
 }

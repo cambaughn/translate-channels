@@ -94,34 +94,8 @@ const buildHomeView = async (userId, teamId, redirect_url, userIsAdmin, nonAdmin
     console.log('subscription active ', subscriptionActive);
   
     if (subscriptionActive) { // show plan & usage data if the subscription is active
-      home.view.blocks.push(
-        {
-          type: 'divider'
-        },
-        {
-          type: 'section',
-          text: {
-            type: 'mrkdwn',
-            text: '*Plan & Usage*'
-          }
-        },
-        {
-          type: 'section',
-          text: {
-            type: 'mrkdwn',
-            text: !subscriptionActive ? "Set up your subscription to begin getting translations for your team :point_right: " : ":white_check_mark: Your subscription is active, and you have unlimited messages."
-          },
-          accessory: {
-            type: 'button',
-            action_id: 'manage_plan',
-            text: {
-              type: 'plain_text',
-              text: ':gear:  Manage Plan'
-            },
-            url: portalUrl
-          }
-        }
-      );
+      const managePlanSection = buildManagePlanSection(portalUrl);
+      home.view.blocks.push(...managePlanSection);
     } else { // if the team's subscription isn't active, show "Get Started" section
       const getStartedSection = buildGetStartedSection(checkoutUrl);
       home.view.blocks.push(...getStartedSection);
@@ -316,6 +290,39 @@ const configureSlashCommandsSection = () => {
       }
     }
   ]
+}
+
+
+const buildManagePlanSection = (portalUrl) => {
+  let managePlanSection = [
+    {
+      type: 'divider'
+    },
+    {
+      type: 'section',
+      text: {
+        type: 'mrkdwn',
+        text: '*Plan & Usage*'
+      }
+    },
+    {
+      type: 'section',
+      text: {
+        type: 'mrkdwn',
+        text: ":white_check_mark: Your subscription is active, and you have unlimited messages."
+      },
+      accessory: {
+        type: 'button',
+        action_id: 'manage_plan',
+        text: {
+          type: 'plain_text',
+          text: ':gear:  Manage Plan'
+        },
+        url: portalUrl
+      }
+    }
+  ]
+  return managePlanSection;
 }
 
 const buildGetStartedSection = (checkoutUrl) => {

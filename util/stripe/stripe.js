@@ -26,7 +26,7 @@ const subscriptionTierDetails = {
     maxUsers: 80
   },
   unlimited: {
-    
+    unlimited: true
   }
 }
 

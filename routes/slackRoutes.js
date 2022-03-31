@@ -61,15 +61,18 @@ const slackRoutes = (app) => {
 
     // If the team is on the tiered plan, need to determine that they are on the correct tier for the number of users
     if (usageType === 'licensed') {
-      // Determine number of registered users
-      const numRegisteredUsers = await userDB.getRegisteredUsersForTeam(context.teamId);
-      // const numRegisteredUsers = 6;
+      // Get tier details
       const tierDetails = getSubscriptionTierDetails(subscriptionData.plan.id);
-      console.log('registered users ', numRegisteredUsers, tierDetails);
-      // Verify that number of users is within the current plan limits
-      if (numRegisteredUsers > tierDetails.maxUsers) { // If there are more registered users than allowed on the current plan
-        // TODO: send error message encouraging team to upgrade their plan
-        return null;
+
+      if (!tierDetails.unlimited) { // Don't need to run this code for unlimited plans
+        // Determine number of registered users
+        const numRegisteredUsers = await userDB.getRegisteredUsersForTeam(context.teamId);
+        console.log('registered users ', numRegisteredUsers, tierDetails);
+        // Verify that number of users is within the current plan limits
+        if (numRegisteredUsers > tierDetails.maxUsers) { // If there are more registered users than allowed on the current plan (don't run this code for unlimited plans)
+          // TODO: send error message encouraging team to upgrade their plan
+          return null;
+        }
       }
     }
 

@@ -60,6 +60,12 @@ const slackRoutes = (app) => {
       let subscriptionReport = await reportSubscriptionUsage(subscriptionData, user);
     }
 
+    // Determine number of registered users
+    const numRegisteredUsers = await userDB.getRegisteredUsersForTeam(context.teamId);
+    console.log('registered users ', numRegisteredUsers);
+
+    // Verify that number of users is within the current plan limits
+
     // Determine which languages we need for this channel
     // If the channel has languages set, use those
     const channelLanguages = team.channel_language_settings[message.channel]?.languages || [];

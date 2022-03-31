@@ -2,6 +2,21 @@ import initStripe from 'stripe';
 const stripe = initStripe(process.env.STRIPE_SECRET_KEY);
 import userDB from '../firebaseAPI/users.js'
 
+const pricingTiers = {
+  small: {
+    maxUsers: 5
+  },
+  medium: {
+    maxUsers: 20
+  },
+  large: {
+    maxUsers: 80
+  },
+  unlimited: {
+    
+  }
+}
+
 const createCustomer = async (teamId) => {
   const id = await stripe.customers.create(
     {

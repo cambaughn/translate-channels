@@ -45,13 +45,18 @@ const slackRoutes = (app) => {
     const customerId = isProd ? team.stripe_customer_id : team.test_stripe_customer_id;
     const subscriptionData = customerId ? await getSubscriptionData(customerId) : null;
     const subscriptionActive = subscriptionData?.status === 'active' || subscriptionData?.status === 'trialing';
+    const usageType = subscriptionData?.plan?.usage_type;
+
+    console.log('subscription data : ', usageType);
+
     // If subscription is not active, do nothing
     if (!subscriptionActive) {
       return null; 
     }
 
     // Log metered usage for per-seat subscription
-    if (subscriptionData?.status === 'active' || subscriptionData?.status === 'trialing') {
+    if (usageType === 'metered' && (subscriptionData?.status === 'active' || subscriptionData?.status === 'trialing')) {
+      console.log('===reporting usage===');
       let subscriptionReport = await reportSubscriptionUsage(subscriptionData, user);
     }
 

@@ -8,10 +8,9 @@ import { updateMessage, getInfoForChannels, provideHelp, postMessageAsUser } fro
 import teamsDB from '../util/firebaseAPI/teams.js';
 import userDB from '../util/firebaseAPI/users.js';
 // Translation
-import { getTranslations } from '../util/languages/translatev2.js';
 import Translator from '../util/languages/translate.js';
 // Subscription
-import { getSubscriptionData, reportSubscriptionUsage } from '../util/stripe/stripe.js';
+import { getSubscriptionData, reportSubscriptionUsage, getSubscriptionTierDetails } from '../util/stripe/stripe.js';
 // Analytics
 import Mixpanel from 'mixpanel';
 // create an instance of the mixpanel client
@@ -60,11 +59,20 @@ const slackRoutes = (app) => {
       let subscriptionReport = await reportSubscriptionUsage(subscriptionData, user);
     }
 
-    // Determine number of registered users
-    const numRegisteredUsers = await userDB.getRegisteredUsersForTeam(context.teamId);
-    console.log('registered users ', numRegisteredUsers);
+    // If the team is on the tiered plan, need to determine that they are on the correct tier for the number of users
+    if (usageType === 'licensed') {
+      // Determine number of registered users
+      const numRegisteredUsers = await userDB.getRegisteredUsersForTeam(context.teamId);
+      // const numRegisteredUsers = 6;
+      const tierDetails = getSubscriptionTierDetails(subscriptionData.plan.id);
+      console.log('registered users ', numRegisteredUsers, tierDetails);
+      // Verify that number of users is within the current plan limits
+      if (numRegisteredUsers > tierDetails.maxUsers) { // If there are more registered users than allowed on the current plan
+        // TODO: send error message encouraging team to upgrade their plan
+        return null;
+      }
+    }
 
-    // Verify that number of users is within the current plan limits
 
     // Determine which languages we need for this channel
     // If the channel has languages set, use those

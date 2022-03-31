@@ -1,8 +1,21 @@
 import initStripe from 'stripe';
 const stripe = initStripe(process.env.STRIPE_SECRET_KEY);
-import userDB from '../firebaseAPI/users.js'
+import userDB from '../firebaseAPI/users.js';
 
-const pricingTiers = {
+const pricesToTiers = process.env.ENVIRONMENT === 'development' ? { // development
+  'price_1Kid6yIEl24u0zqNNqoL8gMY': 'small',
+  'price_1KidBQIEl24u0zqNxyIKHEGe': 'medium',
+  'price_1KidBzIEl24u0zqNoy0jqflM': 'large',
+  'price_1KidCSIEl24u0zqNrmkdUpXO': 'unlimited',
+  'small': 'price_1Kid6yIEl24u0zqNNqoL8gMY',
+  'medium': 'price_1KidBQIEl24u0zqNxyIKHEGe',
+  'large': 'price_1KidBzIEl24u0zqNoy0jqflM',
+  'unlimited': 'price_1KidCSIEl24u0zqNrmkdUpXO'
+} : { // production
+
+}
+
+const subscriptionTierDetails = {
   small: {
     maxUsers: 5
   },
@@ -15,6 +28,11 @@ const pricingTiers = {
   unlimited: {
     
   }
+}
+
+const getSubscriptionTierDetails = (pricing_id) => {
+  const size = pricesToTiers[pricing_id];
+  return subscriptionTierDetails[size];
 }
 
 const createCustomer = async (teamId) => {
@@ -107,5 +125,6 @@ export {
   createCheckoutSession,
   getSubscriptionData,
   createPortalSession,
-  reportSubscriptionUsage
+  reportSubscriptionUsage,
+  getSubscriptionTierDetails
 }

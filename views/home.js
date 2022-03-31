@@ -3,6 +3,8 @@ import userDB from "../util/firebaseAPI/users.js";
 import { getSettingsString } from '../util/languages/languageHelpers.js';
 import { getSubscriptionData } from "../util/stripe/stripe.js";
 
+// NOTE: Only putting dividers at the BOTTOM of each section
+
 const buildHomeView = async (userId, teamId, redirect_url, userIsAdmin, nonAdminAllowSettings) => {
   let auth_url = `https://slack.com/oauth/v2/authorize?scope=channels:read,chat:write,commands,im:history,users:read&user_scope=channels:history,chat:write&client_id=${process.env.CLIENT_ID}&redirect_uri=${redirect_url}`;
 
@@ -68,9 +70,7 @@ const buildHomeView = async (userId, teamId, redirect_url, userIsAdmin, nonAdmin
 
   // Channel Translation Settings Section
   if (subscriptionActive) { // only show translation settings section if the team has an active subscription
-    home.view.blocks.push({ type: 'divider' });
-
-    let channelTranslationSettings = configureTranslationSettingsSection(team, userIsAdmin, nonAdminAllowSettings);
+    let channelTranslationSettings = buildTranslationSettingsSection(team, userIsAdmin, nonAdminAllowSettings);
     home.view.blocks.push(...channelTranslationSettings);
   }
 
@@ -132,15 +132,18 @@ const buildAuthSection = (auth_url) => {
         },
         url: auth_url
       }
+    },
+    {
+      type: 'divider'
     }
-]
+  ]
 
   return authBlock;
 }
 
 
 
-const configureTranslationSettingsSection = (team, userIsAdmin, nonAdminAllowSettings) => {
+const buildTranslationSettingsSection = (team, userIsAdmin, nonAdminAllowSettings) => {
   let settingsSection = [];
 
   settingsSection.push({
@@ -259,15 +262,18 @@ const configureTranslationSettingsSection = (team, userIsAdmin, nonAdminAllowSet
       });
   }
 
+  settingsSection.push(
+    {
+      type: 'divider'
+    }
+  )
+
   return settingsSection;
 }
 
 
 const configureSlashCommandsSection = () => {
   return [
-    {
-      type: 'divider'
-    },
     {
       type: 'section',
       text: {
@@ -288,6 +294,9 @@ const configureSlashCommandsSection = () => {
         type: 'mrkdwn',
         text: "`/nt help` or `DIRECT MESSAGE the app above 👆` for FAQs & How-to's"
       }
+    },
+    {
+      type: 'divider'
     }
   ]
 }
@@ -295,9 +304,6 @@ const configureSlashCommandsSection = () => {
 
 const buildManagePlanSection = (portalUrl) => {
   let managePlanSection = [
-    {
-      type: 'divider'
-    },
     {
       type: 'section',
       text: {

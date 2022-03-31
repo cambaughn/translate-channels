@@ -116,9 +116,9 @@ const buildHomeView = async (userId, teamId, redirect_url, userIsAdmin, nonAdmin
             action_id: 'manage_plan',
             text: {
               type: 'plain_text',
-              text: !subscriptionActive ? 'Get Started' : 'Manage Plan'
+              text: ':gear:  Manage Plan'
             },
-            url: !subscriptionActive ? checkoutUrl : portalUrl
+            url: portalUrl
           }
         }
       );
@@ -346,17 +346,17 @@ const buildPriceButtons = (checkoutUrl) => {
 
   const buttonInfo = [
     {
-      text: ':car:  Small - 5 users',
+      text: ':car:  Small - up to 5 users - $15/mo',
       url: addPlanToCheckoutUrl(checkoutUrl, 'small'),
       action_id: 'small_plan_click'
     },
     {
-      text: ':boat:  Medium - 20 users',
+      text: ':boat:  Medium - up to 20 users',
       url: addPlanToCheckoutUrl(checkoutUrl, 'medium'),
       action_id: 'medium_plan_click'
     },
     {
-      text: ':small_airplane:  Large - 80 users',
+      text: ':small_airplane:  Large - up to 80 users',
       url: addPlanToCheckoutUrl(checkoutUrl, 'large'),
       action_id: 'large_plan_click'
     },

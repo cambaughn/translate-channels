@@ -311,25 +311,31 @@ const configureSlashCommandsSection = () => {
 
 
 const buildManagePlanSection = (subscriptionData, numUsers, portalUrl) => {
-  const tierDetails = getSubscriptionTierDetails(subscriptionData.plan.id);
   let sectionText = '';
-  let upgradeNeeded = !tierDetails.unlimited && numUsers > tierDetails.maxUsers // There are more registered users than allowed on the current plan
 
-  if (!tierDetails.unlimited) { // Team is not on unlimited plan
-    if (!upgradeNeeded) { // plan is active and in good standing
-      sectionText += `:white_check_mark:  Subscription active\n\n`;
-      sectionText += `Your team is currently on the *${tierDetails.name} subscription* with unlimited translations for up to *${tierDetails.maxUsers} users*.\n\nYou currently have *${numUsers} registered user${ numUsers === 1 ? '' : 's'}*.`
-    } else { // upgrade needed
-      sectionText += `:warning:  Upgrade needed\n\n`;
-      sectionText += `Your team is currently on the *${tierDetails.name} subscription* with unlimited translations for up to *${tierDetails.maxUsers} users*.\n\nYou now have *${numUsers} registered users* and need to upgrade your plan to continue getting translations.\n\n`
-      sectionText += '*How to upgrade* \n\n' 
-      sectionText += "Click the `Manage Plan` button to visit your customer portal where you can see pricing details and upgrade your plan. :point_right: \n\n";
+  if (usageType === 'licensed') { // new pricing - tiers 
+    const tierDetails = getSubscriptionTierDetails(subscriptionData.plan.id);
+    let upgradeNeeded = !tierDetails.unlimited && numUsers > tierDetails.maxUsers // There are more registered users than allowed on the current plan
+  
+    if (!tierDetails.unlimited) { // Team is not on unlimited plan
+      if (!upgradeNeeded) { // plan is active and in good standing
+        sectionText += `:white_check_mark:  Subscription active\n\n`;
+        sectionText += `Your team is currently on the *${tierDetails.name} subscription* with unlimited translations for up to *${tierDetails.maxUsers} users*.\n\nYou currently have *${numUsers} registered user${ numUsers === 1 ? '' : 's'}*.`
+      } else { // upgrade needed
+        sectionText += `:warning:  Upgrade needed\n\n`;
+        sectionText += `Your team is currently on the *${tierDetails.name} subscription* with unlimited translations for up to *${tierDetails.maxUsers} users*.\n\nYou now have *${numUsers} registered users* and need to upgrade your plan to continue getting translations.\n\n`
+        sectionText += '*How to upgrade* \n\n' 
+        sectionText += "Click the `Manage Plan` button to visit your customer portal where you can see pricing details and upgrade your plan. :point_right: \n\n";
+      }
+      
+    } else { // the team is on the unlimited plan
+      sectionText += `:white_check_mark:  Subscription active\n\n`
+      sectionText += `Your team is currently on the *${tierDetails.name} subscription* with translations for *unlimited users*.\n\nYou currently have *${numUsers} registered user${ numUsers === 1 ? '' : 's'}*.`
     }
+  } else if (usageType === 'metered') { // old pricing - $3/user/month
     
-  } else { // the team is on the unlimited plan
-    sectionText += `:white_check_mark:  Subscription active\n\n`
-    sectionText += `Your team is currently on the *${tierDetails.name} subscription* with translations for *unlimited users*.\n\nYou currently have *${numUsers} registered user${ numUsers === 1 ? '' : 's'}*.`
   }
+  
 
   let managePlanSection = [
     {

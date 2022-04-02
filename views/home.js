@@ -346,14 +346,33 @@ const buildGetStartedSection = (checkoutUrl) => {
       type: 'section',
       text: {
         type: 'mrkdwn',
-        text: "Choose a subscription to begin getting translations for your team :point_down: "
+        text: "Choose a subscription to begin getting translations for your team :point_down:\n\n_(You can upgrade at any time)_"
       }
     },
-    // {
-    //   type: 'actions',
-    //   elements: buildPriceButtons(checkoutUrl)
-    // }
+    {
+      type: 'section',
+      text: {
+        type: 'mrkdwn',
+        text: "\n\n"
+      }
+    },
+    {
+      type: 'section',
+      text: {
+        type: 'mrkdwn',
+        text: `*Every plan includes all features:*\n\n:white_check_mark:  Unlimited message translations\n\n:white_check_mark:  Custom language settings for each channel\n\n:white_check_mark:  In-message translation - no bots or clutter`
+      }
+    },
+    {
+      type: 'section',
+      text: {
+        type: 'mrkdwn',
+        text: '\n\n'
+      }
+    }
   ]
+
+  
 
   let tiers = buildPriceTiers(checkoutUrl);
 
@@ -384,6 +403,18 @@ const buildPriceTiers = (checkoutUrl) => {
 }
 
 const buildPriceSection = (tier) => {
+  // Build up text for section
+  let sectionText = `${tier.emoji}  *${tier.name}*\n\n`;
+  // Custom messaging depending on if this is the unlimited plan
+  if (!tier.unlimited) {
+    sectionText += `Up to ${tier.maxUsers} registered users\n\n`;
+  } else {
+    sectionText += "Unlimited registered users\n\n";
+  }
+  // Price
+  sectionText += `_$${tier.price}/month_`;
+
+
   return [
     {
       "type": "divider"
@@ -392,21 +423,16 @@ const buildPriceSection = (tier) => {
       type: 'section',
       text: {
         type: 'mrkdwn',
-        text: `${tier.emoji}  *${tier.name}*`
-      }
-    },
-    {
-      type: 'section',
-      text: {
-        type: 'mrkdwn',
-        text: !tier.unlimited ? `Up to ${tier.maxUsers} registered users` : "Unlimited registered users"
-      }
-    },
-    {
-      type: 'section',
-      text: {
-        type: 'mrkdwn',
-        text:  `_$${tier.price}/month_`
+        text: sectionText
+      },
+      accessory: {
+        type: "button",
+        action_id: tier.action_id,
+        text: {
+          type: "plain_text",
+          text: `${tier.emoji}  Join ${tier.name}`
+        },
+        url: tier.url
       }
     },
     {

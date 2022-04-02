@@ -20,25 +20,29 @@ const subscriptionTierDetails = {
     maxUsers: 5,
     name: 'Small',
     price: 15,
-    emoji: ':car:'
+    emoji: ':car:',
+    action_id: 'small_plan_click'
   },
   medium: {
     maxUsers: 20,
     name: 'Medium',
     price: 55,
-    emoji: ':boat:'
+    emoji: ':boat:',
+    action_id: 'medium_plan_click'
   },
   large: {
     maxUsers: 80,
     name: 'Large',
     price: 200,
-    emoji: ':small_airplane:'
+    emoji: ':small_airplane:',
+    action_id: 'large_plan_click'
   },
   unlimited: {
     unlimited: true,
     name: 'Unlimited',
     price: 500,
-    emoji: ':rocket:'
+    emoji: ':rocket:',
+    action_id: 'unlimited_plan_click'
   }
 }
 

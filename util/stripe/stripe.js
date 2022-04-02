@@ -12,7 +12,14 @@ const pricesToTiers = process.env.ENVIRONMENT === 'development' ? { // developme
   'large': 'price_1KidBzIEl24u0zqNoy0jqflM',
   'unlimited': 'price_1KidCSIEl24u0zqNrmkdUpXO'
 } : { // production
-
+  'price_1Kk1lNIEl24u0zqNXTE6yDce': 'small',
+  'price_1Kk1lKIEl24u0zqNSFdbSB2a': 'medium',
+  'price_1Kk1lFIEl24u0zqNZxy8UoZY': 'large',
+  'price_1Kk1lAIEl24u0zqNQucuVCcX': 'unlimited',
+  'small': 'price_1Kk1lNIEl24u0zqNXTE6yDce',
+  'medium': 'price_1Kk1lKIEl24u0zqNSFdbSB2a',
+  'large': 'price_1Kk1lFIEl24u0zqNZxy8UoZY',
+  'unlimited': 'price_1Kk1lAIEl24u0zqNQucuVCcX'
 }
 
 const subscriptionTierDetails = {

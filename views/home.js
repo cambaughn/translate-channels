@@ -373,19 +373,50 @@ const buildPriceTiers = (checkoutUrl) => {
 
   console.log('tierDetails ', tierDetails);
 
-  // const buttons = buttonInfo.map(info => {
-  //   return {
-  //     type: 'button',
-  //     action_id: info.action_id,
-  //     text: {
-  //       type: 'plain_text',
-  //       text: info.text
-  //     },
-  //     url: info.url
-  //   }
-  // })
+  // Put together sections by going through each tier
+  let sections = [];
+  tierDetails.forEach(tier => {
+    let currentSection = buildPriceSection(tier);
+    sections = [...sections, ...currentSection];
+  })
  
-  // return buttons;
+  return sections;
+}
+
+const buildPriceSection = (tier) => {
+  return [
+    {
+      "type": "divider"
+    },
+    {
+      type: 'section',
+      text: {
+        type: 'mrkdwn',
+        text: `${tier.emoji}  *${tier.name}*`
+      }
+    },
+    {
+      type: 'section',
+      text: {
+        type: 'mrkdwn',
+        text: !tier.unlimited ? `Up to ${tier.maxUsers} registered users` : "Unlimited registered users"
+      }
+    },
+    {
+      type: 'section',
+      text: {
+        type: 'mrkdwn',
+        text:  `_$${tier.price}/month_`
+      }
+    },
+    {
+      type: 'section',
+      text: {
+        type: 'mrkdwn',
+        text: '\n\n'
+      }
+    },
+  ]
 }
 
 const buildPriceButtons = (checkoutUrl) => {

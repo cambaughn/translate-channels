@@ -71,7 +71,6 @@ const slackRoutes = (app) => {
         console.log('registered users ', numRegisteredUsers, tierDetails);
         // Verify that number of users is within the current plan limits
         if (numRegisteredUsers > tierDetails.maxUsers) { // If there are more registered users than allowed on the current plan (don't run this code for unlimited plans)
-          // TODO: send error message encouraging team to upgrade their plan
         await sendUpgradeMessage(context.botToken, message.user, client, tierDetails, numRegisteredUsers); 
         return null;
         }

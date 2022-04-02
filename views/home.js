@@ -1,7 +1,7 @@
 import teamsDB from "../util/firebaseAPI/teams.js";
 import userDB from "../util/firebaseAPI/users.js";
 import { getSettingsString } from '../util/languages/languageHelpers.js';
-import { getSubscriptionData, subscriptionTierDetails } from "../util/stripe/stripe.js";
+import { getSubscriptionData, getSubscriptionTierDetails, subscriptionTierDetails } from "../util/stripe/stripe.js";
 
 // NOTE: Only putting dividers at the BOTTOM of each section
 
@@ -27,9 +27,7 @@ const buildHomeView = async (userId, teamId, redirect_url, userIsAdmin, nonAdmin
   const portalUrl = `${process.env.BASE_URL}/portal?teamId=${teamId}`;
   const checkoutUrl = `${process.env.BASE_URL}/checkout?teamId=${teamId}`;
   const customerId = isProd ? team.stripe_customer_id : team.test_stripe_customer_id;
-  // const subscriptionData = customerId ? await getSubscriptionData(customerId) : null;
-  // TODO: remove this line before merge
-  const subscriptionData =  null;
+  const subscriptionData = customerId ? await getSubscriptionData(customerId) : null;
   const subscriptionActive = subscriptionData?.status === 'active' || subscriptionData?.status === 'trialing';
   const subscriptionKey = isProd ? 'stripe_subscription_id' : 'test_stripe_subscription_id';
   // Authentication
@@ -96,7 +94,8 @@ const buildHomeView = async (userId, teamId, redirect_url, userIsAdmin, nonAdmin
     console.log('subscription active ', subscriptionActive);
   
     if (subscriptionActive) { // show plan & usage data if the subscription is active
-      const managePlanSection = buildManagePlanSection(portalUrl);
+      const numUsers = await userDB.getRegisteredUsersForTeam(teamId);
+      const managePlanSection = buildManagePlanSection(subscriptionData, numUsers, portalUrl);
       home.view.blocks.push(...managePlanSection);
     } else { // if the team's subscription isn't active, show "Get Started" section
       const getStartedSection = buildGetStartedSection(checkoutUrl);
@@ -298,13 +297,29 @@ const configureSlashCommandsSection = () => {
       }
     },
     {
+      type: 'section',
+      text: {
+        type: 'mrkdwn',
+        text: "\n\n"
+      }
+    },
+    {
       type: 'divider'
     }
   ]
 }
 
 
-const buildManagePlanSection = (portalUrl) => {
+const buildManagePlanSection = (subscriptionData, numUsers, portalUrl) => {
+  const tierDetails = getSubscriptionTierDetails(subscriptionData.plan.id);
+  let sectionText = '';
+  sectionText += `:white_check_mark:  Subscription active\n\n`
+  if (!tierDetails.unlimited) { // Team is not on unlimited plan
+    sectionText += `Your team is currently on the *${tierDetails.name} subscription* with unlimited translations for up to *${tierDetails.maxUsers} users*.\n\nYou currently have *${numUsers} registered user${ numUsers === 1 ? '' : 's'}*.`
+  } else { // the team is on the unlimited plan
+    sectionText += `Your team is currently on the *${tierDetails.name} subscription* with translations for *unlimited users*.\n\nYou currently have *${numUsers} registered user${ numUsers === 1 ? '' : 's'}*.`
+  }
+
   let managePlanSection = [
     {
       type: 'section',
@@ -317,7 +332,7 @@ const buildManagePlanSection = (portalUrl) => {
       type: 'section',
       text: {
         type: 'mrkdwn',
-        text: ":white_check_mark: Your subscription is active, and you have unlimited messages."
+        text: sectionText
       },
       accessory: {
         type: 'button',

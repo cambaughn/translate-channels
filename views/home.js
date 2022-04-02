@@ -346,7 +346,7 @@ const buildGetStartedSection = (checkoutUrl) => {
       type: 'section',
       text: {
         type: 'mrkdwn',
-        text: "Choose a subscription to begin getting translations for your team :point_down:\n\n_(You can upgrade at any time)_"
+        text: "Choose a subscription to begin getting translations for your team :point_down:\n\n_- 7 day free trial_\n\n_- Upgrade at any time_"
       }
     },
     {

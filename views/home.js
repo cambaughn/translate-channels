@@ -312,6 +312,7 @@ const configureSlashCommandsSection = () => {
 
 const buildManagePlanSection = (subscriptionData, numUsers, portalUrl) => {
   let sectionText = '';
+  const usageType = subscriptionData?.plan?.usage_type;
 
   if (usageType === 'licensed') { // new pricing - tiers 
     const tierDetails = getSubscriptionTierDetails(subscriptionData.plan.id);
@@ -333,7 +334,10 @@ const buildManagePlanSection = (subscriptionData, numUsers, portalUrl) => {
       sectionText += `Your team is currently on the *${tierDetails.name} subscription* with translations for *unlimited users*.\n\nYou currently have *${numUsers} registered user${ numUsers === 1 ? '' : 's'}*.`
     }
   } else if (usageType === 'metered') { // old pricing - $3/user/month
-    
+    sectionText += `:white_check_mark:  Subscription active\n\n`
+    sectionText += `Your team is currently on the *Unlimited subscription* with translations for *unlimited users*.\n\n`
+    sectionText += `_Note: we've recently updated our pricing for new customers. Your team is still on our metered plan of $3/user/month and can keep that plan for as long as you want._\n\n`
+    sectionText += `_However, if the new pricing tiers would work better for you, we'd be happy to switch you over. You can visit the <http://www.translatechannels.com|Translate Channels site> to find more details on the new subscriptions._`
   }
   
 

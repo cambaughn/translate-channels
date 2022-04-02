@@ -1,7 +1,7 @@
 import teamsDB from "../util/firebaseAPI/teams.js";
 import userDB from "../util/firebaseAPI/users.js";
 import { getSettingsString } from '../util/languages/languageHelpers.js';
-import { getSubscriptionData } from "../util/stripe/stripe.js";
+import { getSubscriptionData, subscriptionTierDetails } from "../util/stripe/stripe.js";
 
 // NOTE: Only putting dividers at the BOTTOM of each section
 
@@ -27,7 +27,9 @@ const buildHomeView = async (userId, teamId, redirect_url, userIsAdmin, nonAdmin
   const portalUrl = `${process.env.BASE_URL}/portal?teamId=${teamId}`;
   const checkoutUrl = `${process.env.BASE_URL}/checkout?teamId=${teamId}`;
   const customerId = isProd ? team.stripe_customer_id : team.test_stripe_customer_id;
-  const subscriptionData = customerId ? await getSubscriptionData(customerId) : null;
+  // const subscriptionData = customerId ? await getSubscriptionData(customerId) : null;
+  // TODO: remove this line before merge
+  const subscriptionData =  null;
   const subscriptionActive = subscriptionData?.status === 'active' || subscriptionData?.status === 'trialing';
   const subscriptionKey = isProd ? 'stripe_subscription_id' : 'test_stripe_subscription_id';
   // Authentication
@@ -332,7 +334,7 @@ const buildManagePlanSection = (portalUrl) => {
 }
 
 const buildGetStartedSection = (checkoutUrl) => {
-  return [
+  let getStartedSection = [
     {
       type: 'section',
       text: {
@@ -347,13 +349,44 @@ const buildGetStartedSection = (checkoutUrl) => {
         text: "Choose a subscription to begin getting translations for your team :point_down: "
       }
     },
-    {
-      type: 'actions',
-      elements: buildPriceButtons(checkoutUrl)
-    }
+    // {
+    //   type: 'actions',
+    //   elements: buildPriceButtons(checkoutUrl)
+    // }
   ]
+
+  let tiers = buildPriceTiers(checkoutUrl);
+
+  getStartedSection = [...getStartedSection, ...tiers]
+
+  return getStartedSection;
 }
 
+
+const buildPriceTiers = (checkoutUrl) => {
+  let tiers = ['small', 'medium', 'large', 'unlimited'];
+  let tierDetails = tiers.map(tier => {
+    let details = subscriptionTierDetails[tier];
+    details.url = addPlanToCheckoutUrl(checkoutUrl, tier);
+    return details;
+  });
+
+  console.log('tierDetails ', tierDetails);
+
+  // const buttons = buttonInfo.map(info => {
+  //   return {
+  //     type: 'button',
+  //     action_id: info.action_id,
+  //     text: {
+  //       type: 'plain_text',
+  //       text: info.text
+  //     },
+  //     url: info.url
+  //   }
+  // })
+ 
+  // return buttons;
+}
 
 const buildPriceButtons = (checkoutUrl) => {
 

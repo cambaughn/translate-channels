@@ -18,19 +18,27 @@ const pricesToTiers = process.env.ENVIRONMENT === 'development' ? { // developme
 const subscriptionTierDetails = {
   small: {
     maxUsers: 5,
-    name: 'Small'
+    name: 'Small',
+    price: 15,
+    emoji: ':car:'
   },
   medium: {
     maxUsers: 20,
-    name: 'Medium'
+    name: 'Medium',
+    price: 55,
+    emoji: ':boat:'
   },
   large: {
     maxUsers: 80,
-    name: 'Large'
+    name: 'Large',
+    price: 200,
+    emoji: ':small_airplane:'
   },
   unlimited: {
     unlimited: true,
-    name: 'Unlimited'
+    name: 'Unlimited',
+    price: 500,
+    emoji: ':rocket:'
   }
 }
 
@@ -130,5 +138,6 @@ export {
   getSubscriptionData,
   createPortalSession,
   reportSubscriptionUsage,
-  getSubscriptionTierDetails
+  getSubscriptionTierDetails,
+  subscriptionTierDetails
 }

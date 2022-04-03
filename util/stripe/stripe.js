@@ -73,7 +73,7 @@ const createCustomer = async (teamId) => {
 
 
 const createCheckoutSession = async (stripeId, returnUrl, plan) => {
-  const priceId =  process.env[`STRIPE_PRICE_ID_${plan.toUpperCase()}`];
+  const priceId = pricesToTiers[plan];
   console.log('got price : ', priceId);
 
   return await stripe.checkout.sessions.create({

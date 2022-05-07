@@ -33,7 +33,7 @@ const buildHomeView = async (userId, teamId, redirect_url, userIsAdmin, nonAdmin
   // Authentication
   const userAuthenticated = !!user && !!user.access_token;
 
-  console.log('subscription data ', subscriptionData);
+  // console.log('subscription data ', subscriptionData);
 
   // Define base home object
   let home = {
@@ -425,8 +425,6 @@ const buildPriceTiers = (checkoutUrl) => {
     details.url = addPlanToCheckoutUrl(checkoutUrl, tier);
     return details;
   });
-
-  console.log('tierDetails ', tierDetails);
 
   // Put together sections by going through each tier
   let sections = [];

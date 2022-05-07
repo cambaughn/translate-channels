@@ -10,7 +10,7 @@ import userDB from '../util/firebaseAPI/users.js';
 // Translation
 import Translator from '../util/languages/translate.js';
 // Subscription
-import { getSubscriptionData, reportSubscriptionUsage, getSubscriptionTierDetails } from '../util/stripe/stripe.js';
+import { getSubscriptionData, reportSubscriptionUsage, getSubscriptionTierDetails, cancelSubscription } from '../util/stripe/stripe.js';
 // Analytics
 import Mixpanel from 'mixpanel';
 // create an instance of the mixpanel client
@@ -46,7 +46,7 @@ const slackRoutes = (app) => {
     const subscriptionActive = subscriptionData?.status === 'active' || subscriptionData?.status === 'trialing';
     const usageType = subscriptionData?.plan?.usage_type;
 
-    console.log('subscription data : ', usageType);
+    // console.log('subscription data : ', subscriptionData);
 
     // If subscription is not active, do nothing
     if (!subscriptionActive) {
@@ -203,13 +203,51 @@ const slackRoutes = (app) => {
     }
   });
 
-  app.event('app_uninstalled', async ({ event, ack }) => {
-    console.log('app_uninstalled event');
+  app.event('app_uninstalled', async ({ event, context, ack }) => {
+    console.log('app_uninstalled event ', event, context);
     if (ack) {
       await ack();
     }
-    await teamsDB.deactivateTeam(event.team_id)
+
+    // Delete subscription from Stripe
+    const team = await teamsDB.getTeam(context.teamId);
+    const isProd = process.env.ENVIRONMENT !== 'development';
+    const customerId = isProd ? team.stripe_customer_id : team.test_stripe_customer_id;
+    const subscriptionData = customerId ? await getSubscriptionData(customerId) : null;
+    const subscriptionActive = subscriptionData?.status === 'active' || subscriptionData?.status === 'trialing';
+
+    if (subscriptionActive) {
+      console.log('cancelling subscription ', subscriptionData.id);
+      let result = await cancelSubscription(subscriptionData.id);
+      console.log('cancelled subscription ', result)
+    }
+
+    // Deactivate team in Firebase
+    await teamsDB.deactivateTeam(context.teamId);
   });
+
+  // app.event('tokens_revoked', async ({ event, ack }) => {
+  //   console.log('tokens_revoked event');
+  //   if (ack) {
+  //     await ack();
+  //   }
+
+  //   // Delete subscription from Stripe
+  //   const team = await teamsDB.getTeam(event.team_id);
+  //   const isProd = process.env.ENVIRONMENT !== 'development';
+  //   const customerId = isProd ? team.stripe_customer_id : team.test_stripe_customer_id;
+  //   const subscriptionData = customerId ? await getSubscriptionData(customerId) : null;
+  //   const subscriptionActive = subscriptionData?.status === 'active' || subscriptionData?.status === 'trialing';
+
+  //   if (subscriptionActive) {
+  //     console.log('cancelling subscription ', subscriptionData.id);
+  //     let result = await cancelSubscription(subscriptionData.id);
+  //     console.log('cancelled subscription ', result)
+  //   }
+
+  //   // Deactivate team in Firebase
+  //   await teamsDB.deactivateTeam(event.team_id);
+  // });
 }
 
 export default slackRoutes;

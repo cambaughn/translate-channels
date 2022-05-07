@@ -143,6 +143,15 @@ const reportSubscriptionUsage = async (subscriptionData, user) => {
   return Promise.resolve(true);
 }
 
+
+const cancelSubscription = async (subscriptionId) => {
+  return stripe.subscriptions.del(subscriptionId);
+  // return stripe.subscriptions.update(
+  //   subscriptionId,
+  //   {cancel_at_period_end: true}
+  // );
+}
+
 export {
   createCustomer,
   createCheckoutSession,
@@ -150,5 +159,6 @@ export {
   createPortalSession,
   reportSubscriptionUsage,
   getSubscriptionTierDetails,
+  cancelSubscription,
   subscriptionTierDetails
 }

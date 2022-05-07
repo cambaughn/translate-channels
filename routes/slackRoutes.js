@@ -204,7 +204,7 @@ const slackRoutes = (app) => {
   });
 
   app.event('app_uninstalled', async ({ event, context, ack }) => {
-    console.log('app_uninstalled event ', event, context);
+    console.log('====> app_uninstalled event ', event, context);
     if (ack) {
       await ack();
     }

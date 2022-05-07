@@ -11,9 +11,8 @@ const expressReceiver = new ExpressReceiver({
   signingSecret: process.env.SLACK_SIGNING_SECRET
 });
 
-const authorizeFn = async ({ userId, teamId }) => {
-  // let user = await teamD.getUser(userId);
-  console.log('authorizing for team: ', teamId);
+const authorizeFn = async ({ teamId }) => {
+  // console.log('authorizing for team: ', teamId);
   let team = await teamsDB.getTeam(teamId);
 
   if (team.team_access_token && team.bot_user_id && team.id) {

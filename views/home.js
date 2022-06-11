@@ -8,6 +8,9 @@ import { getSubscriptionData, getSubscriptionTierDetails, subscriptionTierDetail
 const buildHomeView = async (userId, teamId, redirect_url, userIsAdmin, nonAdminAllowSettings) => {
   let auth_url = `https://slack.com/oauth/v2/authorize?scope=channels:read,chat:write,commands,im:history,users:read&user_scope=channels:history,chat:write&client_id=${process.env.CLIENT_ID}&redirect_uri=${redirect_url}`;
 
+  // let teams = await teamsDB.getAll();
+  // console.log('teams => ', teams);
+
   let user = await userDB.getUser(userId);
   let team = {};
 

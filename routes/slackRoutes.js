@@ -3,6 +3,7 @@ import buildHomeView from '../views/home.js';
 import buildSettingsModal from '../views/settingsModal.js';
 // Slack Helpers
 import { isAdmin } from '../util/slack/slackUser.js';
+import { getTeamInfo } from '../util/slack/slackTeam.js';
 import { updateMessage, getInfoForChannels, provideHelp, postMessageAsUser, sendUpgradeMessage } from '../util/slack/slackHelpers.js';
 // Firebase API
 import teamsDB from '../util/firebaseAPI/teams.js';
@@ -190,12 +191,27 @@ const slackRoutes = (app) => {
     console.log('app_home_opened event');
     try {
       let isSlackAdmin = await isAdmin(event.user, context.botToken, client);
+      // Get team info from Slack
+      let teamInfo = await getTeamInfo(context.teamId, context.botToken, client);
+      // Updating all teams
+      teamsDB.updateAllTeams(client);
       let redirect_url = process.env.REDIRECT_URL || 'https://translate-channels.herokuapp.com/auth_redirect';
       /* view.publish is the method that your app uses to push a view to the Home tab */
       let teamId = context.teamId;
       let userId = event.user;
       let homeView = await buildHomeView(userId, teamId, redirect_url, isSlackAdmin);
       homeView.token = context.botToken;
+
+      // Updating team info 
+      if (teamInfo && teamInfo?.id) {
+        const teamUpdates = {
+          name: teamInfo.name || null,
+          slack_url: teamInfo.url || null,
+          slack_domain: teamInfo.domain || null
+        }
+
+        // await teamsDB.updateTeam(teamInfo.id, teamUpdates);
+      }
       console.log('view config ', homeView.token, homeView.user_id);
       const result = await client.views.publish(homeView);
     } catch (error) {

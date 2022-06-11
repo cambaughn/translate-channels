@@ -1,6 +1,7 @@
 import { doc, setDoc, getDoc, deleteDoc, query, collection, where, getDocs  } from "firebase/firestore"; 
 import db from '../firebase/firebaseInit.js';
 import convertFromFirebase from '../firebase/converter.js';
+import { getTeamInfo } from "../slack/slackTeam.js";
 
 const teamsDB = {};
 
@@ -12,6 +13,15 @@ teamsDB.getTeam = async (id) => {
 
   return Promise.resolve(team);
 }
+
+// Get single team document from Firebase
+teamsDB.getAll = async (id) => {
+  const teamsCollection = collection(db, 'teams');
+  let teams = await getDocs(teamsCollection);
+  teams = convertFromFirebase(teams);
+  return Promise.resolve(teams);
+}
+
 
 teamsDB.getTeamsWhere = async (key, comparator, value) => {
   const teamsCollection = collection(db, 'teams');
@@ -120,6 +130,17 @@ const getTeamsWithHomeviewBug = async () => {
   let teams = await teamsDB.getTeamsWhere('viewed_app_home', '==', false);
   console.log('teams not able to access home: ', teams.length);
 }
+
+
+// DANGEROUS: Updating all teams in database
+teamsDB.updateAllTeams = async (client) => {
+  let teams = await teamsDB.getAll();
+  // let teamsInfoRequest = teams.forEach(team => getTeamInfo(team.slack_team_id, team.bot_user_id, client))
+  // let teamsInfo = await Promise.all(teamsInfoRequest);
+  console.log('all teams ', teams);
+}
+
+// updateAllTeams();
 
 
 export { mergeSettings };

@@ -2,10 +2,10 @@ import teamsDB from "../util/firebaseAPI/teams.js";
 import userDB from "../util/firebaseAPI/users.js";
 import { getSettingsString } from '../util/languages/languageHelpers.js';
 import { getSubscriptionData, getSubscriptionTierDetails, subscriptionTierDetails } from "../util/stripe/stripe.js";
+import { getTeamInfo } from "../util/slack/slackTeam.js";
 
 // NOTE: Only putting dividers at the BOTTOM of each section
-
-const buildHomeView = async (userId, teamId, redirect_url, userIsAdmin, nonAdminAllowSettings) => {
+const buildHomeView = async (userId, teamId, redirect_url, userIsAdmin, nonAdminAllowSettings, client) => {
   let auth_url = `https://slack.com/oauth/v2/authorize?scope=channels:read,chat:write,commands,im:history,users:read&user_scope=channels:history,chat:write&client_id=${process.env.CLIENT_ID}&redirect_uri=${redirect_url}`;
 
   // let teams = await teamsDB.getAll();
@@ -14,12 +14,29 @@ const buildHomeView = async (userId, teamId, redirect_url, userIsAdmin, nonAdmin
   let user = await userDB.getUser(userId);
   let team = {};
 
-  if (teamId) {
+  if (teamId) { // if we have the teamId, get the team from Firebase
     console.log('getting team in homeview ', teamId);
     team = await teamsDB.getTeam(teamId);
     // Record team viewing the homescreen for the first time
     if (!team?.viewed_app_home) {
       teamsDB.updateTeam(teamId, { viewed_app_home: true })
+    }
+
+    // If we don't already have it, get the team info from Slack for team name, slack_url, etc.
+    if (team?.slack_team_id && team?.team_access_token && !team?.slack_domain) {
+      let teamInfo = await getTeamInfo(team.slack_team_id, team.team_access_token, client);
+
+      // Set up update object with name, url, and domain
+      const teamUpdates = {
+        name: teamInfo.name || null,
+        slack_url: teamInfo.url || null,
+        slack_domain: teamInfo.domain || null
+      }
+
+      // Update team in Firebase with info from Slack
+      await teamsDB.updateTeam(teamInfo.id, teamUpdates);
+
+      console.log('updated team ==========');
     }
   }
   // console.log('got team in homeview', team);

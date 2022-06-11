@@ -191,16 +191,11 @@ const slackRoutes = (app) => {
     console.log('app_home_opened event');
     try {
       let isSlackAdmin = await isAdmin(event.user, context.botToken, client);
-      // Get team info from Slack
-      let teamInfo = await getTeamInfo(context.teamId, context.botToken, client);
-      // console.log('team info ',  context.botToken, teamInfo);
-      // Updating all teams
-      teamsDB.updateAllTeams(client);
       let redirect_url = process.env.REDIRECT_URL || 'https://translate-channels.herokuapp.com/auth_redirect';
       /* view.publish is the method that your app uses to push a view to the Home tab */
       let teamId = context.teamId;
       let userId = event.user;
-      let homeView = await buildHomeView(userId, teamId, redirect_url, isSlackAdmin);
+      let homeView = await buildHomeView(userId, teamId, redirect_url, isSlackAdmin, false, client);
       homeView.token = context.botToken;
 
 

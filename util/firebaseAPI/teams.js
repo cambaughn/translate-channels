@@ -149,8 +149,6 @@ teamsDB.updateAllTeams = async (client) => {
   // await teamsDB.updateTeam(teamInfo.id, teamUpdates);
 }
 
-// updateAllTeams();
-
 
 export { mergeSettings };
 export default teamsDB;

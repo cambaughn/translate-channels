@@ -135,9 +135,18 @@ const getTeamsWithHomeviewBug = async () => {
 // DANGEROUS: Updating all teams in database
 teamsDB.updateAllTeams = async (client) => {
   let teams = await teamsDB.getAll();
-  // let teamsInfoRequest = teams.forEach(team => getTeamInfo(team.slack_team_id, team.bot_user_id, client))
+  teams = teams.slice(0,5);
+  let teamsInfoRequest = teams.forEach(team => getTeamInfo(team.slack_team_id, team.team_access_token, client))
   // let teamsInfo = await Promise.all(teamsInfoRequest);
-  console.log('all teams ', teams);
+  // console.log('all teams ', teamsInfo);
+
+  // const teamUpdates = {
+  //   name: teamInfo.name || null,
+  //   slack_url: teamInfo.url || null,
+  //   slack_domain: teamInfo.domain || null
+  // }
+
+  // await teamsDB.updateTeam(teamInfo.id, teamUpdates);
 }
 
 // updateAllTeams();

@@ -193,6 +193,7 @@ const slackRoutes = (app) => {
       let isSlackAdmin = await isAdmin(event.user, context.botToken, client);
       // Get team info from Slack
       let teamInfo = await getTeamInfo(context.teamId, context.botToken, client);
+      // console.log('team info ',  context.botToken, teamInfo);
       // Updating all teams
       teamsDB.updateAllTeams(client);
       let redirect_url = process.env.REDIRECT_URL || 'https://translate-channels.herokuapp.com/auth_redirect';
@@ -202,16 +203,7 @@ const slackRoutes = (app) => {
       let homeView = await buildHomeView(userId, teamId, redirect_url, isSlackAdmin);
       homeView.token = context.botToken;
 
-      // Updating team info 
-      if (teamInfo && teamInfo?.id) {
-        const teamUpdates = {
-          name: teamInfo.name || null,
-          slack_url: teamInfo.url || null,
-          slack_domain: teamInfo.domain || null
-        }
 
-        // await teamsDB.updateTeam(teamInfo.id, teamUpdates);
-      }
       console.log('view config ', homeView.token, homeView.user_id);
       const result = await client.views.publish(homeView);
     } catch (error) {

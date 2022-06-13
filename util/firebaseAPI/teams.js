@@ -14,7 +14,7 @@ teamsDB.getTeam = async (id) => {
   return Promise.resolve(team);
 }
 
-// Get single team document from Firebase
+// Get all team documents from Firebase
 teamsDB.getAll = async (id) => {
   const teamsCollection = collection(db, 'teams');
   let teams = await getDocs(teamsCollection);

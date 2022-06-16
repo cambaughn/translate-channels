@@ -11,6 +11,10 @@ const buildHomeView = async (userId, teamId, redirect_url, userIsAdmin, client) 
 
   let user = await userDB.getUser(userId);
   let team = {};
+  // TODO: if we want to allow non admins to change settings, set this to true (for global rule) OR add field to db for each team
+  let nonAdminAllowSettings = false;
+
+  console.log('user ', user);
 
   if (teamId) {
     console.log('getting team in homeview ', teamId);
@@ -21,11 +25,18 @@ const buildHomeView = async (userId, teamId, redirect_url, userIsAdmin, client) 
     }
   }
 
-  if (!user?.name || !user?.display_name) {
+  if (!user?.name && !user?.display_name) {
     // Get user info from Slack and update Firebase
-    let slackUserInfo = await getUserInfo(userId, context.botToken, client);  
+    let slackUserInfo = await getUserInfo(userId, team.team_access_token, client);  
+    console.log('got User info from Slack', slackUserInfo);
+
+    let userUpdates = {
+      name: slackUserInfo?.real_name || null,
+      display_name: slackUserInfo?.profile?.display_name || null
+    }
+
+    await userDB.updateUser(userId, userUpdates)
   }
-  // console.log('got team in homeview', team);
 
 
   // Subscription details

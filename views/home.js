@@ -2,6 +2,7 @@ import teamsDB from "../util/firebaseAPI/teams.js";
 import userDB from "../util/firebaseAPI/users.js";
 import { getSettingsString } from '../util/languages/languageHelpers.js';
 import { getSubscriptionData, getSubscriptionTierDetails, subscriptionTierDetails } from "../util/stripe/stripe.js";
+import { getUserInfo } from "../util/slack/slackUser.js";
 
 // NOTE: Only putting dividers at the BOTTOM of each section
 
@@ -18,6 +19,11 @@ const buildHomeView = async (userId, teamId, redirect_url, userIsAdmin, nonAdmin
     if (!team?.viewed_app_home) {
       teamsDB.updateTeam(teamId, { viewed_app_home: true })
     }
+  }
+
+  if (!user?.name || !user?.display_name) {
+    // Get user info from Slack and update Firebase
+    let slackUserInfo = await getUserInfo(event.user, context.botToken, client);  
   }
   // console.log('got team in homeview', team);
 

@@ -2,7 +2,7 @@
 import buildHomeView from '../views/home.js';
 import buildSettingsModal from '../views/settingsModal.js';
 // Slack Helpers
-import { isAdmin } from '../util/slack/slackUser.js';
+import { isAdmin, getUserInfo } from '../util/slack/slackUser.js';
 import { updateMessage, getInfoForChannels, provideHelp, postMessageAsUser, sendUpgradeMessage } from '../util/slack/slackHelpers.js';
 // Firebase API
 import teamsDB from '../util/firebaseAPI/teams.js';

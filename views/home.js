@@ -6,7 +6,7 @@ import { getUserInfo } from "../util/slack/slackUser.js";
 
 // NOTE: Only putting dividers at the BOTTOM of each section
 
-const buildHomeView = async (userId, teamId, redirect_url, userIsAdmin, nonAdminAllowSettings) => {
+const buildHomeView = async (userId, teamId, redirect_url, userIsAdmin, client) => {
   let auth_url = `https://slack.com/oauth/v2/authorize?scope=channels:read,chat:write,commands,im:history,users:read&user_scope=channels:history,chat:write&client_id=${process.env.CLIENT_ID}&redirect_uri=${redirect_url}`;
 
   let user = await userDB.getUser(userId);
@@ -23,7 +23,7 @@ const buildHomeView = async (userId, teamId, redirect_url, userIsAdmin, nonAdmin
 
   if (!user?.name || !user?.display_name) {
     // Get user info from Slack and update Firebase
-    let slackUserInfo = await getUserInfo(event.user, context.botToken, client);  
+    let slackUserInfo = await getUserInfo(userId, context.botToken, client);  
   }
   // console.log('got team in homeview', team);
 

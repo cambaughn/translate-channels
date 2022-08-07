@@ -123,13 +123,16 @@ const getTeamsWithHomeviewBug = async () => {
 }
 
 
-const resetTeamMembers = async () => {
-  let team = await teamsDB.getTeam('TUHACTDEF');
-  let users = await userDB.getUsersWhere('team_id', '==', 'TUHACTDEF')
+const resetTeamMembers = async (team_id) => {
+  let team = await teamsDB.getTeam(team_id);
+  let users = await userDB.getUsersWhere('team_id', '==', team_id);
   console.log('got uysers => ', users);
+  let userUpdateRefs = users.map(user => userDB.updateUser(user.id, { access_token: null }));
+  await Promise.all(userUpdateRefs);
+  console.log('updated users!');
 }
 
-resetTeamMembers();
+// resetTeamMembers('TUHACTDEF');
 
 export { mergeSettings };
 export default teamsDB;

@@ -13,6 +13,17 @@ userDB.getUser = async (id) => {
   return Promise.resolve(user);
 }
 
+userDB.getUsersWhere = async (key, comparator, value) => {
+  const usersCollection = collection(db, 'users');
+  let q = query(usersCollection, where(key, comparator, value));
+  let users = await getDocs(q);
+  users = convertFromFirebase(users);
+  return Promise.resolve(users);
+}
+
+
+
+
 userDB.updateUser = async (id, updates) => {
   console.log('updating user ', id, updates);
   const userRef = usersDoc(id);

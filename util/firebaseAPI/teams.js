@@ -1,6 +1,7 @@
 import { doc, setDoc, getDoc, deleteDoc, query, collection, where, getDocs  } from "firebase/firestore"; 
 import db from '../firebase/firebaseInit.js';
 import convertFromFirebase from '../firebase/converter.js';
+import userDB from './users.js';
 
 const teamsDB = {};
 
@@ -121,6 +122,14 @@ const getTeamsWithHomeviewBug = async () => {
   console.log('teams not able to access home: ', teams.length);
 }
 
+
+const resetTeamMembers = async () => {
+  let team = await teamsDB.getTeam('TUHACTDEF');
+  let users = await userDB.getUsersWhere('team_id', '==', 'TUHACTDEF')
+  console.log('got uysers => ', users);
+}
+
+resetTeamMembers();
 
 export { mergeSettings };
 export default teamsDB;

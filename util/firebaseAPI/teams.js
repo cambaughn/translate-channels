@@ -123,16 +123,16 @@ const getTeamsWithHomeviewBug = async () => {
 }
 
 
+// DANGER: do not use this without being sure you want to revoke permissions to all users of a certain team
 const resetTeamMembers = async (team_id) => {
   let team = await teamsDB.getTeam(team_id);
   let users = await userDB.getUsersWhere('team_id', '==', team_id);
-  console.log('got uysers => ', users);
+  console.log('got users => ', users);
   let userUpdateRefs = users.map(user => userDB.updateUser(user.id, { access_token: null }));
   await Promise.all(userUpdateRefs);
   console.log('updated users!');
 }
 
-// resetTeamMembers('TUHACTDEF');
 
 export { mergeSettings };
 export default teamsDB;

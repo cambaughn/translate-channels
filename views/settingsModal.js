@@ -58,6 +58,21 @@ const buildSettingsModal = (valueString) => {
           },
           options: []
         }
+      },
+      {
+        type: 'actions',
+        elements: [
+          {
+            type: "button",
+            text: {
+              type: 'plain_text',
+              text: 'Remove channel'
+            },
+            style: "danger",
+            action_id: 'remove_channel_settings',
+            value: JSON.stringify(value)
+          }
+        ]
       }
     ]
   };

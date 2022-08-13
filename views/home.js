@@ -50,8 +50,6 @@ const buildHomeView = async (userId, teamId, redirect_url, userIsAdmin, client) 
   // Authentication
   const userAuthenticated = !!user && !!user.access_token;
 
-  // console.log('subscription data ', subscriptionData);
-
   // Define base home object
   let home = {
     /* the user that opened your app's app home */
@@ -162,6 +160,27 @@ const buildAuthSection = (auth_url) => {
 
 
 const buildTranslationSettingsSection = (team, userIsAdmin, nonAdminAllowSettings) => {
+  // Build different UI elements for reuse
+  const createRemoveButton = (setting) => {
+    let removeChannelButton = {
+      type: 'actions',
+      elements: [
+        {
+          type: "button",
+          text: {
+            type: 'plain_text',
+            text: 'Remove channel'
+          },
+          style: "danger",
+          action_id: 'settings_modal_opened',
+          value: JSON.stringify({ id: setting?.id || null, lang: setting?.languages || [] })
+        }
+      ]
+    }
+
+    return removeChannelButton;
+  }
+
   let settingsSection = [];
 
   settingsSection.push({
@@ -225,7 +244,11 @@ const buildTranslationSettingsSection = (team, userIsAdmin, nonAdminAllowSetting
           value: JSON.stringify({ id: setting.id, lang: setting.languages })
         };
       }
+
+      console.log('setting ', setting);
+      const removeChannelButton = createRemoveButton();
       settingsSection.push(settingsBlock);
+      settingsSection.push(removeChannelButton);
       continue;
     }
 
@@ -256,7 +279,16 @@ const buildTranslationSettingsSection = (team, userIsAdmin, nonAdminAllowSetting
         value: JSON.stringify({ id: setting.id, lang: setting.languages })
       };
     }
+
     settingsSection.push(settingsBlock);
+    
+    const removeChannelSettingsButton = createRemoveButton();
+    if (userIsAdmin || nonAdminAllowSettings) {
+      settingsSection.push(removeChannelSettingsButton);
+    }
+
+
+    settingsSection.push({ type: 'divider' });
   }
 
   if (userIsAdmin || nonAdminAllowSettings) {

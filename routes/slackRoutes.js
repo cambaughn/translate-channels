@@ -205,25 +205,6 @@ const slackRoutes = (app) => {
     }
   });
 
-  // app.action('remove_channel_settings', async ({ ack, action, body, context, client }) => {
-  //   console.log('remove_channel_settings event ', body);
-  //   await ack();
-  //   try {
-  //     let userId = body.user.id;
-  //     let teamId = context.teamId;
-  //     let isSlackAdmin = await isAdmin(userId, context.botToken, client);
-  //     let redirect_url = process.env.REDIRECT_URL || 'https://translate-channels.herokuapp.com/auth_redirect';
-  //     let homeView = await buildHomeView(userId, teamId, redirect_url, isSlackAdmin, client);
-  //     homeView.token = context.botToken;
-  //     console.log('view config ', homeView.token, homeView.user_id);
-  //     /* view.publish is the method that your app uses to push a view to the Home tab */
-  //     const result = await client.views.publish(homeView);
-  //   } catch (error) {
-  //     console.error(error);
-  //   }
-  // });
-
-
   app.view('settings_modal_submitted', async ({ ack, view, context, body, client }) => {
     console.log('settings_modal_submitted event');
     await ack();

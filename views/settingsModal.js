@@ -1,7 +1,6 @@
 import { getSelectableLanguages, getModalOption } from "../util/languages/languageHelpers.js";
 
-const buildSettingsModal = (valueString) => {
-  const value = JSON.parse(valueString);
+const buildSettingsModal = (value) => {
   const modal = {
     type: 'modal',
     callback_id: 'settings_modal_submitted',

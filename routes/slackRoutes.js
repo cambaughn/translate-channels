@@ -149,11 +149,19 @@ const slackRoutes = (app) => {
     await ack();
   })
 
+  const openSettingsModal = async (actionValue, body, context) => {
+    const settingsModal = await buildSettingsModal(actionValue);
+      // Opens the modal itself
+    return app.client.views.open({
+      token: context.botToken,
+      trigger_id: body.trigger_id,
+      view: settingsModal
+    });
+  }
 
   app.action('settings_modal_opened', async ({ ack, action, body, context }) => {
     console.log('settings_modal_opened event');
     await ack();
-    const homeViewId = body.container.view_id;
     const settingsModal = await buildSettingsModal(action.value);
     try {
       // Opens the modal itself
@@ -171,9 +179,15 @@ const slackRoutes = (app) => {
     console.log('overflow_selected event ');
     await ack();
 
-    let value = JSON.parse(action.selected_option.value);
+    let actionValue = JSON.parse(action.selected_option.value);
     // NOTE: keep going from here down
-    const homeViewId = body.container.view_id;
+    // const homeViewId = body.container.view_id;
+
+    if (actionValue.type === 'edit_settings') { // open the settings modal
+      await openSettingsModal(actionValue, body, context);
+    } else { // delete channel from settings
+
+    }
     const settingsModal = await buildSettingsModal(action.value);
     try {
       // Opens the modal itself

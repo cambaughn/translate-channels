@@ -14,11 +14,9 @@ const buildHomeView = async (userId, teamId, redirect_url, userIsAdmin, client) 
   // TODO: if we want to allow non admins to change settings, set this to true (for global rule) OR add field to db for each team
   let nonAdminAllowSettings = false;
 
-  console.log('user ', user);
-
   if (teamId) {
-    console.log('getting team in homeview ', teamId);
     team = await teamsDB.getTeam(teamId);
+    console.log('getting team in homeview ', teamId);
     // Record team viewing the homescreen for the first time
     if (!team?.viewed_app_home) {
       teamsDB.updateTeam(teamId, { viewed_app_home: true })
@@ -224,7 +222,6 @@ const buildTranslationSettingsSection = (team, userIsAdmin, nonAdminAllowSetting
         };
       }
 
-      console.log('setting ', setting);
       settingsSection.push(settingsBlock);
       continue;
     }

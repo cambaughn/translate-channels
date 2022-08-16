@@ -57,29 +57,6 @@ const buildSettingsModal = (value) => {
           },
           options: []
         }
-      },
-      { type: 'divider' },
-      {
-        type: 'input',
-        block_id: 'remove_channel_settings',
-        label: {
-          type: 'plain_text',
-          text: 'testing'
-        },
-        element: {
-          type: 'checkboxes',
-          action_id: 'remove_channel_settings',
-          options: [
-            {
-              text: {
-                type: "plain_text",
-                text: "Remove settings for channel",
-                emoji: true
-              },
-              value: "true"
-            }
-          ]
-        }
       }
     ]
   };

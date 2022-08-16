@@ -17,6 +17,14 @@ import Mixpanel from 'mixpanel';
 const mixpanel = Mixpanel.init(process.env.MIXPANEL_API_KEY);
 
 
+const publishHomeView = async (userId, teamId, context, client) => {
+  let isSlackAdmin = await isAdmin(userId, context.botToken, client);
+  let redirect_url = process.env.REDIRECT_URL || 'https://translate-channels.herokuapp.com/auth_redirect';
+  let homeView = await buildHomeView(userId, teamId, redirect_url, isSlackAdmin);
+  const result = await client.views.publish(homeView);
+}
+
+
 const slackRoutes = (app) => {
 
   app.event('message', async ({ message, context, client }) => {
@@ -162,7 +170,9 @@ const slackRoutes = (app) => {
   app.action('settings_modal_opened', async ({ ack, action, body, context }) => {
     console.log('settings_modal_opened event');
     await ack();
-    const settingsModal = await buildSettingsModal(action.value);
+
+    let actionValue = JSON.parse(action.value);
+    const settingsModal = await buildSettingsModal(actionValue);
     try {
       // Opens the modal itself
       await app.client.views.open({
@@ -175,27 +185,21 @@ const slackRoutes = (app) => {
     }
   });
 
-  app.action('overflow_selected', async ({ ack, action, body, context }) => {
+  app.action('overflow_selected', async ({ ack, action, body, context, client }) => {
     console.log('overflow_selected event ');
     await ack();
 
     let actionValue = JSON.parse(action.selected_option.value);
-    // NOTE: keep going from here down
-    // const homeViewId = body.container.view_id;
+    const teamId = context.teamId;
+    const userId = body.user.id;
 
-    if (actionValue.type === 'edit_settings') { // open the settings modal
-      await openSettingsModal(actionValue, body, context);
-    } else { // delete channel from settings
-
-    }
-    const settingsModal = await buildSettingsModal(action.value);
     try {
-      // Opens the modal itself
-      await app.client.views.open({
-        token: context.botToken,
-        trigger_id: body.trigger_id,
-        view: settingsModal
-      });
+      if (actionValue.type === 'edit_settings') { // open the settings modal
+        await openSettingsModal(actionValue, body, context);
+      } else { // delete channel from settings
+        await teamsDB.removeChannelSettings(actionValue.id, context.teamId);
+        publishHomeView(userId, teamId, context, client);
+      }
     } catch (error) {
       console.error(error);
     }
@@ -231,10 +235,7 @@ const slackRoutes = (app) => {
     const teamId = context.teamId;
     const userId = body.user.id;
     await teamsDB.updateLanguageSettings(channels, languages, context.teamId);
-    let isSlackAdmin = await isAdmin(userId, context.botToken, client);
-    let redirect_url = process.env.REDIRECT_URL || 'https://translate-channels.herokuapp.com/auth_redirect';
-    let homeView = await buildHomeView(userId, teamId, redirect_url, isSlackAdmin);
-    const result = await client.views.publish(homeView);
+    publishHomeView(userId, teamId, context, client);
   });
 
 

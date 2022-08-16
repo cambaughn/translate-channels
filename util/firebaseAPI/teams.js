@@ -1,4 +1,4 @@
-import { doc, setDoc, getDoc, deleteDoc, query, collection, where, getDocs  } from "firebase/firestore"; 
+import { doc, setDoc, getDoc, deleteDoc, query, collection, where, getDocs, updateDoc, deleteField } from "firebase/firestore"; 
 import db from '../firebase/firebaseInit.js';
 import convertFromFirebase from '../firebase/converter.js';
 import userDB from './users.js';
@@ -24,7 +24,7 @@ teamsDB.getTeamsWhere = async (key, comparator, value) => {
 
 // Create (or update existing) team in Firebase
 teamsDB.updateTeam = async (id, updates) => {
-  console.log('updating team ', id);
+  console.log('updating team ', id, updates);
   const teamRef = teamsDoc(id);
   return setDoc(teamRef, updates, { merge: true });
 }
@@ -97,6 +97,16 @@ teamsDB.updateLanguageSettings = async (channels, languages, teamId) => {
   } else { // Workspace as a whole
     return teamsDB.updateTeam(teamId, { workspace_languages: languages });
   }
+}
+
+// Remove channel and settings from team
+teamsDB.removeChannelSettings = async (channelId, teamId) => {
+  let updates = {};
+  // Need to use dot notation with deleteField() function in order to delete nested element inside object: https://firebase.google.com/docs/firestore/manage-data/delete-data
+  updates[`channel_language_settings.${channelId}`] = deleteField();
+  // Update team in database
+  const teamRef = teamsDoc(teamId);
+  return updateDoc(teamRef, updates);
 }
 
 

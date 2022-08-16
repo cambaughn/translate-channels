@@ -17,7 +17,7 @@ const buildSettingsModal = (valueString) => {
     },
     close: {
       type: 'plain_text',
-      text: 'Cancel',
+      text: 'Delete Settings',
       emoji: true
     },
     blocks: [
@@ -59,20 +59,28 @@ const buildSettingsModal = (valueString) => {
           options: []
         }
       },
+      { type: 'divider' },
       {
-        type: 'actions',
-        elements: [
-          {
-            type: "button",
-            text: {
-              type: 'plain_text',
-              text: 'Remove channel'
-            },
-            style: "danger",
-            action_id: 'remove_channel_settings',
-            value: JSON.stringify(value)
-          }
-        ]
+        type: 'input',
+        block_id: 'remove_channel_settings',
+        label: {
+          type: 'plain_text',
+          text: 'testing'
+        },
+        element: {
+          type: 'checkboxes',
+          action_id: 'remove_channel_settings',
+          options: [
+            {
+              text: {
+                type: "plain_text",
+                text: "Remove settings for channel",
+                emoji: true
+              },
+              value: "true"
+            }
+          ]
+        }
       }
     ]
   };

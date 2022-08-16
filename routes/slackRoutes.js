@@ -167,6 +167,26 @@ const slackRoutes = (app) => {
     }
   });
 
+  app.action('overflow_selected', async ({ ack, action, body, context }) => {
+    console.log('overflow_selected event ');
+    await ack();
+
+    let value = JSON.parse(action.selected_option.value);
+    // NOTE: keep going from here down
+    const homeViewId = body.container.view_id;
+    const settingsModal = await buildSettingsModal(action.value);
+    try {
+      // Opens the modal itself
+      await app.client.views.open({
+        token: context.botToken,
+        trigger_id: body.trigger_id,
+        view: settingsModal
+      });
+    } catch (error) {
+      console.error(error);
+    }
+  });
+
   // app.action('remove_channel_settings', async ({ ack, action, body, context, client }) => {
   //   console.log('remove_channel_settings event ', body);
   //   await ack();

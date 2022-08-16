@@ -160,27 +160,6 @@ const buildAuthSection = (auth_url) => {
 
 
 const buildTranslationSettingsSection = (team, userIsAdmin, nonAdminAllowSettings) => {
-  // Build different UI elements for reuse
-  const createRemoveButton = (setting) => {
-    let removeChannelButton = {
-      type: 'actions',
-      elements: [
-        {
-          type: "button",
-          text: {
-            type: 'plain_text',
-            text: 'Remove channel'
-          },
-          style: "danger",
-          action_id: 'settings_modal_opened',
-          value: JSON.stringify({ id: setting?.id || null, lang: setting?.languages || [] })
-        }
-      ]
-    }
-
-    return removeChannelButton;
-  }
-
   let settingsSection = [];
 
   settingsSection.push({
@@ -246,9 +225,7 @@ const buildTranslationSettingsSection = (team, userIsAdmin, nonAdminAllowSetting
       }
 
       console.log('setting ', setting);
-      const removeChannelButton = createRemoveButton();
       settingsSection.push(settingsBlock);
-      settingsSection.push(removeChannelButton);
       continue;
     }
 
@@ -268,27 +245,45 @@ const buildTranslationSettingsSection = (team, userIsAdmin, nonAdminAllowSetting
       }
     };
 
-    if (userIsAdmin || nonAdminAllowSettings) {
+    // if (userIsAdmin || nonAdminAllowSettings) {
+    //   settingsBlock.accessory = {
+    //     type: 'button',
+    //     text: {
+    //       type: 'plain_text',
+    //       text: 'Edit'
+    //     },
+    //     action_id: 'settings_modal_opened',
+    //     value: JSON.stringify({ id: setting.id, lang: setting.languages })
+    //   };    
+      
+      if (userIsAdmin || nonAdminAllowSettings) {
+
+        
       settingsBlock.accessory = {
-        type: 'button',
-        text: {
-          type: 'plain_text',
-          text: 'Edit'
-        },
-        action_id: 'settings_modal_opened',
-        value: JSON.stringify({ id: setting.id, lang: setting.languages })
+        type: "overflow",
+        options: [
+          {
+            text: {
+              type: "plain_text",
+              text: "Edit Settings"
+            },
+            value: JSON.stringify({ type: 'edit_settings', id: setting.id, lang: setting.languages })
+          },
+          {
+            text: {
+              type: "plain_text",
+              text: "Remove Channel"
+            },
+            value: JSON.stringify({ type: 'remove_channel_settings', id: setting.id, lang: setting.languages })
+          }
+        ],
+        action_id: "overflow_selected"
+        // action_id: 'settings_modal_opened',
+        // value: JSON.stringify({ id: setting.id, lang: setting.languages })
       };
     }
 
     settingsSection.push(settingsBlock);
-    
-    const removeChannelSettingsButton = createRemoveButton();
-    if (userIsAdmin || nonAdminAllowSettings) {
-      settingsSection.push(removeChannelSettingsButton);
-    }
-
-
-    settingsSection.push({ type: 'divider' });
   }
 
   if (userIsAdmin || nonAdminAllowSettings) {

@@ -102,8 +102,13 @@ teamsDB.updateLanguageSettings = async (channels, languages, teamId) => {
 // Remove channel and settings from team
 teamsDB.removeChannelSettings = async (channelId, teamId) => {
   let updates = {};
-  // Need to use dot notation with deleteField() function in order to delete nested element inside object: https://firebase.google.com/docs/firestore/manage-data/delete-data
-  updates[`channel_language_settings.${channelId}`] = deleteField();
+
+  if (channelId === 'any_channel') { // if the settings apply to the entire workspace, clear the team's workspace_languages
+    updates.workspace_languages = [];
+  } else { // otherwise, we're dealing with a single channel and need to clear that from channel_language_settings
+    // Need to use dot notation with deleteField() function in order to delete nested element inside object: https://firebase.google.com/docs/firestore/manage-data/delete-data
+    updates[`channel_language_settings.${channelId}`] = deleteField();
+  }
   // Update team in database
   const teamRef = teamsDoc(teamId);
   return updateDoc(teamRef, updates);

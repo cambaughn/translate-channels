@@ -16,7 +16,7 @@ const buildSettingsModal = (value) => {
     },
     close: {
       type: 'plain_text',
-      text: 'Delete Settings',
+      text: 'Close',
       emoji: true
     },
     blocks: [

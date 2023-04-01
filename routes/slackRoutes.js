@@ -237,6 +237,16 @@ const slackRoutes = (app) => {
     }
   });
 
+  // User leaves workspace - use to de-authorize user so they don't count toward team total
+  app.event("user_change", async ({ event, client }) => {
+    // Check if the user is no longer in the workspace
+    if (event.user.deleted) {
+      console.log(`User ${event.user.name} has left the workspace`);
+      // Do something here, such as send a notification to a channel or update a database
+      
+    }
+  });
+
   app.event('app_uninstalled', async ({ event, context, ack }) => {
     console.log('====> app_uninstalled event ', event, context);
     if (ack) {

@@ -45,8 +45,11 @@ userDB.getRegisteredUsersForTeam = async (team_id) => {
   // Filter for users who have authorized the app ("Registered")
   users = users.filter(user => !!user.access_token);
   const numUsers = users.length;
+  console.log('num users ', users);
   return Promise.resolve(numUsers);
 }
+
+// userDB.getRegisteredUsersForTeam('T01J3FNBG59');
 
 
 

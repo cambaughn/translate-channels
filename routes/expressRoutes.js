@@ -36,7 +36,7 @@ const expressRoutes = (app, slackApp, dbConnector) => {
 
     return slackApp.client.oauth.v2.access(accessDetails)
     .then(async (result) => {
-      console.log('got oauth back');
+      console.log('got oauth back ::::: ', result);
       let { team, authed_user, app_id } = result;
       let userInfo = {
         access_token: authed_user.access_token,

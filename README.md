@@ -19,7 +19,7 @@ Read the [Getting Started guide](https://api.slack.com/start/building/bolt)
 Read the [Bolt documentation](https://slack.dev/bolt)
 -------------------
 
-Running the app
+# Running the app
 In two separate tabs:
 - ngrok http 3000
 - npm run dev

@@ -3,7 +3,7 @@ import languageOperations from './languageOperations.js';
 import GoogleTranslate from '@google-cloud/translate';
 const { Translate } = GoogleTranslate.v2;
 import stringOperator from './stringHelpers.js';
-const translate = new Translate({projectId: 'translate-channels-d7fb1', key: 'AIzaSyAs9_XTqDt1AJw-qOZnXae-PlEfSxPFMpk'});
+const translate = new Translate({projectId: 'translate-channels-d7fb1', key: process.env.TRANSLATE_API_KEY});
 
 // NOTE: Translator doesn't handle italics - leaves untranslated. It does handle bolding, which is odd. Probably don't need to handle unless users complain.
 class Translator {

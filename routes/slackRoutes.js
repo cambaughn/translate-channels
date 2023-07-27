@@ -209,8 +209,10 @@ const slackRoutes = (app) => {
     console.log('settings_modal_submitted event');
     await ack();
     const settingsModal = view.state.values;
+    console.log('settingsModal ', settingsModal)
     const languages = settingsModal.select_lang_block.select_lang.selected_options.map(x => x.value);
-    const channelIds = settingsModal.select_channel_block.select_channel.selected_channels;
+    const channelIds = settingsModal.select_channel_block.select_channel.selected_conversations;
+    console.log('channelIds ', channelIds)
     const channels = await getInfoForChannels(channelIds, client, context);
 
     const teamId = context.teamId;

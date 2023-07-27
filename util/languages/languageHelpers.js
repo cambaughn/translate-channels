@@ -1,4 +1,4 @@
-import supportedLanguages from './supportedLanguages.json';
+import supportedLanguages from './supportedLanguages.json' assert { type: 'json' };
 
 const getSlackHeading = (languageCode) => {
   // takes language code returned by google and constructs a slack heading

@@ -28,9 +28,9 @@ const buildSettingsModal = (value) => {
           text: 'Select a channel [leave blank to apply settings to all channels]'
         },
         element: {
-          type: 'multi_channels_select',
+          type: 'multi_conversations_select',
           action_id: 'select_channel',
-          initial_channels: [],
+          initial_conversations: [],
           placeholder: {
             type: 'plain_text',
             text: 'Select channels',
@@ -71,7 +71,7 @@ const buildSettingsModal = (value) => {
     value: 'do_not_translate'
   });
   if (preselectedChannel.length > 0) {
-    modal.blocks[0].element.initial_channels = preselectedChannel;
+    modal.blocks[0].element.initial_conversations = preselectedChannel;
   }
   if (value.lang.length > 0) {
     const preselectedLanguages = value.lang.map(langCode => getModalOption(langCode));

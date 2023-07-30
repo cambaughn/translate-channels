@@ -248,7 +248,17 @@ const slackRoutes = (app) => {
       
     }
   });
-
+  
+  /**
+     * Responds to the 'app_uninstalled' event by cancelling the team's Stripe subscription.
+     *
+     * @param {Object}   payload                   - The payload of the Slack event.
+     * @param {Object}   payload.event             - The event data sent by Slack.
+     * @param {Object}   payload.context           - The context in which the event occurred.
+     * @param {string}   payload.context.teamId    - The ID of the team that uninstalled the app.
+     * @param {Function} payload.ack               - The function to acknowledge the event received from Slack.
+     * @returns {Promise<void>}                    - A promise that resolves when the operation is complete.
+  */
   app.event('app_uninstalled', async ({ event, context, ack }) => {
     console.log('====> app_uninstalled event ', event, context);
     if (ack) {
@@ -269,7 +279,7 @@ const slackRoutes = (app) => {
     }
 
     // Deactivate team in Firebase
-    await teamsDB.deactivateTeam(context.teamId);
+    // await teamsDB.deactivateTeam(context.teamId);
   });
 
   // app.event('tokens_revoked', async ({ event, ack }) => {

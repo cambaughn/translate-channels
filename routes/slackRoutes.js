@@ -13,15 +13,29 @@ import Translator from '../util/languages/translate.js';
 import { getSubscriptionData, reportSubscriptionUsage, getSubscriptionTierDetails, cancelSubscription } from '../util/stripe/stripe.js';
 // Analytics
 import Mixpanel from 'mixpanel';
-// create an instance of the mixpanel client
+// Create an instance of the mixpanel client
 const mixpanel = Mixpanel.init(process.env.MIXPANEL_API_KEY);
 
 
+/**
+   * Publishes the home view for a user.
+   * This function builds and publishes the home view for a given user by checking if the 
+   * user is an admin and building the home view accordingly. The view is then published 
+   * using the provided Slack client.
+   *
+   * @param {string} userId - The ID of the user for whom the home view will be published.
+   * @param {string} teamId - The ID of the team that the user belongs to.
+   * @param {Object} context - The context of the event.
+   * @param {string} context.botToken - The bot token of the app.
+   * @param {Object} client - Slack client instance to make API calls.
+   *
+   * @returns {Promise<void>} A promise indicating the completion of the home view publishing.
+*/
 const publishHomeView = async (userId, teamId, context, client) => {
   let isSlackAdmin = await isAdmin(userId, context.botToken, client);
   let redirect_url = process.env.REDIRECT_URL || 'https://translate-channels.herokuapp.com/auth_redirect';
   let homeView = await buildHomeView(userId, teamId, redirect_url, isSlackAdmin);
-  const result = await client.views.publish(homeView);
+  await client.views.publish(homeView);
 }
 
 
@@ -298,7 +312,7 @@ const slackRoutes = (app) => {
       let homeView = await buildHomeView(userId, teamId, redirect_url, isSlackAdmin, client);
       homeView.token = context.botToken;
       console.log('view config ', homeView.token, homeView.user_id);
-      const result = await client.views.publish(homeView);
+      await client.views.publish(homeView);
     } catch (error) {
       console.error(error);
     }

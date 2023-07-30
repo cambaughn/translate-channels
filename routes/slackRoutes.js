@@ -27,6 +27,27 @@ const publishHomeView = async (userId, teamId, context, client) => {
 
 const slackRoutes = (app) => {
 
+  /**
+     * Slack Event Handler for 'message' event.
+     * This handler checks if the message comes from a bot or if it's an edited message, 
+     * in which case it does nothing. If the message is in an IM to the app bot, it sends 
+     * a help message. Otherwise, it checks if the user has an active subscription, if the
+     * subscription is metered, it reports usage. If the subscription is licensed, it checks
+     * that the number of users is within the current plan limits and sends an upgrade message
+     * if necessary.
+     *
+     * @param {Object} message - The message object containing the message information.
+     * @param {string} message.user - The ID of the user who sent the message.
+     * @param {string} message.channel_type - The type of channel where the message was sent.
+     * @param {string} message.bot_id - The ID of the bot if the message was sent by a bot.
+     * @param {string} message.subtype - The subtype of the message, 'message_changed' if it was edited.
+     * @param {Object} context - The context of the event.
+     * @param {string} context.teamId - The ID of the team that the event belongs to.
+     * @param {string} context.botToken - The bot token of the app.
+     * @param {Object} client - Slack client instance to make API calls.
+     *
+     * @returns {Promise<void>} A promise indicating the completion of the message handling.
+   */
   app.event('message', async ({ message, context, client }) => {
     console.log('message event for user: ', message.user);
     // if the message comes from a bot OR the message has been edited manually, don't translate
@@ -107,6 +128,22 @@ const slackRoutes = (app) => {
   });
 
 
+  /**
+     * Slack Command Handler for '/nt' command.
+     * This handler acknowledges the command, checks the command text, and responds accordingly.
+     * If the command text is 'help' or empty, it will send a help message.
+     * Otherwise, it posts the user's message to the channel.
+     *
+     * @param {Object} context - The context of the command.
+     * @param {Object} command - The command object containing the command information.
+     * @param {string} command.text - The text of the command.
+     * @param {string} command.user_id - The ID of the user who issued the command.
+     * @param {string} command.channel_id - The ID of the channel where the command was issued.
+     * @param {function} ack - Function to acknowledge the command.
+     * @param {Object} client - Slack client instance to make API calls.
+     *
+     * @returns {Promise<void>} A promise indicating the completion of command handling.
+   */
   app.command('/nt', async ({ ack, command, context, client }) => {
     console.log('/nt slash command');
     await ack();
@@ -123,40 +160,16 @@ const slackRoutes = (app) => {
     }
   });
 
-  // This action only needs to acknowledge the button click - auth is otherwise handled with oAuth redirect url
-  app.action('authorize_app', async ({ ack }) => {
-    console.log('authorize_app event');
-    // We just need ack() here to respond to the action, even though we're redirecting to a url
-    await ack();
-  })  
-  
-  // This action only needs to acknowledge the button click - auth is otherwise handled with a url
-  app.action('manage_plan', async ({ ack }) => {
-    console.log('manage_plan event');
-    // We just need ack() here to respond to the action, even though we're redirecting to a url
-    await ack();
-  })
-  
-  app.action('small_plan_click', async ({ ack }) => {
-    // We just need ack() here to respond to the action, even though we're redirecting to a url
-    await ack();
-  })
-
-  app.action('medium_plan_click', async ({ ack }) => {
-    // We just need ack() here to respond to the action, even though we're redirecting to a url
-    await ack();
-  })
-
-  app.action('large_plan_click', async ({ ack }) => {
-    // We just need ack() here to respond to the action, even though we're redirecting to a url
-    await ack();
-  })
-
-  app.action('unlimited_plan_click', async ({ ack }) => {
-    // We just need ack() here to respond to the action, even though we're redirecting to a url
-    await ack();
-  })
-
+  /**
+     * Opens the settings modal in the Slack application.
+     *
+     * @param {Object} actionValue - The action value received from the 'settings_modal_opened' action.
+     * @param {Object} body        - The body of the action event.
+     * @param {string} body.trigger_id - The trigger ID provided by Slack to open a modal.
+     * @param {Object} context     - The context in which the event occurred.
+     * @param {string} context.botToken - The bot token used to authenticate with the Slack API.
+     * @returns {Promise<Object>} A promise that resolves with the response from the Slack API when the modal is opened.
+   */
   const openSettingsModal = async (actionValue, body, context) => {
     const settingsModal = await buildSettingsModal(actionValue);
       // Opens the modal itself
@@ -167,6 +180,19 @@ const slackRoutes = (app) => {
     });
   }
 
+  /**
+     * Handles the 'settings_modal_opened' action. This opens the settings modal when the corresponding button is clicked.
+     *
+     * @param {Object}   payload             - The payload of the Slack action.
+     * @param {Function} payload.ack         - Function to acknowledge the action from Slack.
+     * @param {Object}   payload.action      - The action object from Slack.
+     * @param {string}   payload.action.value - The value associated with the action.
+     * @param {Object}   payload.body        - The body of the action event.
+     * @param {string}   payload.body.trigger_id - The trigger ID provided by Slack to open a modal.
+     * @param {Object}   payload.context     - The context in which the event occurred.
+     * @param {string}   payload.context.botToken - The bot token used to authenticate with the Slack API.
+     * @returns {Promise<void>} A promise that resolves when the operation is complete.
+   */
   app.action('settings_modal_opened', async ({ ack, action, body, context }) => {
     console.log('settings_modal_opened event');
     await ack();
@@ -185,6 +211,20 @@ const slackRoutes = (app) => {
     }
   });
 
+  /**
+     * Handles the 'overflow_selected' action. This can either open the settings modal or remove channel settings, based on the action value.
+     *
+     * @param {Object}   payload             - The payload of the Slack action.
+     * @param {Function} payload.ack         - Function to acknowledge the action from Slack.
+     * @param {Object}   payload.action      - The action object from Slack.
+     * @param {Object}   payload.action.selected_option - The selected option in the overflow menu.
+     * @param {Object}   payload.body        - The body of the action event.
+     * @param {string}   payload.body.user.id - The ID of the user who triggered the action.
+     * @param {Object}   payload.context     - The context in which the event occurred.
+     * @param {string}   payload.context.teamId - The ID of the team to which the user belongs.
+     * @param {Object}   payload.client      - The Slack WebClient instance to interact with Slack API.
+     * @returns {Promise<void>} A promise that resolves when the operation is complete.
+   */
   app.action('overflow_selected', async ({ ack, action, body, context, client }) => {
     console.log('overflow_selected event ');
     await ack();
@@ -205,6 +245,20 @@ const slackRoutes = (app) => {
     }
   });
 
+  /**
+     * Handles the 'settings_modal_submitted' view submission by updating language settings and publishing a new home view.
+     *
+     * @param {Object}   payload             - The payload of the Slack view submission.
+     * @param {Function} payload.ack         - Function to acknowledge the view submission from Slack.
+     * @param {Object}   payload.view        - The state of the view at the time of submission.
+     * @param {Object}   payload.view.state.values - The values of the inputs in the view.
+     * @param {Object}   payload.context     - The context in which the event occurred.
+     * @param {string}   payload.context.teamId - The ID of the team to which the user belongs.
+     * @param {Object}   payload.body        - The body of the view submission event.
+     * @param {string}   payload.body.user.id - The ID of the user who submitted the view.
+     * @param {Object}   payload.client      - The Slack WebClient instance to interact with Slack API.
+     * @returns {Promise<void>} A promise that resolves when the operation is complete.
+  */
   app.view('settings_modal_submitted', async ({ ack, view, context, body, client }) => {
     console.log('settings_modal_submitted event');
     await ack();
@@ -221,7 +275,18 @@ const slackRoutes = (app) => {
     publishHomeView(userId, teamId, context, client);
   });
 
-
+  /**
+     * Handles the 'app_home_opened' event by building and publishing the Home tab view for the user.
+     *
+     * @param {Object}   payload                   - The payload of the Slack event.
+     * @param {Object}   payload.event             - The event data sent by Slack.
+     * @param {string}   payload.event.user        - The ID of the user who opened the app home.
+     * @param {Object}   payload.context           - The context in which the event occurred.
+     * @param {string}   payload.context.teamId    - The ID of the team to which the user belongs.
+     * @param {string}   payload.context.botToken  - The bot token associated with your app.
+     * @param {Object}   payload.client            - The Slack WebClient instance to interact with Slack API.
+     * @returns {Promise<void>} A promise that resolves when the operation is complete.
+   */
   app.event('app_home_opened', async ({ event, client, context }) => {
     console.log('app_home_opened event');
     try {
@@ -304,6 +369,42 @@ const slackRoutes = (app) => {
   //   // Deactivate team in Firebase
   //   await teamsDB.deactivateTeam(event.team_id);
   // });
+
+  // All the next routes only need to acknowledge the event, the actual functionality is done as a link to a url in ../views/home.js
+  // This action only needs to acknowledge the button click - auth is otherwise handled with oAuth redirect url
+  app.action('authorize_app', async ({ ack }) => {
+    console.log('authorize_app event');
+    // We just need ack() here to respond to the action, even though we're redirecting to a url
+    await ack();
+  })  
+  
+  // This action only needs to acknowledge the button click - auth is otherwise handled with a url
+  app.action('manage_plan', async ({ ack }) => {
+    console.log('manage_plan event');
+    // We just need ack() here to respond to the action, even though we're redirecting to a url
+    await ack();
+  })
+  
+  app.action('small_plan_click', async ({ ack }) => {
+    // We just need ack() here to respond to the action, even though we're redirecting to a url
+    await ack();
+  })
+
+  app.action('medium_plan_click', async ({ ack }) => {
+    // We just need ack() here to respond to the action, even though we're redirecting to a url
+    await ack();
+  })
+
+  app.action('large_plan_click', async ({ ack }) => {
+    // We just need ack() here to respond to the action, even though we're redirecting to a url
+    await ack();
+  })
+
+  
+  app.action('unlimited_plan_click', async ({ ack }) => {
+    // We just need ack() here to respond to the action, even though we're redirecting to a url
+    await ack();
+  })
 }
 
 export default slackRoutes;

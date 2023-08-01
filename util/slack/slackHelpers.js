@@ -35,11 +35,17 @@ const getInfoForChannels = async (channelIds, client, context) => {
 };
 
 const getChannelInfo = async (channel, client, context) => {
+  console.log('getting channel info ', channel, context.botToken)
   try {
+    const conversationsList = await client.conversations.list();
+    console.log('got conversations list', conversationsList);
+
     const result = await client.conversations.info({
       token: context.botToken,
       channel: channel
     });
+
+    console.log('got channel info', result);
 
     return Promise.resolve({ name: result.channel.name, id: result.channel.id });
   } catch (error) {

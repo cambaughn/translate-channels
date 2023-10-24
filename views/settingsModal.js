@@ -25,7 +25,7 @@ const buildSettingsModal = (value) => {
         block_id: 'select_channel_block',
         label: {
           type: 'plain_text',
-          text: 'Select a channel [leave blank to apply settings to all channels]'
+          text: 'Select channels to translate'
         },
         element: {
           type: 'multi_conversations_select',

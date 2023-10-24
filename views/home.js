@@ -170,7 +170,7 @@ const buildTranslationSettingsSection = (team, userIsAdmin, nonAdminAllowSetting
 
   // Overall workspace settings that apply to every channel - holding it here until after sorting the channel settings alphabetically
   let everyChannel = {
-    name: 'every_channel', 
+    name: 'All Channels', 
     id: 'any_channel', 
     languages: team?.workspace_languages || []
   }
@@ -197,8 +197,12 @@ const buildTranslationSettingsSection = (team, userIsAdmin, nonAdminAllowSetting
       return 0;
     }
   })
+  console.log('everyChannel: ', everyChannel);
 
-  settings.unshift(everyChannel);
+  // NOTE: The feature to apply a workspace-wide setting to all channels is currently disabled
+  if (everyChannel.languages.length > 0) { // if there are workspace-wide settings, add them to the settings array. Currently, we have DISABLED this feature to apply settings to all channels
+    settings.unshift(everyChannel);
+  }
 
   for (const setting of settings) {
     // the languages length of 0 should be only possible for workspace settings which must exist by schema
@@ -288,7 +292,7 @@ const buildTranslationSettingsSection = (team, userIsAdmin, nonAdminAllowSetting
         type: 'section',
         text: {
           type: 'mrkdwn',
-          text: 'You can add translation settings for any channel :point_right:'
+          text: 'Add translation settings for any channel :point_right:'
         },
         accessory: {
           type: 'button',

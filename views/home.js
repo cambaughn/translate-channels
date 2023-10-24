@@ -105,16 +105,17 @@ const buildHomeView = async (userId, teamId, redirect_url, userIsAdmin, client) 
     
     // console.log('subscription data ', subscriptionData);
     console.log('subscription active ', subscriptionActive);
-  
-    if (subscriptionActive) { // show plan & usage data if the subscription is active
-      const numUsers = await userDB.getRegisteredUsersForTeam(teamId);
-      const managePlanSection = buildManagePlanSection(subscriptionData, numUsers, portalUrl);
-      home.view.blocks.push(...managePlanSection);
-    } else { // if the team's subscription isn't active, show "Get Started" section
-      const getStartedSection = buildGetStartedSection(checkoutUrl);
-      home.view.blocks.push(...getStartedSection);
+    
+    if (userIsAdmin || nonAdminAllowSettings) {
+      if (subscriptionActive) { // show plan & usage data if the subscription is active
+        const numUsers = await userDB.getRegisteredUsersForTeam(teamId);
+        const managePlanSection = buildManagePlanSection(subscriptionData, numUsers, portalUrl);
+        home.view.blocks.push(...managePlanSection);
+      } else { // if the team's subscription isn't active, show "Get Started" section
+        const getStartedSection = buildGetStartedSection(checkoutUrl);
+        home.view.blocks.push(...getStartedSection);
+      }
     }
-
   }
 
   return home;

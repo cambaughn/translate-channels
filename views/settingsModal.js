@@ -31,6 +31,7 @@ const buildSettingsModal = (value) => {
           type: 'multi_conversations_select',
           action_id: 'select_channel',
           initial_conversations: [],
+          filter: { include: ['public', 'private']},
           placeholder: {
             type: 'plain_text',
             text: 'Select channels',

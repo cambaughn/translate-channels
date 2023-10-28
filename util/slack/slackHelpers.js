@@ -35,8 +35,11 @@ const getInfoForChannels = async (channelIds, client, context) => {
 };
 
 const getChannelInfo = async (channel, client, context) => {
-  console.log('getting channel info ', channel)
+  console.log('getting channel info ', channel, context.botToken)
   try {
+    // const conversationsList = await client.conversations.list({ types: 'public_channel,private_channel'});
+    // console.log('got conversations list', conversationsList);
+
     const result = await client.conversations.info({
       channel: channel
     });

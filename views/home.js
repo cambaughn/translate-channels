@@ -307,7 +307,6 @@ const buildTranslationSettingsSection = (team, userIsAdmin, nonAdminAllowSetting
         },
       });
   }
-  console.log('settings section ================ ', settingsSection);
 
   settingsSection.push(
     {

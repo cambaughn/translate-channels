@@ -141,7 +141,6 @@ const slackRoutes = (app) => {
     updateMessage(message, translation.response, token, client);
   });
 
-
   /**
      * Slack Command Handler for '/nt' command.
      * This handler acknowledges the command, checks the command text, and responds accordingly.
@@ -280,7 +279,7 @@ const slackRoutes = (app) => {
     const languages = settingsModal.select_lang_block.select_lang.selected_options.map(x => x.value);
     const channelIds = settingsModal.select_channel_block.select_channel.selected_conversations;
     console.log('channelIds ', channelIds)
-    const channels = await getInfoForChannels(channelIds, client, context);
+    const channels = await getInfoForChannels(channelIds, client, context, body.user.id);
 
     const teamId = context.teamId;
     const userId = body.user.id;

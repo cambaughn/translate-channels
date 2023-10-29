@@ -1,5 +1,6 @@
 import helpMessage from "../../views/helpMessage.js";
 import upgradeMessage from "../../views/upgradeMessage.js";
+import userDB from "../firebaseAPI/users.js";
 
 const updateMessage = (message, response, token, client) => {
   // finds message and edits it with the translated text (response) as blocks
@@ -30,17 +31,20 @@ const postMessageAsUser = (text, channel, token, client) => {
 }
 
 
-const getInfoForChannels = async (channelIds, client, context) => {
-  return Promise.all(channelIds.map(channel => getChannelInfo(channel, client, context)));
+const getInfoForChannels = async (channelIds, client, context, userId) => {
+  return Promise.all(channelIds.map(channel => getChannelInfo(channel, client, context, userId)));
 };
 
-const getChannelInfo = async (channel, client, context) => {
-  console.log('getting channel info ', channel, context.botToken)
+const getChannelInfo = async (channel, client, context, userId) => {
+  console.log('getting channel info ', channel, userId)
   try {
     // const conversationsList = await client.conversations.list({ types: 'public_channel,private_channel'});
     // console.log('got conversations list', conversationsList);
-
+    const user = await userDB.getUser(userId);
+    console.log('got user from inside getChannelInfo', user);
+    // MY USER TOKEN: xoxp-5075958246082-5078431559956-6109929257122-e44e1c86c091b801af8875cea90dbbf4
     const result = await client.conversations.info({
+      token: user.access_token,
       channel: channel
     });
 

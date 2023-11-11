@@ -12,7 +12,8 @@ const buildHomeView = async (userId, teamId, redirect_url, userIsAdmin, client) 
   let user = await userDB.getUser(userId);
   let team = {};
   // TODO: if we want to allow non admins to change settings, set this to true (for global rule) OR add field to db for each team
-  let nonAdminAllowSettings = false;
+  const nonAdminAllowSettings = false;
+  const nonAdminAllowSubscriptionChange = false;
 
   if (teamId) {
     team = await teamsDB.getTeam(teamId);
@@ -106,7 +107,7 @@ const buildHomeView = async (userId, teamId, redirect_url, userIsAdmin, client) 
     // console.log('subscription data ', subscriptionData);
     console.log('subscription active ', subscriptionActive);
     
-    if (userIsAdmin || nonAdminAllowSettings) {
+    if (userIsAdmin || nonAdminAllowSubscriptionChange) {
       if (subscriptionActive) { // show plan & usage data if the subscription is active
         const numUsers = await userDB.getRegisteredUsersForTeam(teamId);
         const managePlanSection = buildManagePlanSection(subscriptionData, numUsers, portalUrl);
@@ -215,7 +216,7 @@ const buildTranslationSettingsSection = (team, userIsAdmin, nonAdminAllowSetting
           text: `\`${setting.name}\` No translation set`
         }
       };
-      // if (userIsAdmin || nonAdminAllowSettings) {
+      if (userIsAdmin || nonAdminAllowSettings) {
         settingsBlock.accessory = {
           type: 'button',
           text: {
@@ -225,7 +226,7 @@ const buildTranslationSettingsSection = (team, userIsAdmin, nonAdminAllowSetting
           action_id: 'settings_modal_opened',
           value: JSON.stringify({ id: setting.id, lang: setting.languages })
         };
-      // }
+      }
 
       settingsSection.push(settingsBlock);
       continue;
@@ -258,7 +259,7 @@ const buildTranslationSettingsSection = (team, userIsAdmin, nonAdminAllowSetting
     //     value: JSON.stringify({ id: setting.id, lang: setting.languages })
     //   };    
       
-      // if (userIsAdmin || nonAdminAllowSettings) {
+      if (userIsAdmin || nonAdminAllowSettings) {
 
         
       settingsBlock.accessory = {
@@ -283,11 +284,11 @@ const buildTranslationSettingsSection = (team, userIsAdmin, nonAdminAllowSetting
         // action_id: 'settings_modal_opened',
         // value: JSON.stringify({ id: setting.id, lang: setting.languages })
       };
-    // }
+    }
 
     settingsSection.push(settingsBlock);
   }
-  // if (userIsAdmin || nonAdminAllowSettings) {
+  if (userIsAdmin || nonAdminAllowSettings) {
     settingsSection.push(
       {
         type: 'section',
@@ -306,7 +307,7 @@ const buildTranslationSettingsSection = (team, userIsAdmin, nonAdminAllowSetting
           value: JSON.stringify({ id: 'none', lang: [] })
         },
       });
-  // }
+  }
 
   settingsSection.push(
     {

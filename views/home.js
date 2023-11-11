@@ -12,7 +12,7 @@ const buildHomeView = async (userId, teamId, redirect_url, userIsAdmin, client) 
   let user = await userDB.getUser(userId);
   let team = {};
   // TODO: if we want to allow non admins to change settings, set this to true (for global rule) OR add field to db for each team
-  const nonAdminAllowSettings = false;
+  const nonAdminAllowSettings = true;
   const nonAdminAllowSubscriptionChange = false;
 
   if (teamId) {

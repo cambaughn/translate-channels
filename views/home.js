@@ -105,9 +105,9 @@ const buildHomeView = async (userId, teamId, redirect_url, userIsAdmin, client) 
     }
     
     // console.log('subscription data ', subscriptionData);
-    console.log('subscription active ', subscriptionActive);
     
     if (userIsAdmin || nonAdminAllowSubscriptionChange) {
+      console.log('subscription active ', subscriptionActive);
       if (subscriptionActive) { // show plan & usage data if the subscription is active
         const numUsers = await userDB.getRegisteredUsersForTeam(teamId);
         const managePlanSection = buildManagePlanSection(subscriptionData, numUsers, portalUrl);

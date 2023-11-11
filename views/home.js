@@ -215,7 +215,7 @@ const buildTranslationSettingsSection = (team, userIsAdmin, nonAdminAllowSetting
           text: `\`${setting.name}\` No translation set`
         }
       };
-      if (userIsAdmin || nonAdminAllowSettings) {
+      // if (userIsAdmin || nonAdminAllowSettings) {
         settingsBlock.accessory = {
           type: 'button',
           text: {
@@ -225,7 +225,7 @@ const buildTranslationSettingsSection = (team, userIsAdmin, nonAdminAllowSetting
           action_id: 'settings_modal_opened',
           value: JSON.stringify({ id: setting.id, lang: setting.languages })
         };
-      }
+      // }
 
       settingsSection.push(settingsBlock);
       continue;
@@ -258,7 +258,7 @@ const buildTranslationSettingsSection = (team, userIsAdmin, nonAdminAllowSetting
     //     value: JSON.stringify({ id: setting.id, lang: setting.languages })
     //   };    
       
-      if (userIsAdmin || nonAdminAllowSettings) {
+      // if (userIsAdmin || nonAdminAllowSettings) {
 
         
       settingsBlock.accessory = {
@@ -283,11 +283,11 @@ const buildTranslationSettingsSection = (team, userIsAdmin, nonAdminAllowSetting
         // action_id: 'settings_modal_opened',
         // value: JSON.stringify({ id: setting.id, lang: setting.languages })
       };
-    }
+    // }
 
     settingsSection.push(settingsBlock);
   }
-  if (userIsAdmin || nonAdminAllowSettings) {
+  // if (userIsAdmin || nonAdminAllowSettings) {
     settingsSection.push(
       {
         type: 'section',
@@ -306,7 +306,7 @@ const buildTranslationSettingsSection = (team, userIsAdmin, nonAdminAllowSetting
           value: JSON.stringify({ id: 'none', lang: [] })
         },
       });
-  }
+  // }
 
   settingsSection.push(
     {

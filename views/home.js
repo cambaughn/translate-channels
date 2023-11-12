@@ -105,17 +105,15 @@ const buildHomeView = async (userId, teamId, redirect_url, userIsAdmin, client) 
     }
     
     // console.log('subscription data ', subscriptionData);
+    console.log('subscription active ', subscriptionActive);
     
-    if (userIsAdmin || nonAdminAllowSubscriptionChange) {
-      console.log('subscription active ', subscriptionActive);
-      if (subscriptionActive) { // show plan & usage data if the subscription is active
-        const numUsers = await userDB.getRegisteredUsersForTeam(teamId);
-        const managePlanSection = buildManagePlanSection(subscriptionData, numUsers, portalUrl);
-        home.view.blocks.push(...managePlanSection);
-      } else { // if the team's subscription isn't active, show "Get Started" section
-        const getStartedSection = buildGetStartedSection(checkoutUrl);
-        home.view.blocks.push(...getStartedSection);
-      }
+    if (subscriptionActive) { // show plan & usage data if the subscription is active
+      const numUsers = await userDB.getRegisteredUsersForTeam(teamId);
+      const managePlanSection = buildManagePlanSection(subscriptionData, numUsers, portalUrl, userIsAdmin || nonAdminAllowSubscriptionChange);
+      home.view.blocks.push(...managePlanSection);
+    } else { // if the team's subscription isn't active, show "Get Started" section
+      const getStartedSection = buildGetStartedSection(checkoutUrl, userIsAdmin || nonAdminAllowSubscriptionChange);
+      home.view.blocks.push(...getStartedSection);
     }
   }
 
@@ -415,7 +413,7 @@ const buildManagePlanSection = (subscriptionData, numUsers, portalUrl) => {
   return managePlanSection;
 }
 
-const buildGetStartedSection = (checkoutUrl) => {
+const buildGetStartedSection = (checkoutUrl, userIsAdmin) => {
   let getStartedSection = [
     {
       type: 'section',
@@ -428,7 +426,7 @@ const buildGetStartedSection = (checkoutUrl) => {
       type: 'section',
       text: {
         type: 'mrkdwn',
-        text: "Choose a subscription to begin getting translations for your team :point_down:\n\n_- 7 day free trial_\n\n_- Upgrade at any time_"
+        text: `${userIsAdmin ? 'Choose' : 'Your workspace admin can choose'} a subscription to begin getting translations for your team :point_down:\n\n_- 7 day free trial_\n\n_- Upgrade at any time_`
       }
     },
     {
@@ -456,7 +454,7 @@ const buildGetStartedSection = (checkoutUrl) => {
 
   
 
-  let tiers = buildPriceTiers(checkoutUrl);
+  let tiers = buildPriceTiers(checkoutUrl, userIsAdmin);
 
   getStartedSection = [...getStartedSection, ...tiers]
 
@@ -464,7 +462,7 @@ const buildGetStartedSection = (checkoutUrl) => {
 }
 
 
-const buildPriceTiers = (checkoutUrl) => {
+const buildPriceTiers = (checkoutUrl, userIsAdmin) => {
   let tiers = ['small', 'medium', 'large', 'unlimited'];
   let tierDetails = tiers.map(tier => {
     let details = subscriptionTierDetails[tier];
@@ -475,14 +473,14 @@ const buildPriceTiers = (checkoutUrl) => {
   // Put together sections by going through each tier
   let sections = [];
   tierDetails.forEach(tier => {
-    let currentSection = buildPriceSection(tier);
+    let currentSection = buildPriceSection(tier, userIsAdmin);
     sections = [...sections, ...currentSection];
   })
  
   return sections;
 }
 
-const buildPriceSection = (tier) => {
+const buildPriceSection = (tier, userIsAdmin) => {
   // Build up text for section
   let sectionText = `${tier.emoji}  *${tier.name}*\n\n`;
   // Custom messaging depending on if this is the unlimited plan
@@ -494,8 +492,7 @@ const buildPriceSection = (tier) => {
   // Price
   sectionText += `_$${tier.price}/month_`;
 
-
-  return [
+  let section = [
     {
       "type": "divider"
     },
@@ -504,15 +501,6 @@ const buildPriceSection = (tier) => {
       text: {
         type: 'mrkdwn',
         text: sectionText
-      },
-      accessory: {
-        type: "button",
-        action_id: tier.action_id,
-        text: {
-          type: "plain_text",
-          text: `${tier.emoji}  Join ${tier.name}`
-        },
-        url: tier.url
       }
     },
     {
@@ -523,6 +511,20 @@ const buildPriceSection = (tier) => {
       }
     },
   ]
+
+  if (userIsAdmin) {
+    section[1].accessory = {
+      type: "button",
+      action_id: tier.action_id,
+      text: {
+        type: "plain_text",
+        text: `${tier.emoji}  Join ${tier.name}`
+      },
+      url: tier.url
+    }
+  }
+
+  return section;
 }
 
 const buildPriceButtons = (checkoutUrl) => {

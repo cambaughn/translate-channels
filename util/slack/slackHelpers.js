@@ -41,6 +41,8 @@ const getChannelInfo = async (channel, client, userId) => {
     // console.log('got conversations list', conversationsList);
     const user = await userDB.getUser(userId);
 
+    console.log('user access token ', user.access_token);
+
     const result = await client.conversations.info({
       token: user.access_token,
       channel: channel

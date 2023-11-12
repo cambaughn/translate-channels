@@ -13,7 +13,7 @@ const buildHomeView = async (userId, teamId, redirect_url, userIsAdmin, client) 
   let team = {};
   // TODO: if we want to allow non admins to change settings, set this to true (for global rule) OR add field to db for each team
   const nonAdminAllowSettings = true;
-  const nonAdminAllowSubscriptionChange = false;
+  const nonAdminAllowSubscriptionChange = true;
 
   if (teamId) {
     team = await teamsDB.getTeam(teamId);
@@ -354,7 +354,7 @@ const configureSlashCommandsSection = () => {
 }
 
 
-const buildManagePlanSection = (subscriptionData, numUsers, portalUrl) => {
+const buildManagePlanSection = (subscriptionData, numUsers, portalUrl, userIsAdmin) => {
   let sectionText = '';
   const usageType = subscriptionData?.plan?.usage_type;
 
@@ -398,18 +398,21 @@ const buildManagePlanSection = (subscriptionData, numUsers, portalUrl) => {
       text: {
         type: 'mrkdwn',
         text: sectionText
-      },
-      accessory: {
-        type: 'button',
-        action_id: 'manage_plan',
-        text: {
-          type: 'plain_text',
-          text: ':gear:  Manage Plan'
-        },
-        url: portalUrl
       }
     }
   ]
+
+  if (userIsAdmin) {
+    managePlanSection[1].accessory = {
+      type: 'button',
+      action_id: 'manage_plan',
+      text: {
+        type: 'plain_text',
+        text: ':gear:  Manage Plan'
+      },
+      url: portalUrl
+    }
+  }
   return managePlanSection;
 }
 

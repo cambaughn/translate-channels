@@ -356,7 +356,7 @@ const slackRoutes = (app) => {
     }
 
     // Deactivate team in Firebase
-    // await teamsDB.deactivateTeam(context.teamId);
+    await teamsDB.deactivateTeam(context.teamId);
   });
 
   // app.event('tokens_revoked', async ({ event, ack }) => {

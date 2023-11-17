@@ -7,7 +7,8 @@ import { getUserInfo } from "../util/slack/slackUser.js";
 // NOTE: Only putting dividers at the BOTTOM of each section
 
 const buildHomeView = async (userId, teamId, redirect_url, userIsAdmin, client) => {
-  let auth_url = `https://slack.com/oauth/v2/authorize?user_scope=channels:history,channels:read,groups:history,groups:read,chat:write&client_id=${process.env.CLIENT_ID}&redirect_uri=${redirect_url}`;
+  console.log('building home view for ', userId)
+  let auth_url = `https://slack.com/oauth/v2/authorize?user_scope=channels:history,channels:read,groups:read,chat:write&client_id=${process.env.CLIENT_ID}&redirect_uri=${redirect_url}`;
 
   let user = await userDB.getUser(userId);
   let team = {};
@@ -206,12 +207,14 @@ const buildTranslationSettingsSection = (team, userIsAdmin, nonAdminAllowSetting
 
   for (const setting of settings) {
     // the languages length of 0 should be only possible for workspace settings which must exist by schema
+    console.log('setting id :::: ', setting.id)
+    
     if (!setting.languages || setting.languages.length === 0) {
       const settingsBlock = {
         type: 'section',
         text: {
           type: 'mrkdwn',
-          text: `\`${setting.name}\` No translation set`
+          text: `\`<#${setting.id}>\` No translation set`
         }
       };
       if (userIsAdmin || nonAdminAllowSettings) {
@@ -242,7 +245,7 @@ const buildTranslationSettingsSection = (team, userIsAdmin, nonAdminAllowSetting
       type: 'section',
       text: {
         type: 'mrkdwn',
-        text: `\`${setting.name}\` translate any language :arrow_right: ${languagesString.slice(0, -1)}`
+        text: `\`<#${setting.id}>\` translate any language :arrow_right: ${languagesString.slice(0, -1)}`
       }
     };
 

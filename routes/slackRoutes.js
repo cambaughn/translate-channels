@@ -251,7 +251,15 @@ const slackRoutes = (app) => {
         await openSettingsModal(actionValue, body, context);
       } else { // delete channel from settings
         await teamsDB.removeChannelSettings(actionValue.id, context.teamId);
-        publishHomeView(userId, teamId, context, client);
+        // publishHomeView(userId, teamId, context, client);
+
+        let isSlackAdmin = await isAdmin(userId, context.botToken, client);
+        let redirect_url = process.env.REDIRECT_URL || 'https://translate-channels.herokuapp.com/auth_redirect';
+        /* view.publish is the method that your app uses to push a view to the Home tab */
+        let homeView = await buildHomeView(userId, teamId, redirect_url, isSlackAdmin, client);
+        homeView.token = context.botToken;
+        console.log('view config ', homeView.token, homeView.user_id);
+        await client.views.publish(homeView);
       }
     } catch (error) {
       console.error(error);
@@ -284,7 +292,15 @@ const slackRoutes = (app) => {
     const teamId = context.teamId;
     const userId = body.user.id;
     await teamsDB.updateLanguageSettings(channels, languages, context.teamId);
-    publishHomeView(userId, teamId, context, client);
+    // publishHomeView(userId, teamId, context, client);
+
+    let isSlackAdmin = await isAdmin(userId, context.botToken, client);
+    let redirect_url = process.env.REDIRECT_URL || 'https://translate-channels.herokuapp.com/auth_redirect';
+    /* view.publish is the method that your app uses to push a view to the Home tab */
+    let homeView = await buildHomeView(userId, teamId, redirect_url, isSlackAdmin, client);
+    homeView.token = context.botToken;
+    console.log('view config ', homeView.token, homeView.user_id);
+    await client.views.publish(homeView);
   });
 
   /**

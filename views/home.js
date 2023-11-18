@@ -106,7 +106,7 @@ const buildHomeView = async (userId, teamId, redirect_url, userIsAdmin, client) 
     }
     
     // console.log('subscription data ', subscriptionData);
-    console.log('subscription active ', subscriptionActive);
+    // console.log('subscription active ', subscriptionActive);
     
     if (subscriptionActive) { // show plan & usage data if the subscription is active
       const numUsers = await userDB.getRegisteredUsersForTeam(teamId);
@@ -198,7 +198,7 @@ const buildTranslationSettingsSection = (team, userIsAdmin, nonAdminAllowSetting
       return 0;
     }
   })
-  console.log('everyChannel: ', everyChannel);
+  // console.log('everyChannel: ', everyChannel);
 
   // NOTE: The feature to apply a workspace-wide setting to all channels is currently disabled
   if (everyChannel.languages.length > 0) { // if there are workspace-wide settings, add them to the settings array. Currently, we have DISABLED this feature to apply settings to all channels
@@ -207,7 +207,6 @@ const buildTranslationSettingsSection = (team, userIsAdmin, nonAdminAllowSetting
 
   for (const setting of settings) {
     // the languages length of 0 should be only possible for workspace settings which must exist by schema
-    console.log('setting id :::: ', setting.id)
     
     if (!setting.languages || setting.languages.length === 0) {
       const settingsBlock = {

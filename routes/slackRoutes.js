@@ -283,71 +283,25 @@ const slackRoutes = (app) => {
   app.view('settings_modal_submitted', async ({ ack, view, context, body, client }) => {
     console.log('settings_modal_submitted event');
     await ack();
-  
     const settingsModal = view.state.values;
     const languages = settingsModal.select_lang_block.select_lang.selected_options.map(x => x.value);
     const channelIds = settingsModal.select_channel_block.select_channel.selected_conversations;
-    console.log('channelIds ', channelIds);
-  
-    // Check if the bot is a member of the selected channel
-    const isBotMember = await isBotMemberOfChannels(channelIds, context.botToken, client);
-    if (!isBotMember) {
-      // If the bot is not a member, update the modal with an error message
-      const errorModal = {
-        response_action: 'errors',
-        errors: {
-          select_channel_block: 'Bot is not a member of the selected channel.',
-        },
-      };
-      await client.views.update({
-        view_id: view.id,
-        hash: view.hash,
-        view: errorModal,
-      });
-      return;
-    }
-  
-    // Continue with settings update
+    console.log('channelIds ', channelIds)
     const channels = await getInfoForChannels(channelIds, client, body.user.id);
+
     const teamId = context.teamId;
     const userId = body.user.id;
     await teamsDB.updateLanguageSettings(channels, languages, context.teamId);
-  
+    // publishHomeView(userId, teamId, context, client);
+
     let isSlackAdmin = await isAdmin(userId, context.botToken, client);
     let redirect_url = process.env.REDIRECT_URL || 'https://translate-channels.herokuapp.com/auth_redirect';
-  
-    // Update the modal with a success message
-    const successModal = {
-      response_action: 'update',
-      view: await buildHomeView(userId, teamId, redirect_url, isSlackAdmin, client),
-    };
-    await client.views.update({
-      view_id: view.id,
-      hash: view.hash,
-      view: successModal.view,
-    });
+    /* view.publish is the method that your app uses to push a view to the Home tab */
+    let homeView = await buildHomeView(userId, teamId, redirect_url, isSlackAdmin, client);
+    homeView.token = context.botToken;
+    console.log('view config ', homeView.token, homeView.user_id);
+    await client.views.publish(homeView);
   });
-  
-  // Function to check if the bot is a member of the selected channels
-  const isBotMemberOfChannels = async (channelIds, botToken, client) => {
-    try {
-      for (const channelId of channelIds) {
-        // TODO: This token needs to be the user token (like getChannelInfo() )
-        const result = await client.conversations.info({
-          token: botToken,
-          channel: channelId,
-        });
-        if (!result.channel.is_member) {
-          return false; // Bot is not a member of at least one channel
-        }
-      }
-      return true; // Bot is a member of all selected channels
-    } catch (error) {
-      console.error('Error checking bot membership:', error);
-      return false;
-    }
-  }
-  
 
   /**
      * Handles the 'app_home_opened' event by building and publishing the Home tab view for the user.

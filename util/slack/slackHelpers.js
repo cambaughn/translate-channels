@@ -31,20 +31,17 @@ const postMessageAsUser = (text, channel, token, client) => {
 }
 
 
-const getInfoForChannels = async (channelIds, client, userId) => {
-  return Promise.all(channelIds.map(channel => getChannelInfo(channel, client, userId)));
+const getInfoForChannels = async (channelIds, client, token) => {
+  return Promise.all(channelIds.map(channel => getChannelInfo(channel, client, token)));
 };
 
-const getChannelInfo = async (channel, client, userId) => {
+const getChannelInfo = async (channel, client, token) => {
   try {
     // const conversationsList = await client.conversations.list({ types: 'public_channel,private_channel'});
     // console.log('got conversations list', conversationsList);
-    const user = await userDB.getUser(userId);
-
-    console.log('user access token ', user.access_token);
 
     const result = await client.conversations.info({
-      token: user.access_token,
+      token: token,
       channel: channel
     });
 

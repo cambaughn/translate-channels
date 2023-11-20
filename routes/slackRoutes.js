@@ -281,26 +281,37 @@ const slackRoutes = (app) => {
      * @returns {Promise<void>} A promise that resolves when the operation is complete.
   */
   app.view('settings_modal_submitted', async ({ ack, view, context, body, client }) => {
+    const errorView = {
+      "response_action": "errors",
+      "errors": {
+        "select_channel_block": "You may not select a due date in the past"
+      }
+    }
     console.log('settings_modal_submitted event');
-    await ack();
-    const settingsModal = view.state.values;
-    const languages = settingsModal.select_lang_block.select_lang.selected_options.map(x => x.value);
-    const channelIds = settingsModal.select_channel_block.select_channel.selected_conversations;
-    console.log('channelIds ', channelIds)
-    const channels = await getInfoForChannels(channelIds, client, body.user.id);
+    await ack(errorView);
 
-    const teamId = context.teamId;
-    const userId = body.user.id;
-    await teamsDB.updateLanguageSettings(channels, languages, context.teamId);
-    // publishHomeView(userId, teamId, context, client);
 
-    let isSlackAdmin = await isAdmin(userId, context.botToken, client);
-    let redirect_url = process.env.REDIRECT_URL || 'https://translate-channels.herokuapp.com/auth_redirect';
-    /* view.publish is the method that your app uses to push a view to the Home tab */
-    let homeView = await buildHomeView(userId, teamId, redirect_url, isSlackAdmin, client);
-    homeView.token = context.botToken;
-    console.log('view config ', homeView.token, homeView.user_id);
-    await client.views.publish(homeView);
+    // const settingsModal = view.state.values;
+    // const languages = settingsModal.select_lang_block.select_lang.selected_options.map(x => x.value);
+    // const channelIds = settingsModal.select_channel_block.select_channel.selected_conversations;
+    // console.log('channelIds ', channelIds)
+    // const channels = await getInfoForChannels(channelIds, client, body.user.id);
+    // const channelsForDB = channels.map(channel => ({ id: channel.id, name: channel.name }));
+
+    // console.log('channels! ', channels)
+
+    // const teamId = context.teamId;
+    // const userId = body.user.id;
+    // await teamsDB.updateLanguageSettings(channelsForDB, languages, context.teamId);
+    // // publishHomeView(userId, teamId, context, client);
+
+    // let isSlackAdmin = await isAdmin(userId, context.botToken, client);
+    // let redirect_url = process.env.REDIRECT_URL || 'https://translate-channels.herokuapp.com/auth_redirect';
+    // /* view.publish is the method that your app uses to push a view to the Home tab */
+    // let homeView = await buildHomeView(userId, teamId, redirect_url, isSlackAdmin, client);
+    // homeView.token = context.botToken;
+    // console.log('view config ', homeView.token, homeView.user_id);
+    // await client.views.publish(homeView);
   });
 
   /**

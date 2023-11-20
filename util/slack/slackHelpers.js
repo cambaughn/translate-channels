@@ -48,9 +48,9 @@ const getChannelInfo = async (channel, client, userId) => {
       channel: channel
     });
 
-    console.log('got channel info', result);
+    // console.log('got channel info', result);
 
-    return { name: result.channel.name, id: result.channel.id };
+    return result.channel;
   } catch (error) {
     console.error(error);
     return {};

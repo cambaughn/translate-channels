@@ -1,6 +1,5 @@
 import helpMessage from "../../views/helpMessage.js";
 import upgradeMessage from "../../views/upgradeMessage.js";
-import userDB from "../firebaseAPI/users.js";
 
 const updateMessage = (message, response, token, client) => {
   // finds message and edits it with the translated text (response) as blocks

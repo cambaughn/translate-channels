@@ -28,26 +28,26 @@ const expressReceiver = new ExpressReceiver({
  * @throws {Error} Throws an error if the team does not have valid access tokens.
  */
 const authorizeFn = async ({ teamId }) => {
-  if (teamId !== 'TC50HT63W') {
-    console.log('authorizing for team: ', teamId);
-    let team = await teamsDB.getTeam(teamId);
-    // console.log('team: ', team);
+  console.log('authorizing for team: ', teamId);
+  let team = await teamsDB.getTeam(teamId);
   
-    // If the team has access tokens, return an object containing botToken, botId, and teamId
-    if (team.team_access_token && team.bot_user_id && team.id) {
-      return {
-        botToken: team.team_access_token,
-        botId: team.bot_user_id,
-        teamId: team.slack_team_id
-      };
-    }
-  
-  } else {
-    console.log('hey the team is here +++++++++++++++++++ ')
+  // If the team does not exist in the database, throw a specific error
+  if (!team) {
+    throw new Error(`Team with ID ${teamId} does not exist in the database`);
   }
 
-  // If the team does not have valid access tokens, throw an error
-  throw new Error('No matching authorizations');
+  // If the team has access tokens, return an object containing botToken, botId, and teamId
+  if (team.team_access_token && team.bot_user_id && team.id) {
+    return {
+      botToken: team.team_access_token,
+      botId: team.bot_user_id,
+      teamId: team.slack_team_id
+    };
+  } else {
+    // If the team does not have valid access tokens, throw an error
+    throw new Error('No matching authorizations');
+  }
+
 };
 
 // Create a new Slack App with the custom authorize function and express receiver

@@ -48,9 +48,6 @@ const expressRoutes = (app, slackApp, dbConnector) => {
       // Find team in firebase database
       let teamInFirebase = await teamsDB.getTeam(team.id);
 
-      console.log('team in Firebase ::::: ', teamInFirebase);
-      console.log('vs team from Slack auth ::::: ', team, result.bot_user_id, result.access_token);
-
       // If we're getting the team tokens from them as well, update/create the team in the database
       if (result.bot_user_id && result.access_token) {
         let teamUpdates = { 

@@ -48,17 +48,26 @@ const expressRoutes = (app, slackApp, dbConnector) => {
       // Find team in firebase database
       let teamInFirebase = await teamsDB.getTeam(team.id);
 
+      console.log('team in Firebase ::::: ', teamInFirebase);
+      console.log('vs team from Slack auth ::::: ', team, result.bot_user_id, result.access_token);
+
       // If we're getting the team tokens from them as well, update/create the team in the database
-      if (result.bot_user_id && result.access_token && !teamInFirebase?.team_access_token) { // if we have the bot_user_id, the access_token, and the team doesn't already exist, then create it
-        console.log('creating new team =======');
+      if (result.bot_user_id && result.access_token) {
         let teamUpdates = { 
           slack_team_id: team.id,
           bot_user_id: result.bot_user_id,
           team_access_token: result.access_token
         }
-        
-        await teamsDB.createNew(team.id, teamUpdates);
-        console.log('created new team');
+
+        if (!teamInFirebase?.team_access_token) { // if we have the bot_user_id, the access_token, and the team doesn't already exist, then create it
+          console.log('creating new team =======');
+          await teamsDB.createNew(team.id, teamUpdates);
+          console.log('created new team');
+        } else { // if the team already exists, just update the bot
+          console.log('updating existing team =======');
+          await teamsDB.updateTeam(team.id, teamUpdates);
+          console.log('updated existing team');
+        }
       }
 
       // Upon approval and new user creation, redirect back to app: https://api.slack.com/reference/deep-linking

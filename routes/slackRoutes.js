@@ -371,28 +371,28 @@ const slackRoutes = (app) => {
      * @param {Function} payload.ack               - The function to acknowledge the event received from Slack.
      * @returns {Promise<void>}                    - A promise that resolves when the operation is complete.
   */
-  app.event('app_uninstalled', async ({ event, context, ack }) => {
-    console.log('====> app_uninstalled event ', event, context);
-    if (ack) {
-      await ack();
-    }
+  // app.event('app_uninstalled', async ({ event, context, ack }) => {
+  //   console.log('====> app_uninstalled event ', event, context);
+  //   if (ack) {
+  //     await ack();
+  //   }
 
-    // Delete subscription from Stripe
-    const team = await teamsDB.getTeam(context.teamId);
-    const isProd = process.env.ENVIRONMENT !== 'development';
-    const customerId = isProd ? team.stripe_customer_id : team.test_stripe_customer_id;
-    const subscriptionData = customerId ? await getSubscriptionData(customerId) : null;
-    const subscriptionActive = subscriptionData?.status === 'active' || subscriptionData?.status === 'trialing';
+  //   // Delete subscription from Stripe
+  //   const team = await teamsDB.getTeam(context.teamId);
+  //   const isProd = process.env.ENVIRONMENT !== 'development';
+  //   const customerId = isProd ? team.stripe_customer_id : team.test_stripe_customer_id;
+  //   const subscriptionData = customerId ? await getSubscriptionData(customerId) : null;
+  //   const subscriptionActive = subscriptionData?.status === 'active' || subscriptionData?.status === 'trialing';
 
-    if (subscriptionActive) {
-      console.log('cancelling subscription ', subscriptionData.id);
-      let result = await cancelSubscription(subscriptionData.id);
-      console.log('cancelled subscription ', result)
-    }
+  //   if (subscriptionActive) {
+  //     console.log('cancelling subscription ', subscriptionData.id);
+  //     let result = await cancelSubscription(subscriptionData.id);
+  //     console.log('cancelled subscription ', result)
+  //   }
 
-    // Deactivate team in Firebase
-    await teamsDB.deactivateTeam(context.teamId);
-  });
+  //   // Deactivate team in Firebase
+  //   await teamsDB.deactivateTeam(context.teamId);
+  // });
 
   // app.event('tokens_revoked', async ({ event, ack }) => {
   //   console.log('tokens_revoked event');

@@ -60,7 +60,6 @@ const slackRoutes = (app) => {
    */
   app.event('message', async ({ message, context, client }) => {
     console.log('message event for user: ', message.user);
-    console.log('message: ', message);
     // if the message comes from a bot OR the message has been edited manually, don't translate
     if (message.bot_id || message.subtype === 'message_changed') {
       console.log('returning without doing anything! ==========')

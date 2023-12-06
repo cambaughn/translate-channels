@@ -28,17 +28,22 @@ const expressReceiver = new ExpressReceiver({
  * @throws {Error} Throws an error if the team does not have valid access tokens.
  */
 const authorizeFn = async ({ teamId }) => {
-  console.log('authorizing for team: ', teamId);
-  let team = await teamsDB.getTeam(teamId);
-  // console.log('team: ', team);
-
-  // If the team has access tokens, return an object containing botToken, botId, and teamId
-  if (team.team_access_token && team.bot_user_id && team.id) {
-    return {
-      botToken: team.team_access_token,
-      botId: team.bot_user_id,
-      teamId: team.slack_team_id
-    };
+  if (teamId !== 'TC50HT63W') {
+    console.log('authorizing for team: ', teamId);
+    let team = await teamsDB.getTeam(teamId);
+    // console.log('team: ', team);
+  
+    // If the team has access tokens, return an object containing botToken, botId, and teamId
+    if (team.team_access_token && team.bot_user_id && team.id) {
+      return {
+        botToken: team.team_access_token,
+        botId: team.bot_user_id,
+        teamId: team.slack_team_id
+      };
+    }
+  
+  } else {
+    console.log('hey the team is here +++++++++++++++++++ ')
   }
 
   // If the team does not have valid access tokens, throw an error

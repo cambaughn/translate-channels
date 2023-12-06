@@ -63,7 +63,7 @@ const expressRoutes = (app, slackApp, dbConnector) => {
           console.log('creating new team =======');
           await teamsDB.createNew(team.id, teamUpdates);
           console.log('created new team');
-        } else { // if the team already exists, just update the bot
+        } else { // if the team already exists, just update the team
           console.log('updating existing team =======');
           await teamsDB.updateTeam(team.id, teamUpdates);
           console.log('updated existing team');

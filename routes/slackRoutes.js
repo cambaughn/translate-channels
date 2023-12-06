@@ -11,10 +11,6 @@ import userDB from '../util/firebaseAPI/users.js';
 import Translator from '../util/languages/translate.js';
 // Subscription
 import { getSubscriptionData, reportSubscriptionUsage, getSubscriptionTierDetails, cancelSubscription } from '../util/stripe/stripe.js';
-// Analytics
-import Mixpanel from 'mixpanel';
-// Create an instance of the mixpanel client
-const mixpanel = Mixpanel.init(process.env.MIXPANEL_API_KEY);
 
 
 /**
@@ -132,11 +128,6 @@ const slackRoutes = (app) => {
     if (!translation) { // if the translation didn't return anything
       return null; 
     }
-
-    mixpanel.track('Translate Message', {
-      distinct_id: message.user,
-      "User ID": message.user
-    });
 
     updateMessage(message, translation.response, token, client);
   });

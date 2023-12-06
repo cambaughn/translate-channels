@@ -8,7 +8,7 @@ import { getUserInfo } from "../util/slack/slackUser.js";
 
 const buildHomeView = async (userId, teamId, redirect_url, userIsAdmin, client) => {
   console.log('building home view for ', userId)
-  let auth_url = `https://slack.com/oauth/v2/authorize?user_scope=channels:history,chat:write,groups:read&client_id=${process.env.CLIENT_ID}&redirect_uri=${redirect_url}`;
+  let auth_url = `https://slack.com/oauth/v2/authorize?user_scope=channels:history,chat:write&client_id=${process.env.CLIENT_ID}&redirect_uri=${redirect_url}`;
 
   let user = await userDB.getUser(userId);
   let team = {};

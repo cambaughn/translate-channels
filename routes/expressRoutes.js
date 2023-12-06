@@ -11,7 +11,7 @@ const expressRoutes = (app, slackApp, dbConnector) => {
 
     // console.log('direct install ', redirect_url);
 
-    response.redirect(`https://slack.com/oauth/v2/authorize?client_id=${process.env.CLIENT_ID}&scope=channels:read,chat:write,commands,groups:history,groups:read,users:read&user_scope=channels:history,chat:write,groups:read&redirect_uri=${redirect_url}`);
+    response.redirect(`https://slack.com/oauth/v2/authorize?client_id=${process.env.CLIENT_ID}&scope=channels:read,chat:write,commands,groups:history,groups:read,users:read&user_scope=channels:history,chat:write&redirect_uri=${redirect_url}`);
   });
 
   // Handle authentication button press

@@ -199,21 +199,19 @@ const buildTranslationSettingsSection = (team, userIsAdmin, nonAdminAllowSetting
     }
   })
   // console.log('everyChannel: ', everyChannel);
-
-  // NOTE: The feature to apply a workspace-wide setting to all channels is currently disabled
-  if (everyChannel.languages.length > 0) { // if there are workspace-wide settings, add them to the settings array. Currently, we have DISABLED this feature to apply settings to all channels
-    settings.unshift(everyChannel);
-  }
+  settings.unshift(everyChannel);
 
   for (const setting of settings) {
     // the languages length of 0 should be only possible for workspace settings which must exist by schema
+
+    let channelName = setting.id === 'any_channel' ? 'Every Channel' : `<#${setting.id}>`
     
     if (!setting.languages || setting.languages.length === 0) {
       const settingsBlock = {
         type: 'section',
         text: {
           type: 'mrkdwn',
-          text: `\`<#${setting.id}>\` No translation set`
+          text: `\`${channelName}\` No translation set`
         }
       };
       if (userIsAdmin || nonAdminAllowSettings) {
@@ -244,7 +242,7 @@ const buildTranslationSettingsSection = (team, userIsAdmin, nonAdminAllowSetting
       type: 'section',
       text: {
         type: 'mrkdwn',
-        text: `\`<#${setting.id}>\` translate any language :arrow_right: ${languagesString.slice(0, -1)}`
+        text: `\`${channelName}\` translate any language :arrow_right: ${languagesString.slice(0, -1)}`
       }
     };
 

@@ -283,7 +283,7 @@ const slackRoutes = (app) => {
     let errorChannelIds = [];
 
     channels.forEach((channel, index) => {
-      if (!channel.id) {
+      if (!channel.id && channel.id !== 'any_channel') {
         errorChannelIds.push(channelIds[index]);
       }
     })

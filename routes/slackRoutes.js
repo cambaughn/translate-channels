@@ -292,11 +292,14 @@ const slackRoutes = (app) => {
       let userData = await userDB.getUser(userId);
       let errorChannels = await getInfoForChannels(errorChannelIds, client, userData.access_token);
       let errorChannelNames = errorChannels.map(channel => channel.name);
+      let errorMessage = errorChannelNames.length > 0 ? 
+        `Translate Channels is not yet a member of the following private channels: ${errorChannelNames.join(', ')}. Please invite Translate Channels to these channels and try again.` : 
+        `Translate Channels is not yet a member of these private channels. Please invite Translate Channels to the private channels and try again.`;
 
       const errorView = {
         "response_action": "errors",
         "errors": {
-          "select_channel_block": `Translate Channels is not yet a member of the following private channels: ${errorChannelNames.join(', ')}. Please invite Translate Channels to these channels and try again.`
+          "select_channel_block": errorMessage
         }
       }
       await ack(errorView);

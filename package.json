@@ -1,6 +1,6 @@
 {
   "name": "bolt-app-template",
-  "version": "2.4",
+  "version": "2.5",
   "description": "A basic template to spin up a Bolt app for Slack",
   "main": "app.js",
   "type": "module",

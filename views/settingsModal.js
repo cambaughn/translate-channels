@@ -80,12 +80,16 @@ const buildSettingsModal = (value) => {
     },
     value: 'do_not_translate'
   });
-  if (preselectedChannel.length > 0) {
+  if (value.id !== 'any_channel' && preselectedChannel.length > 0) {
     modal.blocks[0].element.initial_conversations = preselectedChannel;
   }
   if (value.lang.length > 0) {
     const preselectedLanguages = value.lang.map(langCode => getModalOption(langCode));
-    modal.blocks[2].element.initial_options = preselectedLanguages;
+    if (value.id === 'any_channel') {
+      modal.blocks[0].element.initial_options = preselectedLanguages;
+    } else {
+      modal.blocks[2].element.initial_options = preselectedLanguages;
+    }
   }
 
   if (value.id === 'any_channel') {

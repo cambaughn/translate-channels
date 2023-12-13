@@ -33,5 +33,12 @@ Then, add the https url from ngrok to these pages on your test Slack app configu
 Configure the REDIRECT_URL and BASE_URL values in the .env file to match your ngrok url (note that REDIRECT_URL has /auth_redirect at the end—keep this)
 
 Reinstall the app via the /direct_install url
+-------------------
+
+# Submitting the app for review by Slack
+- Download staging app: https://translate-channels-staging-f5bab0837b06.herokuapp.com/direct_install
+- Using an admin account, sign up for any of the plans
+- Stripe is on test mode, so you can use a Stripe test credit card: https://stripe.com/docs/testing
+- Happy testing!
 
 \ ゜o゜)ノ

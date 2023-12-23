@@ -41,7 +41,7 @@ const authorizeFn = async ({ teamId }) => {
     return {
       botToken: team.team_access_token,
       botId: team.bot_user_id,
-      teamId: team.slack_team_id
+      teamId: team.id
     };
   } else {
     // If the team does not have valid access tokens, throw an error

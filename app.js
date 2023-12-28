@@ -34,7 +34,7 @@ const authorizeFn = async ({ teamId }) => {
       let team = await teamsDB.getTeam(teamId);
       
       // If the team does not exist in the database, throw a specific error
-      if (!team) {
+      if (!team?.id || !team?.team_access_token) {
         console.error(`Team with ID ${teamId} does not exist in the database`);
       }
     

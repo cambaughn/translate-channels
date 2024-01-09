@@ -3,7 +3,7 @@ import buildHomeView from '../views/home.js';
 import buildSettingsModal from '../views/settingsModal.js';
 // Slack Helpers
 import { isAdmin, getUserInfo } from '../util/slack/slackUser.js';
-import { updateMessage, getInfoForChannels, provideHelp, postMessageAsUser, sendUpgradeMessage, postAuthMessage } from '../util/slack/slackHelpers.js';
+import { updateMessage, getInfoForChannels, provideHelp, postMessageAsUser, sendUpgradeMessage, sendAuthDM } from '../util/slack/slackHelpers.js';
 // Firebase API
 import teamsDB from '../util/firebaseAPI/teams.js';
 import userDB from '../util/firebaseAPI/users.js';
@@ -80,13 +80,13 @@ const slackRoutes = (app) => {
     const token = user?.access_token;
 
     // If the user is not authenticated, send the ephemeral auth message
-    const userAuthenticated = !!user.access_token;
+    const userAuthed = !!user.access_token;
     const authMessageDismissed = user.auth_message_dismissed;
-    const showAuthMessage = !userAuthenticated && !authMessageDismissed;
+    const showAuthMessage = !userAuthed && !authMessageDismissed;
     console.log('should show auth message:::: ', showAuthMessage);
 
     if (showAuthMessage) {
-      postAuthMessage(message.channel, context.botToken, client, message.user);
+      sendAuthDM(context.botToken, client, message.user);
     }
 
     if (!token) {  // if there is no access token for the user, return null

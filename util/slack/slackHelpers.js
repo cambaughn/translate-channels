@@ -29,6 +29,20 @@ const postMessageAsUser = (text, channel, token, client) => {
   });
 }
 
+const postEphemeralMessage = (channel, token, client, user) => {
+  // finds message and edits it with the translated text (response) as blocks
+  const messageRequest = {
+    token: token,
+    channel: channel,
+    text: 'Hey there! This is an ephemeral message.',
+    user: user
+  };
+
+  client.chat.postEphemeral(messageRequest, (error) => {
+    console.error(error);
+  });
+}
+
 
 const getInfoForChannels = async (channelIds, client, token) => {
   return Promise.all(channelIds.map(channel => getChannelInfo(channel, client, token)));
@@ -84,5 +98,6 @@ export {
   getChannelInfo, 
   provideHelp,
   postMessageAsUser,
+  postEphemeralMessage,
   sendUpgradeMessage
 }

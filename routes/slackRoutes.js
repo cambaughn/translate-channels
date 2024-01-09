@@ -3,7 +3,7 @@ import buildHomeView from '../views/home.js';
 import buildSettingsModal from '../views/settingsModal.js';
 // Slack Helpers
 import { isAdmin, getUserInfo } from '../util/slack/slackUser.js';
-import { updateMessage, getInfoForChannels, provideHelp, postMessageAsUser, sendUpgradeMessage } from '../util/slack/slackHelpers.js';
+import { updateMessage, getInfoForChannels, provideHelp, postMessageAsUser, sendUpgradeMessage, postEphemeralMessage } from '../util/slack/slackHelpers.js';
 // Firebase API
 import teamsDB from '../util/firebaseAPI/teams.js';
 import userDB from '../util/firebaseAPI/users.js';
@@ -64,6 +64,10 @@ const slackRoutes = (app) => {
       return null; 
     } 
 
+    if (message.subtype === 'me_message') { 
+      return null;
+    }
+
     // If the message is in an IM to the app bot, just return the help message
     if (message.channel_type === 'im') { 
       await provideHelp(context.botToken, message.user, client); 
@@ -121,10 +125,12 @@ const slackRoutes = (app) => {
     const requiredLanguages = channelLanguages.length > 0 ? channelLanguages : workspaceLanguages;
     const translator = new Translator(message, requiredLanguages);
     const translation = await translator.getTranslatedData();
+
+    postEphemeralMessage(message.channel, token, client, message.user);
+
     if (!translation) { // if the translation didn't return anything
       return null; 
     }
-
     updateMessage(message, translation.response, token, client);
   });
 

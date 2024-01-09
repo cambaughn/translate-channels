@@ -1,5 +1,6 @@
 import helpMessage from "../../views/helpMessage.js";
 import upgradeMessage from "../../views/upgradeMessage.js";
+import authorizationMessage from "../../views/authorizationMessage.js";
 
 const updateMessage = (message, response, token, client) => {
   // finds message and edits it with the translated text (response) as blocks
@@ -34,8 +35,8 @@ const postEphemeralMessage = (channel, token, client, user) => {
   const messageRequest = {
     token: token,
     channel: channel,
-    text: 'Hey there! This is an ephemeral message.',
-    user: user
+    user: user,
+    blocks: authorizationMessage
   };
 
   client.chat.postEphemeral(messageRequest, (error) => {

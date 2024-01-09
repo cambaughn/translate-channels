@@ -126,6 +126,7 @@ const slackRoutes = (app) => {
     const translator = new Translator(message, requiredLanguages);
     const translation = await translator.getTranslatedData();
 
+    // Need to add conditions for this, if the user hasn't authenticated yet
     postEphemeralMessage(message.channel, token, client, message.user);
 
     if (!translation) { // if the translation didn't return anything

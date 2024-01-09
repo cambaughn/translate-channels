@@ -30,7 +30,7 @@ const postMessageAsUser = (text, channel, token, client) => {
   });
 }
 
-const postEphemeralMessage = (channel, token, client, user) => {
+const postAuthMessage = (channel, token, client, user) => {
   // finds message and edits it with the translated text (response) as blocks
   const messageRequest = {
     token: token,
@@ -99,6 +99,6 @@ export {
   getChannelInfo, 
   provideHelp,
   postMessageAsUser,
-  postEphemeralMessage,
+  postAuthMessage,
   sendUpgradeMessage
 }

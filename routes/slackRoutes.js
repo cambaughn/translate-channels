@@ -3,7 +3,7 @@ import buildHomeView from '../views/home.js';
 import buildSettingsModal from '../views/settingsModal.js';
 // Slack Helpers
 import { isAdmin, getUserInfo } from '../util/slack/slackUser.js';
-import { updateMessage, getInfoForChannels, provideHelp, postMessageAsUser, sendUpgradeMessage, postEphemeralMessage } from '../util/slack/slackHelpers.js';
+import { updateMessage, getInfoForChannels, provideHelp, postMessageAsUser, sendUpgradeMessage, postAuthMessage } from '../util/slack/slackHelpers.js';
 // Firebase API
 import teamsDB from '../util/firebaseAPI/teams.js';
 import userDB from '../util/firebaseAPI/users.js';
@@ -59,6 +59,7 @@ const slackRoutes = (app) => {
      * @returns {Promise<void>} A promise indicating the completion of the message handling.
    */
   app.event('message', async ({ message, context, client }) => {
+    console.log('bot token! ', context.botToken)
     // if the message comes from a bot OR the message has been edited manually, don't translate
     if (message.bot_id || message.subtype === 'message_changed' || !message.user) {
       return null; 
@@ -77,7 +78,18 @@ const slackRoutes = (app) => {
     const team = await teamsDB.getTeam(context.teamId);
     const user = await userDB.getUser(message.user);
     const token = user?.access_token;
-    if (!token) {  // if there is no access token for the user
+
+    // If the user is not authenticated, send the ephemeral auth message
+    const userAuthenticated = !!user.access_token;
+    const authMessageDismissed = user.auth_message_dismissed;
+    const showAuthMessage = !userAuthenticated && !authMessageDismissed;
+    console.log('should show auth message:::: ', showAuthMessage);
+
+    if (showAuthMessage) {
+      postAuthMessage(message.channel, context.botToken, client, message.user);
+    }
+
+    if (!token) {  // if there is no access token for the user, return null
       return null; 
     }
 
@@ -126,15 +138,37 @@ const slackRoutes = (app) => {
     const translator = new Translator(message, requiredLanguages);
     const translation = await translator.getTranslatedData();
 
-    // Need to add conditions for this, if the user hasn't authenticated yet
-    postEphemeralMessage(message.channel, token, client, message.user);
-
     if (!translation) { // if the translation didn't return anything
       return null; 
     }
     updateMessage(message, translation.response, token, client);
   });
 
+
+  app.action('action_dismiss', async ({ ack, action, body, context }) => {
+    console.log('action_dismiss event');
+    await ack();
+
+    const update = {
+      auth_message_dismissed: true
+    }
+
+    // Handle dismissal in database
+
+    // let actionValue = JSON.parse(action.value);
+    // const settingsModal = await buildSettingsModal(actionValue);
+    // try {
+    //   // Opens the modal itself
+    //   await app.client.views.open({
+    //     token: context.botToken,
+    //     trigger_id: body.trigger_id,
+    //     view: settingsModal
+    //   });
+    // } catch (error) {
+    //   console.error(error);
+    // }
+  });
+  
   /**
      * Slack Command Handler for '/nt' command.
      * This handler acknowledges the command, checks the command text, and responds accordingly.
@@ -433,6 +467,12 @@ const slackRoutes = (app) => {
   // This action only needs to acknowledge the button click - auth is otherwise handled with oAuth redirect url
   app.action('authorize_app', async ({ ack }) => {
     console.log('authorize_app event');
+    // We just need ack() here to respond to the action, even though we're redirecting to a url
+    await ack();
+  })  
+
+  app.action('action_authenticate', async ({ ack }) => {
+    console.log('action_authenticate event');
     // We just need ack() here to respond to the action, even though we're redirecting to a url
     await ack();
   })  

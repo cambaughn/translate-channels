@@ -1,6 +1,6 @@
 import helpMessage from "../../views/helpMessage.js";
 import upgradeMessage from "../../views/upgradeMessage.js";
-import authorizationMessage from "../../views/authorizationMessage.js";
+import authMessage from "../../views/authMessage.js";
 
 const updateMessage = (message, response, token, client) => {
   // finds message and edits it with the translated text (response) as blocks
@@ -45,7 +45,7 @@ const sendAuthDM = async (botToken, client, userId) => {
         token: botToken,
         channel: conversationResponse.channel.id, // DM channel ID
         text: "Please authenticate to use the Translate Channels feature.",
-        blocks: authorizationMessage // If you have specific blocks to send
+        blocks: authMessage // If you have specific blocks to send
       });
 
       console.log('DM sent successfully:', messageResponse.ts);

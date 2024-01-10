@@ -1,12 +1,12 @@
 let redirect_url = process.env.REDIRECT_URL || 'https://translate-channels.herokuapp.com/auth_redirect';
 let auth_url = `https://slack.com/oauth/v2/authorize?user_scope=channels:history,chat:write&client_id=${process.env.CLIENT_ID}&redirect_uri=${redirect_url}`;
 
-const authorizationMessage = [
+const authMessage = [
       {
           "type": "section",
           "text": {
               "type": "mrkdwn",
-              "text": "Please authenticate to use the Translate Channels feature."
+              "text": "Your admin has set up automatic translations for your workspace. Please authorize the Translate Channels app to enable translation of your messages."
           }
       },
       {
@@ -16,25 +16,15 @@ const authorizationMessage = [
                   "type": "button",
                   "text": {
                       "type": "plain_text",
-                      "text": "Authenticate",
+                      "text": "Authorize Translate Channels",
                       "emoji": true
                   },
-                  "value": "click_authenticate",
-                  "action_id": "action_authenticate",
+                  "value": "click_auth",
+                  "action_id": "action_auth",
                   "url": auth_url
-              },
-              {
-                  "type": "button",
-                  "text": {
-                      "type": "plain_text",
-                      "text": "Dismiss",
-                      "emoji": true
-                  },
-                  "value": "click_dismiss",
-                  "action_id": "action_dismiss"
               }
           ]
       }
   ]
 
-export default authorizationMessage;
+export default authMessage;

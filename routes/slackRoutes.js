@@ -78,19 +78,15 @@ const slackRoutes = (app) => {
     const team = await teamsDB.getTeam(context.teamId);
     const user = await userDB.getUser(message.user);
     const token = user?.access_token;
-
-    // If the user is not authenticated, send the ephemeral auth message
-    const userAuthed = !!user.access_token;
-    const authMessageDismissed = user.auth_message_dismissed;
-    const showAuthMessage = !userAuthed && !authMessageDismissed;
-    console.log('should show auth message:::: ', showAuthMessage);
-
-    if (showAuthMessage) {
-      sendAuthDM(context.botToken, client, message.user);
-    }
+    const sentAuthMessage = user?.sent_auth_message;
 
     if (!token) {  // if there is no access token for the user, return null
-      return null; 
+      if (!sentAuthMessage) {
+        // If the user is not authenticated, send the DM auth message
+        sendAuthDM(context.botToken, client, message.user);
+        await userDB.updateUser(message.user, { sent_auth_message: true });
+      }
+      return null;
     }
 
     // Check for active subscription in Stripe
@@ -142,31 +138,6 @@ const slackRoutes = (app) => {
       return null; 
     }
     updateMessage(message, translation.response, token, client);
-  });
-
-
-  app.action('action_dismiss', async ({ ack, action, body, context }) => {
-    console.log('action_dismiss event');
-    await ack();
-
-    const update = {
-      auth_message_dismissed: true
-    }
-
-    // Handle dismissal in database
-
-    // let actionValue = JSON.parse(action.value);
-    // const settingsModal = await buildSettingsModal(actionValue);
-    // try {
-    //   // Opens the modal itself
-    //   await app.client.views.open({
-    //     token: context.botToken,
-    //     trigger_id: body.trigger_id,
-    //     view: settingsModal
-    //   });
-    // } catch (error) {
-    //   console.error(error);
-    // }
   });
   
   /**
@@ -469,10 +440,10 @@ const slackRoutes = (app) => {
     console.log('authorize_app event');
     // We just need ack() here to respond to the action, even though we're redirecting to a url
     await ack();
-  })  
+  })
 
-  app.action('action_authenticate', async ({ ack }) => {
-    console.log('action_authenticate event');
+  app.action('action_auth', async ({ ack }) => {
+    console.log('action_auth event');
     // We just need ack() here to respond to the action, even though we're redirecting to a url
     await ack();
   })  

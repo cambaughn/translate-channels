@@ -3,7 +3,7 @@ import buildHomeView from '../views/home.js';
 import buildSettingsModal from '../views/settingsModal.js';
 // Slack Helpers
 import { isAdmin, getUserInfo } from '../util/slack/slackUser.js';
-import { updateMessage, getInfoForChannels, provideHelp, postMessageAsUser, sendUpgradeMessage } from '../util/slack/slackHelpers.js';
+import { updateMessage, getInfoForChannels, provideHelp, postMessageAsUser, sendUpgradeMessage, sendAuthDM } from '../util/slack/slackHelpers.js';
 // Firebase API
 import teamsDB from '../util/firebaseAPI/teams.js';
 import userDB from '../util/firebaseAPI/users.js';
@@ -59,10 +59,15 @@ const slackRoutes = (app) => {
      * @returns {Promise<void>} A promise indicating the completion of the message handling.
    */
   app.event('message', async ({ message, context, client }) => {
+    console.log('bot token! ', context.botToken)
     // if the message comes from a bot OR the message has been edited manually, don't translate
     if (message.bot_id || message.subtype === 'message_changed' || !message.user) {
       return null; 
     } 
+
+    if (message.subtype === 'me_message') { 
+      return null;
+    }
 
     // If the message is in an IM to the app bot, just return the help message
     if (message.channel_type === 'im') { 
@@ -73,8 +78,15 @@ const slackRoutes = (app) => {
     const team = await teamsDB.getTeam(context.teamId);
     const user = await userDB.getUser(message.user);
     const token = user?.access_token;
-    if (!token) {  // if there is no access token for the user
-      return null; 
+    const sentAuthMessage = user?.sent_auth_message;
+
+    if (!token) {  // if there is no access token for the user, return null
+      if (!sentAuthMessage) {
+        // If the user is not authenticated, send the DM auth message
+        sendAuthDM(context.botToken, client, message.user);
+        await userDB.updateUser(message.user, { sent_auth_message: true });
+      }
+      return null;
     }
 
     // Check for active subscription in Stripe
@@ -121,13 +133,13 @@ const slackRoutes = (app) => {
     const requiredLanguages = channelLanguages.length > 0 ? channelLanguages : workspaceLanguages;
     const translator = new Translator(message, requiredLanguages);
     const translation = await translator.getTranslatedData();
+
     if (!translation) { // if the translation didn't return anything
       return null; 
     }
-
     updateMessage(message, translation.response, token, client);
   });
-
+  
   /**
      * Slack Command Handler for '/nt' command.
      * This handler acknowledges the command, checks the command text, and responds accordingly.
@@ -426,6 +438,12 @@ const slackRoutes = (app) => {
   // This action only needs to acknowledge the button click - auth is otherwise handled with oAuth redirect url
   app.action('authorize_app', async ({ ack }) => {
     console.log('authorize_app event');
+    // We just need ack() here to respond to the action, even though we're redirecting to a url
+    await ack();
+  })
+
+  app.action('action_auth', async ({ ack }) => {
+    console.log('action_auth event');
     // We just need ack() here to respond to the action, even though we're redirecting to a url
     await ack();
   })  

@@ -1,5 +1,6 @@
 import helpMessage from "../../views/helpMessage.js";
 import upgradeMessage from "../../views/upgradeMessage.js";
+import authMessage from "../../views/authMessage.js";
 
 const updateMessage = (message, response, token, client) => {
   // finds message and edits it with the translated text (response) as blocks
@@ -28,6 +29,33 @@ const postMessageAsUser = (text, channel, token, client) => {
     console.error(error);
   });
 }
+
+const sendAuthDM = async (botToken, client, userId) => {
+  try {
+    // Open a conversation with the user
+    const conversationResponse = await client.conversations.open({
+      token: botToken,
+      users: userId
+    });
+
+    // Check if the conversation was successfully opened
+    if (conversationResponse.ok) {
+      // Send a message in the DM
+      const messageResponse = await client.chat.postMessage({
+        token: botToken,
+        channel: conversationResponse.channel.id, // DM channel ID
+        text: "Please authenticate to use the Translate Channels feature.",
+        blocks: authMessage // If you have specific blocks to send
+      });
+
+      console.log('DM sent successfully:', messageResponse.ts);
+    } else {
+      console.error('Error opening conversation:', conversationResponse.error);
+    }
+  } catch (error) {
+    console.error('Error in sending DM:', error);
+  }
+};
 
 
 const getInfoForChannels = async (channelIds, client, token) => {
@@ -84,5 +112,6 @@ export {
   getChannelInfo, 
   provideHelp,
   postMessageAsUser,
+  sendAuthDM,
   sendUpgradeMessage
 }

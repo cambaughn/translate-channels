@@ -50,7 +50,7 @@ const authorizeFn = async ({ teamId }) => {
         console.error('Team is missing necessary data to authorize app');
       }
     } catch (error) {
-      console.error(error);
+      console.error('Error for team: ', team.id, error);
     }
   }
 };

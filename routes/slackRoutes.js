@@ -99,6 +99,7 @@ const slackRoutes = (app) => {
     if (usageType === 'licensed') {
       // Get tier details
       const tierDetails = getSubscriptionTierDetails(subscriptionData.plan.id);
+      console.log('tierDetails ', tierDetails);
 
       if (!tierDetails.unlimited) { // Don't need to run this code for unlimited plans
         // Determine number of registered users

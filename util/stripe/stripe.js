@@ -143,6 +143,18 @@ const reportSubscriptionUsage = async (subscriptionData, user) => {
   return Promise.resolve(true);
 }
 
+const getSubscriptionUsage = async (subscriptionData) => {
+  const subscriptionItemId = subscriptionData?.items?.data[0].id;
+  let subscriptionUsage = await stripe.subscriptionItems.listUsageRecordSummaries(
+    subscriptionItemId,
+    {
+      limit: 10
+    }
+  );
+
+  return subscriptionUsage?.data[0]?.total_usage;
+}
+
 
 const cancelSubscription = async (subscriptionId) => {
   return stripe.subscriptions.del(subscriptionId);
@@ -158,6 +170,7 @@ export {
   getSubscriptionData,
   createPortalSession,
   reportSubscriptionUsage,
+  getSubscriptionUsage,
   getSubscriptionTierDetails,
   cancelSubscription,
   subscriptionTierDetails

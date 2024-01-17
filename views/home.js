@@ -1,7 +1,7 @@
 import teamsDB from "../util/firebaseAPI/teams.js";
 import userDB from "../util/firebaseAPI/users.js";
 import { getSettingsString } from '../util/languages/languageHelpers.js';
-import { getSubscriptionData, getSubscriptionTierDetails, subscriptionTierDetails } from "../util/stripe/stripe.js";
+import { getSubscriptionData, getSubscriptionUsage, getSubscriptionTierDetails, subscriptionTierDetails } from "../util/stripe/stripe.js";
 import { getUserInfo } from "../util/slack/slackUser.js";
 
 // NOTE: Only putting dividers at the BOTTOM of each section
@@ -110,7 +110,11 @@ const buildHomeView = async (userId, teamId, redirect_url, userIsAdmin, client) 
     
     if (subscriptionActive) { // show plan & usage data if the subscription is active
       const numUsers = await userDB.getRegisteredUsersForTeam(teamId);
-      const managePlanSection = buildManagePlanSection(subscriptionData, numUsers, portalUrl, userIsAdmin || nonAdminAllowSubscriptionChange);
+      let subscriptionUsage = null;
+      if (subscriptionData?.plan?.usage_type === 'metered') {
+        subscriptionUsage = await getSubscriptionUsage(subscriptionData);
+      }
+      const managePlanSection = buildManagePlanSection(subscriptionData, numUsers, portalUrl, userIsAdmin || nonAdminAllowSubscriptionChange, subscriptionUsage);
       home.view.blocks.push(...managePlanSection);
     } else { // if the team's subscription isn't active, show "Get Started" section
       const getStartedSection = buildGetStartedSection(checkoutUrl, userIsAdmin || nonAdminAllowSubscriptionChange);
@@ -354,7 +358,7 @@ const configureSlashCommandsSection = () => {
 }
 
 
-const buildManagePlanSection = (subscriptionData, numUsers, portalUrl, userIsAdmin) => {
+const buildManagePlanSection = (subscriptionData, numUsers, portalUrl, userIsAdmin, subscriptionUsage) => {
   let sectionText = '';
   const usageType = subscriptionData?.plan?.usage_type;
 
@@ -377,11 +381,14 @@ const buildManagePlanSection = (subscriptionData, numUsers, portalUrl, userIsAdm
       sectionText += `:white_check_mark:  Subscription active\n\n`
       sectionText += `Your team is currently on the *${tierDetails.name} subscription* with translations for *unlimited users*.\n\nYou currently have *${numUsers} registered user${ numUsers === 1 ? '' : 's'}*.`
     }
-  } else if (usageType === 'metered') { // old pricing - $3/user/month
+
+    sectionText += `_Note: we've recently updated our pricing for new customers. Your team is still on our tier-based plan, and you can keep that plan for as long as you want._\n\n`
+    sectionText += `_However, if the new pricing tiers would work better for you, we'd be happy to switch you over. You can visit the <http://www.translatechannels.com|Translate Channels site> to find more details on the new subscriptions._`
+    sectionText += `_Reach out to us at team@translatechannels.com to update your plan_`
+  } else if (usageType === 'metered') { // new pricing - $4/user/month
     sectionText += `:white_check_mark:  Subscription active\n\n`
     sectionText += `Your team is currently on the *Unlimited subscription* with translations for *unlimited users*.\n\n`
-    sectionText += `_Note: we've recently updated our pricing for new customers. Your team is still on our metered plan of $3/user/month and can keep that plan for as long as you want._\n\n`
-    sectionText += `_However, if the new pricing tiers would work better for you, we'd be happy to switch you over. You can visit the <http://www.translatechannels.com|Translate Channels site> to find more details on the new subscriptions._`
+    sectionText += `So far, your team has ${subscriptionUsage || 0} active ${subscriptionUsage === 1 ? 'user' : 'users'} this month.`
   }
   
 

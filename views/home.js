@@ -1,7 +1,7 @@
 import teamsDB from "../util/firebaseAPI/teams.js";
 import userDB from "../util/firebaseAPI/users.js";
 import { getSettingsString } from '../util/languages/languageHelpers.js';
-import { getSubscriptionData, getSubscriptionUsage, getSubscriptionTierDetails, subscriptionTierDetails } from "../util/stripe/stripe.js";
+import { getSubscriptionData, getSubscriptionUsage, getSubscriptionTierDetails, subscriptionTierDetails, meteredUsagePriceId } from "../util/stripe/stripe.js";
 import { getUserInfo } from "../util/slack/slackUser.js";
 
 // NOTE: Only putting dividers at the BOTTOM of each section
@@ -429,14 +429,7 @@ const buildGetStartedSection = (checkoutUrl, userIsAdmin) => {
       type: 'section',
       text: {
         type: 'mrkdwn',
-        text: ':sparkles: *Get Started*'
-      }
-    },
-    {
-      type: 'section',
-      text: {
-        type: 'mrkdwn',
-        text: `${userIsAdmin ? 'Choose' : 'Your workspace admin can choose'} a subscription to begin getting translations for your team :point_down:\n\n_- 7 day free trial_\n\n_- Upgrade at any time_`
+        text: '*Try Translate Channels free for 7 days*\n\n_$4/user/month after_'
       }
     },
     {
@@ -450,7 +443,7 @@ const buildGetStartedSection = (checkoutUrl, userIsAdmin) => {
       type: 'section',
       text: {
         type: 'mrkdwn',
-        text: `*Every plan includes all features:*\n\n:white_check_mark:  Unlimited message translations\n\n:white_check_mark:  Custom language settings for each channel\n\n:white_check_mark:  In-message translation - no bots or clutter`
+        text: `:sparkles: *Features*\n\n:white_check_mark:  Unlimited message translations\n\n:white_check_mark:  Custom language settings for each channel\n\n:white_check_mark:  In-message translation - no bots or clutter`
       }
     },
     {
@@ -462,120 +455,23 @@ const buildGetStartedSection = (checkoutUrl, userIsAdmin) => {
     }
   ]
 
-  
+  let priceUrl = addPlanToCheckoutUrl(checkoutUrl, meteredUsagePriceId);
 
-  let tiers = buildPriceTiers(checkoutUrl, userIsAdmin);
-
-  getStartedSection = [...getStartedSection, ...tiers]
+  if (userIsAdmin) {
+    getStartedSection[0].accessory = {
+      type: "button",
+      action_id: "unlimited_plan_click",
+      text: {
+        type: "plain_text",
+        text: `:rocket:  Get Started`
+      },
+      url: priceUrl
+    }
+  }
 
   return getStartedSection;
 }
 
-
-const buildPriceTiers = (checkoutUrl, userIsAdmin) => {
-  let tiers = ['small', 'medium', 'large', 'unlimited'];
-  let tierDetails = tiers.map(tier => {
-    let details = subscriptionTierDetails[tier];
-    details.url = addPlanToCheckoutUrl(checkoutUrl, tier);
-    return details;
-  });
-
-  // Put together sections by going through each tier
-  let sections = [];
-  tierDetails.forEach(tier => {
-    let currentSection = buildPriceSection(tier, userIsAdmin);
-    sections = [...sections, ...currentSection];
-  })
- 
-  return sections;
-}
-
-const buildPriceSection = (tier, userIsAdmin) => {
-  // Build up text for section
-  let sectionText = `${tier.emoji}  *${tier.name}*\n\n`;
-  // Custom messaging depending on if this is the unlimited plan
-  if (!tier.unlimited) {
-    sectionText += `Up to ${tier.maxUsers} registered users\n\n`;
-  } else {
-    sectionText += "Unlimited registered users\n\n";
-  }
-  // Price
-  sectionText += `_$${tier.price}/month_`;
-
-  let section = [
-    {
-      "type": "divider"
-    },
-    {
-      type: 'section',
-      text: {
-        type: 'mrkdwn',
-        text: sectionText
-      }
-    },
-    {
-      type: 'section',
-      text: {
-        type: 'mrkdwn',
-        text: '\n\n'
-      }
-    },
-  ]
-
-  if (userIsAdmin) {
-    section[1].accessory = {
-      type: "button",
-      action_id: tier.action_id,
-      text: {
-        type: "plain_text",
-        text: `${tier.emoji}  Join ${tier.name}`
-      },
-      url: tier.url
-    }
-  }
-
-  return section;
-}
-
-const buildPriceButtons = (checkoutUrl) => {
-
-  const buttonInfo = [
-    {
-      text: ':car:  Small - up to 5 users - $15/mo',
-      url: addPlanToCheckoutUrl(checkoutUrl, 'small'),
-      action_id: 'small_plan_click'
-    },
-    {
-      text: ':boat:  Medium - up to 20 users',
-      url: addPlanToCheckoutUrl(checkoutUrl, 'medium'),
-      action_id: 'medium_plan_click'
-    },
-    {
-      text: ':small_airplane:  Large - up to 80 users',
-      url: addPlanToCheckoutUrl(checkoutUrl, 'large'),
-      action_id: 'large_plan_click'
-    },
-    {
-      text: ':rocket:  Unlimited - ∞ users',
-      url: addPlanToCheckoutUrl(checkoutUrl, 'unlimited'),
-      action_id: 'unlimited_plan_click'
-    },
-  ]
-
-  const buttons = buttonInfo.map(info => {
-    return {
-      type: 'button',
-      action_id: info.action_id,
-      text: {
-        type: 'plain_text',
-        text: info.text
-      },
-      url: info.url
-    }
-  })
- 
-  return buttons;
-}
 
 const addPlanToCheckoutUrl = (checkoutUrl, plan) => {
   return `${checkoutUrl}&plan=${plan}`

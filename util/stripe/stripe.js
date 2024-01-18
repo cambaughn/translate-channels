@@ -74,16 +74,15 @@ const createCustomer = async (teamId) => {
 };
 
 
-const createCheckoutSession = async (stripeId, returnUrl, plan) => {
-  const priceId = pricesToTiers[plan];
-  console.log('got price : ', priceId);
+const createCheckoutSession = async (stripeId, returnUrl) => {
+  // const priceId = pricesToTiers[plan];
+  // console.log('got price : ', priceId);
 
   return await stripe.checkout.sessions.create({
     line_items: [
       {
         // Provide the exact Price ID (for example, pr_1234) of the product you want to sell
-        price: priceId,
-        quantity: 1
+        price: meteredUsagePriceId
       }
     ],
     mode: 'subscription',

@@ -1,18 +1,22 @@
 import helpMessage from "../../views/helpMessage.js";
 import upgradeMessage from "../../views/upgradeMessage.js";
 
-const updateMessage = (message, response, token, client) => {
-  // finds message and edits it with the translated text (response) as blocks
-  const messageRequest = {
-    token: token,
-    channel: message.channel,
-    ts: message.ts,
-    text: response
-  };
+const updateMessage = async (message, response, token, client) => {
+  try {
+    // finds message and edits it with the translated text (response) as blocks
+    const messageRequest = {
+      token: token,
+      channel: message.channel,
+      ts: message.ts,
+      text: response
+    };
 
-  return client.chat.update(messageRequest, error => {
-    console.error(error);
-  });
+    await client.chat.update(messageRequest, error => {
+      console.error(error);
+    });
+  } catch (error) {
+    console.error('updateMessage function error: ', error);
+  }
 }
 
 const postMessageAsUser = (text, channel, token, client) => {

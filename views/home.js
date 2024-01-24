@@ -135,7 +135,7 @@ const buildAuthSection = (auth_url) => {
       "type": "section",
       "text": {
         "type": "mrkdwn",
-        "text": "Authorize the app to update your messages with translations :point_right: \n _(Each user must do this once to enable automatic translation)_"
+        "text": "Authorize the app to update your messages with translations :point_right: \n _(Each user must authorize the app to enable automatic translation)_"
       },
 
       "accessory": {

@@ -1,5 +1,6 @@
 import helpMessage from "../../views/helpMessage.js";
 import upgradeMessage from "../../views/upgradeMessage.js";
+import userDB from "../firebaseAPI/users.js";
 
 const updateMessage = async (message, response, token, client) => {
   try {
@@ -11,11 +12,16 @@ const updateMessage = async (message, response, token, client) => {
       text: response
     };
 
+    console.log('message user ', message.user)
+
     await client.chat.update(messageRequest, error => {
       console.error(error);
     });
   } catch (error) {
     console.error('updateMessage function error: ', error);
+    if (error.data && error.data.error === 'token_revoked') {
+      userDB.updateUser(message.user, { access_token: null });
+    }
   }
 }
 

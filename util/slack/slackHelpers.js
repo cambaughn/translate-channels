@@ -12,8 +12,6 @@ const updateMessage = async (message, response, token, client) => {
       text: response
     };
 
-    console.log('message user ', message.user)
-
     await client.chat.update(messageRequest, error => {
       console.error(error);
     });

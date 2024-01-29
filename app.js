@@ -28,8 +28,8 @@ const expressReceiver = new ExpressReceiver({
  * @throws {Error} Throws an error if the team does not have valid access tokens.
  */
 const authorizeFn = async ({ teamId }) => {
-  if (teamId && teamId !== 'T032MKA5W6M' && teamId !== 'TGCMFL22X') {
-    try {
+  try {
+    if (teamId) {
       console.log('authorizing for team: ', teamId);
       let team = await teamsDB.getTeam(teamId);
       
@@ -49,9 +49,9 @@ const authorizeFn = async ({ teamId }) => {
         // If the team does not have valid access tokens, throw an error
         console.error('Team is missing necessary data to authorize app');
       }
-    } catch (error) {
-      console.error('Error for team: ', team.id, error);
     }
+  } catch (error) {
+    console.error('Error for team: ', team.id, error);
   }
 };
 

@@ -28,7 +28,7 @@ const expressReceiver = new ExpressReceiver({
  * @throws {Error} Throws an error if the team does not have valid access tokens.
  */
 const authorizeFn = async ({ teamId }) => {
-  if (teamId && teamId !== 'T032MKA5W6M') {
+  if (teamId && teamId !== 'T032MKA5W6M' && teamId !== 'TGCMFL22X') {
     try {
       console.log('authorizing for team: ', teamId);
       let team = await teamsDB.getTeam(teamId);

@@ -39,7 +39,7 @@ const authorizeFn = async ({ teamId }) => {
       }
     
       // If the team has access tokens, return an object containing botToken, botId, and teamId
-      if (team.team_access_token && team.bot_user_id && team.id) {
+      if (team?.team_access_token && team?.bot_user_id && team?.id) {
         return {
           botToken: team.team_access_token,
           botId: team.bot_user_id,

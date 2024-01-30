@@ -33,14 +33,11 @@ const authorizeFn = async ({ teamId }) => {
       throw new Error('Team ID is undefined');
     }
 
-    let team = await teamsDB.getTeam(teamId);
-
-    if (!team) {
-      throw new Error(`Team with ID ${teamId} does not exist in the database`);
-    }
-
-    if (!team.team_access_token || !team.bot_user_id) {
-      throw new Error('Team is missing necessary data to authorize app');
+    const team = await teamsDB.getTeam(teamId);
+    if (!team || !team.team_access_token || !team.bot_user_id) {
+      console.error(`Incomplete authorization data for team: ${teamId}`);
+      // Return empty but valid data
+      return { botToken: '', botId: '', teamId: teamId || '' };
     }
 
     return {
@@ -51,10 +48,11 @@ const authorizeFn = async ({ teamId }) => {
 
   } catch (error) {
     console.error('Authorization error for team:', teamId, error);
-    // Return an object with botId as undefined to prevent TypeError
-    return { botToken: undefined, botId: undefined, teamId: undefined };
+    // Return empty but valid data
+    return { botToken: '', botId: '', teamId: teamId || '' };
   }
 };
+
 
 
 // Create a new Slack App with the custom authorize function and express receiver

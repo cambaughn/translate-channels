@@ -29,8 +29,6 @@ const expressReceiver = new ExpressReceiver({
  */
 const authorizeFn = async ({ teamId }) => {
   try {
-    console.log('authorizing for team: ', teamId);
-
     if (!teamId) {
       throw new Error('Team ID is undefined');
     }
@@ -53,10 +51,11 @@ const authorizeFn = async ({ teamId }) => {
 
   } catch (error) {
     console.error('Authorization error for team:', teamId, error);
-    // Return a default structure with undefined values to prevent TypeError
+    // Return an object with botId as undefined to prevent TypeError
     return { botToken: undefined, botId: undefined, teamId: undefined };
   }
 };
+
 
 
 // Create a new Slack App with the custom authorize function and express receiver

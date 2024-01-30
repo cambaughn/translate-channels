@@ -57,7 +57,6 @@ const authorizeFn = async ({ teamId }) => {
 };
 
 
-
 // Create a new Slack App with the custom authorize function and express receiver
 const slackApp = new App({
   authorize: authorizeFn,

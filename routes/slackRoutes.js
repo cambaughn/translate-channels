@@ -96,20 +96,19 @@ const slackRoutes = (app) => {
         let subscriptionReport = await reportSubscriptionUsage(subscriptionData, user);
       }
 
-      // If the team is on the tiered plan, need to determine that they are on the correct tier for the number of users
-      if (usageType === 'licensed') {
-        // Get tier details
-        const tierDetails = getSubscriptionTierDetails(subscriptionData.plan.id);
+    // If the team is on the tiered plan, need to determine that they are on the correct tier for the number of users
+    if (usageType === 'licensed') {
+      // Get tier details
+      const tierDetails = getSubscriptionTierDetails(subscriptionData.plan.id);
 
-        if (!tierDetails.unlimited) { // Don't need to run this code for unlimited plans
-          // Determine number of registered users
-          const numRegisteredUsers = await userDB.getRegisteredUsersForTeam(context.teamId);
-          // const numRegisteredUsers = 10;
-          // Verify that number of users is within the current plan limits
-          if (numRegisteredUsers > tierDetails.maxUsers) { // If there are more registered users than allowed on the current plan (don't run this code for unlimited plans)
-            await sendUpgradeMessage(context.botToken, message.user, client, tierDetails, numRegisteredUsers); 
-            return null;
-          }
+      if (!tierDetails.unlimited) { // Don't need to run this code for unlimited plans
+        // Determine number of registered users
+        const numRegisteredUsers = await userDB.getRegisteredUsersForTeam(context.teamId);
+        // const numRegisteredUsers = 10;
+        // Verify that number of users is within the current plan limits
+        if (numRegisteredUsers > tierDetails.maxUsers) { // If there are more registered users than allowed on the current plan (don't run this code for unlimited plans)
+          await sendUpgradeMessage(context.botToken, message.user, client, tierDetails, numRegisteredUsers); 
+          return null;
         }
       }
 

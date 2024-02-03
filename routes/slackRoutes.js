@@ -127,7 +127,7 @@ const slackRoutes = (app) => {
 
       await updateMessage(message, translation.response, token, client);
     } catch (error) {
-      console.error('Message event error: ', error);
+      console.error('Message event error:', error);
     }
   });
 

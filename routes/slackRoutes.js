@@ -59,85 +59,76 @@ const slackRoutes = (app) => {
      * @returns {Promise<void>} A promise indicating the completion of the message handling.
    */
   app.event('message', async ({ message, context, client }) => {
-    console.log('bot token! ', context.botToken)
-    // if the message comes from a bot OR the message has been edited manually, don't translate
-    if (message.bot_id || message.subtype === 'message_changed' || !message.user) {
-      return null; 
-    } 
+    try {
+      // if the message comes from a bot OR the message has been edited manually, don't translate
+      if (message.bot_id || message.subtype === 'message_changed' || !message.user) {
+        return null; 
+      } 
 
-    if (message.subtype === 'me_message') { 
-      return null;
-    }
-
-    // If the message is in an IM to the app bot, just return the help message
-    if (message.channel_type === 'im') { 
-      await provideHelp(context.botToken, message.user, client); 
-      return null; 
-    }
-    
-    const team = await teamsDB.getTeam(context.teamId);
-    const user = await userDB.getUser(message.user);
-    const token = user?.access_token;
-    const sentAuthMessage = user?.sent_auth_message;
-
-    if (!token) {  // if there is no access token for the user, return null
-      if (!sentAuthMessage) {
-        // If the user is not authenticated, send the DM auth message
-        sendAuthDM(context.botToken, client, message.user);
-        await userDB.updateUser(message.user, { sent_auth_message: true });
+      // If the message is in an IM to the app bot, just return the help message
+      if (message.channel_type === 'im') { 
+        await provideHelp(context.botToken, message.user, client); 
+        return null; 
       }
-      return null;
-    }
+      
+      const team = await teamsDB.getTeam(context.teamId);
+      const user = await userDB.getUser(message.user);
+      const token = user?.access_token;
+      if (!token) {  // if there is no access token for the user
+        return null; 
+      }
 
-    // Check for active subscription in Stripe
-    const isProd = process.env.ENVIRONMENT !== 'development';
-    const customerId = isProd ? team.stripe_customer_id : team.test_stripe_customer_id;
-    const subscriptionData = customerId ? await getSubscriptionData(customerId) : null;
-    const subscriptionActive = subscriptionData?.status === 'active' || subscriptionData?.status === 'trialing';
-    const usageType = subscriptionData?.plan?.usage_type;
+      // Check for active subscription in Stripe
+      const isProd = process.env.ENVIRONMENT !== 'development';
+      const customerId = isProd ? team.stripe_customer_id : team.test_stripe_customer_id;
+      const subscriptionData = customerId ? await getSubscriptionData(customerId) : null;
+      const subscriptionActive = subscriptionData?.status === 'active' || subscriptionData?.status === 'trialing';
+      const usageType = subscriptionData?.plan?.usage_type;
 
-    // If subscription is not active, do nothing
-    if (!subscriptionActive) {
-      return null; 
-    }
+      // If subscription is not active, do nothing
+      if (!subscriptionActive) {
+        return null; 
+      }
 
-    // Log metered usage for per-seat subscription
-    if (usageType === 'metered' && (subscriptionData?.status === 'active' || subscriptionData?.status === 'trialing')) {
-      console.log('===reporting usage===');
-      let subscriptionReport = await reportSubscriptionUsage(subscriptionData, user);
-    }
+      // Log metered usage for per-seat subscription
+      if (usageType === 'metered' && (subscriptionData?.status === 'active' || subscriptionData?.status === 'trialing')) {
+        console.log('===reporting usage===');
+        let subscriptionReport = await reportSubscriptionUsage(subscriptionData, user);
+      }
 
-    // If the team is on the tiered plan, need to determine that they are on the correct tier for the number of users
-    if (usageType === 'licensed') {
-      // Get tier details
-      const tierDetails = getSubscriptionTierDetails(subscriptionData.plan.id);
+      // If the team is on the tiered plan, need to determine that they are on the correct tier for the number of users
+      if (usageType === 'licensed') {
+        // Get tier details
+        const tierDetails = getSubscriptionTierDetails(subscriptionData.plan.id);
 
-      if (!tierDetails.unlimited) { // Don't need to run this code for unlimited plans
-        // Determine number of registered users
-        const numRegisteredUsers = await userDB.getRegisteredUsersForTeam(context.teamId);
-        // const numRegisteredUsers = 10;
-        // Verify that number of users is within the current plan limits
-        if (numRegisteredUsers > tierDetails.maxUsers) { // If there are more registered users than allowed on the current plan (don't run this code for unlimited plans)
-        await sendUpgradeMessage(context.botToken, message.user, client, tierDetails, numRegisteredUsers); 
-        return null;
+        if (!tierDetails.unlimited) { // Don't need to run this code for unlimited plans
+          // Determine number of registered users
+          const numRegisteredUsers = await userDB.getRegisteredUsersForTeam(context.teamId);
+          // const numRegisteredUsers = 10;
+          // Verify that number of users is within the current plan limits
+          if (numRegisteredUsers > tierDetails.maxUsers) { // If there are more registered users than allowed on the current plan (don't run this code for unlimited plans)
+            await sendUpgradeMessage(context.botToken, message.user, client, tierDetails, numRegisteredUsers); 
+            return null;
+          }
         }
       }
+
+      // Determine which languages we need for this channel
+      // If the channel has languages set, use those
+      const channelLanguages = team.channel_language_settings[message.channel]?.languages || [];
+      // Otherwise, use the workspace languages
+      const workspaceLanguages = team.workspace_languages || [];
+      const requiredLanguages = channelLanguages.length > 0 ? channelLanguages : workspaceLanguages;
+      const translator = new Translator(message, requiredLanguages);
+      const translation = await translator.getTranslatedData();
+      if (!translation) { // if the translation didn't return anything
+        return null; 
+      }
+
+      await updateMessage(message, translation.response, token, client);
+    } catch (error) {
+      console.error('Message event error:', error);
     }
-
-
-    // Determine which languages we need for this channel
-    // If the channel has languages set, use those
-    const channelLanguages = team.channel_language_settings[message.channel]?.languages || [];
-    // Otherwise, use the workspace languages
-    const workspaceLanguages = team.workspace_languages || [];
-    const requiredLanguages = channelLanguages.length > 0 ? channelLanguages : workspaceLanguages;
-    const translator = new Translator(message, requiredLanguages);
-    const translation = await translator.getTranslatedData();
-
-    if (!translation) { // if the translation didn't return anything
-      return null; 
-    }
-    updateMessage(message, translation.response, token, client);
   });
   
   /**

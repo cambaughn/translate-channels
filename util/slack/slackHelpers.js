@@ -1,19 +1,27 @@
 import helpMessage from "../../views/helpMessage.js";
 import upgradeMessage from "../../views/upgradeMessage.js";
 import authMessage from "../../views/authMessage.js";
+import userDB from "../firebaseAPI/users.js";
 
-const updateMessage = (message, response, token, client) => {
-  // finds message and edits it with the translated text (response) as blocks
-  const messageRequest = {
-    token: token,
-    channel: message.channel,
-    ts: message.ts,
-    text: response
-  };
+const updateMessage = async (message, response, token, client) => {
+  try {
+    // finds message and edits it with the translated text (response) as blocks
+    const messageRequest = {
+      token: token,
+      channel: message.channel,
+      ts: message.ts,
+      text: response
+    };
 
-  return client.chat.update(messageRequest, error => {
-    console.error(error);
-  });
+    await client.chat.update(messageRequest, error => {
+      console.error(error);
+    });
+  } catch (error) {
+    console.error('updateMessage function error: ', error);
+    if (error.data && error.data.error === 'token_revoked') {
+      userDB.updateUser(message.user, { access_token: null });
+    }
+  }
 }
 
 const postMessageAsUser = (text, channel, token, client) => {

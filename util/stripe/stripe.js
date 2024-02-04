@@ -53,6 +53,8 @@ const subscriptionTierDetails = {
   }
 }
 
+export const meteredUsagePriceId = process.env.ENVIRONMENT === 'development' ? 'price_1OXdrQIEl24u0zqNCYgOkbM8' : 'price_1OZJRBIEl24u0zqNmISnjjkq';
+
 const getSubscriptionTierDetails = (pricing_id) => {
   const size = pricesToTiers[pricing_id];
   return subscriptionTierDetails[size];
@@ -72,16 +74,15 @@ const createCustomer = async (teamId) => {
 };
 
 
-const createCheckoutSession = async (stripeId, returnUrl, plan) => {
-  const priceId = pricesToTiers[plan];
-  console.log('got price : ', priceId);
+const createCheckoutSession = async (stripeId, returnUrl) => {
+  // const priceId = pricesToTiers[plan];
+  // console.log('got price : ', priceId);
 
   return await stripe.checkout.sessions.create({
     line_items: [
       {
         // Provide the exact Price ID (for example, pr_1234) of the product you want to sell
-        price: priceId,
-        quantity: 1
+        price: meteredUsagePriceId
       }
     ],
     mode: 'subscription',
@@ -143,6 +144,18 @@ const reportSubscriptionUsage = async (subscriptionData, user) => {
   return Promise.resolve(true);
 }
 
+const getSubscriptionUsage = async (subscriptionData) => {
+  const subscriptionItemId = subscriptionData?.items?.data[0].id;
+  let subscriptionUsage = await stripe.subscriptionItems.listUsageRecordSummaries(
+    subscriptionItemId,
+    {
+      limit: 10
+    }
+  );
+
+  return subscriptionUsage?.data[0]?.total_usage;
+}
+
 
 const cancelSubscription = async (subscriptionId) => {
   return stripe.subscriptions.del(subscriptionId);
@@ -158,6 +171,7 @@ export {
   getSubscriptionData,
   createPortalSession,
   reportSubscriptionUsage,
+  getSubscriptionUsage,
   getSubscriptionTierDetails,
   cancelSubscription,
   subscriptionTierDetails

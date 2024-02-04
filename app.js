@@ -28,32 +28,32 @@ const expressReceiver = new ExpressReceiver({
  * @throws {Error} Throws an error if the team does not have valid access tokens.
  */
 const authorizeFn = async ({ teamId }) => {
-  if (teamId && teamId !== 'T032MKA5W6M') {
-    try {
-      console.log('authorizing for team: ', teamId);
-      let team = await teamsDB.getTeam(teamId);
-      
-      // If the team does not exist in the database, throw a specific error
-      if (!team?.id || !team?.team_access_token) {
-        console.error(`Team with ID ${teamId} does not exist in the database`);
-      }
-    
-      // If the team has access tokens, return an object containing botToken, botId, and teamId
-      if (team.team_access_token && team.bot_user_id && team.id) {
-        return {
-          botToken: team.team_access_token,
-          botId: team.bot_user_id,
-          teamId: team.id
-        };
-      } else {
-        // If the team does not have valid access tokens, throw an error
-        console.error('Team is missing necessary data to authorize app');
-      }
-    } catch (error) {
-      console.error(error);
+  try {
+    if (!teamId) {
+      throw new Error('Team ID is undefined');
     }
+
+    const team = await teamsDB.getTeam(teamId);
+    if (!team || !team.team_access_token || !team.bot_user_id) {
+      console.error(`Incomplete authorization data for team: ${teamId}`);
+      // Return empty but valid data
+      return { botToken: '', botId: '', teamId: teamId || '' };
+    }
+
+    return {
+      botToken: team.team_access_token,
+      botId: team.bot_user_id,
+      teamId: team.id
+    };
+
+  } catch (error) {
+    console.error('Authorization error for team:', teamId, error);
+    // Return empty but valid data
+    return { botToken: '', botId: '', teamId: teamId || '' };
   }
 };
+
+
 
 // Create a new Slack App with the custom authorize function and express receiver
 const slackApp = new App({

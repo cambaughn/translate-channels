@@ -19,6 +19,12 @@ Read the [Getting Started guide](https://api.slack.com/start/building/bolt)
 Read the [Bolt documentation](https://slack.dev/bolt)
 -------------------
 
+# Set up
+From the terminal, run:
+- `yarn`
+- `brew install ngrok/ngrok/ngrok`
+- `ngrok config add-authtoken 2oMsFdLSJ6fq6HtQkR8gICmV466_3vDW9GQWt3WCCEfEGDUun`
+
 # Running the app
 In two separate terminal tabs, run:
 - `ngrok http 3000`

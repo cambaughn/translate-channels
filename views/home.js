@@ -429,7 +429,7 @@ const buildGetStartedSection = (checkoutUrl, userIsAdmin) => {
       type: 'section',
       text: {
         type: 'mrkdwn',
-        text: '*Try Translate Channels free for 7 days*\n\n_$4/user/month after_'
+        text: '*Try Translate Channels free for 14 days*\n\n_$4/user/month after_'
       }
     },
     {

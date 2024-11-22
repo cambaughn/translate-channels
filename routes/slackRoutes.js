@@ -345,6 +345,22 @@ const slackRoutes = (app) => {
   app.event('app_home_opened', async ({ event, client, context }) => {
     console.log('app_home_opened event');
     try {
+
+      const result = await client.users.list({
+        token: context.botToken
+      });
+      const memberCount = result.members.length;
+      
+      console.log('member count ', memberCount);
+
+      // const currentUserInfo = await client.users.info({
+      //   token: context.botToken,
+      //   user: event.user // You’ll have this from the installation data
+      // });
+      // const email = currentUserInfo.user.profile;
+      
+      // console.log('user email : ', email);
+
       let isSlackAdmin = await isAdmin(event.user, context.botToken, client);
       let redirect_url = process.env.REDIRECT_URL || 'https://translate-channels.herokuapp.com/auth_redirect';
       /* view.publish is the method that your app uses to push a view to the Home tab */

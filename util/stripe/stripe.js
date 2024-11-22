@@ -90,7 +90,7 @@ const createCheckoutSession = async (stripeId, returnUrl) => {
     customer: stripeId,
     cancel_url: returnUrl,
     subscription_data: {
-      trial_period_days: 7
+      trial_period_days: 14
     }
   });
 };

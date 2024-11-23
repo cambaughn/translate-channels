@@ -53,7 +53,9 @@ const subscriptionTierDetails = {
   }
 }
 
-export const meteredUsagePriceId = process.env.ENVIRONMENT === 'development' ? 'price_1OXdrQIEl24u0zqNCYgOkbM8' : 'price_1OZJRBIEl24u0zqNmISnjjkq';
+export const meteredUsagePriceId = process.env.ENVIRONMENT === 'development' 
+  ? 'price_1QO80aIEl24u0zqNQFUJbFz7'  // development price
+  : 'price_1OZJRBIEl24u0zqNmISnjjkq'; // production price
 
 const getSubscriptionTierDetails = (pricing_id) => {
   const size = pricesToTiers[pricing_id];

@@ -457,7 +457,7 @@ const buildGetStartedSection = (checkoutUrl, userIsAdmin) => {
 
   let priceUrl = addPlanToCheckoutUrl(checkoutUrl, meteredUsagePriceId);
 
-  if (userIsAdmin) {
+  // if (userIsAdmin) {
     getStartedSection[0].accessory = {
       type: "button",
       action_id: "unlimited_plan_click",
@@ -467,7 +467,7 @@ const buildGetStartedSection = (checkoutUrl, userIsAdmin) => {
       },
       url: priceUrl
     }
-  }
+  // }
 
   return getStartedSection;
 }

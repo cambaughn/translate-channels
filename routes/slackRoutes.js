@@ -94,6 +94,7 @@ const slackRoutes = (app) => {
       if (usageType === 'metered' && (subscriptionData?.status === 'active' || subscriptionData?.status === 'trialing')) {
         console.log('===reporting usage===');
         let subscriptionReport = await reportSubscriptionUsage(subscriptionData, user);
+        console.log('subscriptionReport result:', subscriptionReport);
       }
 
       // If the team is on the tiered plan, need to determine that they are on the correct tier for the number of users

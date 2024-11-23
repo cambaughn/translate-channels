@@ -125,6 +125,13 @@ const reportSubscriptionUsage = async (subscriptionData, user) => {
   const subscriptionItemId = subscriptionData?.items?.data[0].id;
   const lastActivityPeriod = user?.last_activity_period;
   const billingPeriod = subscriptionData.current_period_end;
+  
+  // Add these debug logs
+  console.log('Debug reportSubscriptionUsage:');
+  console.log('lastActivityPeriod:', lastActivityPeriod);
+  console.log('billingPeriod:', billingPeriod);
+  console.log('subscriptionItemId:', subscriptionItemId);
+  
   // Check user's last activity period and compare to current billing period to see if the user has been active during current billing period
   // These timestamps should be the same
   if (lastActivityPeriod !== billingPeriod) { // if they're not the same, then we need to update user in Firebase and record usage

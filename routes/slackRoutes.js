@@ -92,6 +92,7 @@ const slackRoutes = (app) => {
 
       // Log metered usage for per-seat subscription
       if (usageType === 'metered' && (subscriptionData?.status === 'active' || subscriptionData?.status === 'trialing')) {
+        console.log('===reporting usage===');
         let subscriptionReport = await reportSubscriptionUsage(subscriptionData, user);
       }
 
@@ -270,56 +271,63 @@ const slackRoutes = (app) => {
      * @returns {Promise<void>} A promise that resolves when the operation is complete.
   */
   app.view('settings_modal_submitted', async ({ ack, view, context, body, client }) => {
-    // Acknowledge immediately
-    await ack();
-    
-    try {
-      const userId = body.user.id;
-      const teamId = context.teamId;
-      const settingsModal = view.state.values;
-      const languages = settingsModal.select_lang_block.select_lang.selected_options.map(x => x.value);
-      console.log('select_channel_block :::::: ', !!settingsModal.select_channel_block)
+    console.log('settings_modal_submitted event');
 
-      if (settingsModal.select_channel_block) { // User is setting channel-specific languages
-        const channelIds = settingsModal.select_channel_block.select_channel.selected_conversations;
-        console.log('channelIds ', channelIds)
-        let channels = await getInfoForChannels(channelIds, client, context.botToken);
-        let errorChannelIds = [];
-    
-        channels.forEach((channel, index) => {
-          if (!channel.id && channel.id !== 'any_channel') {
-            errorChannelIds.push(channelIds[index]);
-          }
-        })
-    
-        if (errorChannelIds.length > 0) { // error if the bot is not a member of the selected channels
-          let userData = await userDB.getUser(userId);
-          let errorChannels = await getInfoForChannels(errorChannelIds, client, userData.access_token);
-          let errorChannelNames = errorChannels.map(channel => channel.name);
-          let errorMessage = errorChannelNames.length > 0 ? 
-            `Translate Channels is not yet a member of the following private channels: ${errorChannelNames.join(', ')}. Please invite Translate Channels to these channels and try again.` : 
-            `Translate Channels is not yet a member of these private channels. Please invite Translate Channels to the private channels and try again.`;
-    
-          throw new Error(errorMessage);
-        } else {
-          const channelsForDB = channels.map(channel => ({ id: channel.id, name: channel.name, is_private: channel.is_private }));
-          console.log('channels! ', channels)
-          await teamsDB.updateLanguageSettings(channelsForDB, languages, teamId);
+    const userId = body.user.id;
+    const teamId = context.teamId;
+    const settingsModal = view.state.values;
+    const languages = settingsModal.select_lang_block.select_lang.selected_options.map(x => x.value);
+    console.log('select_channel_block :::::: ', !!settingsModal.select_channel_block)
+
+    if (settingsModal.select_channel_block) { // User is setting channel-specific languages
+      const channelIds = settingsModal.select_channel_block.select_channel.selected_conversations;
+      console.log('channelIds ', channelIds)
+      let channels = await getInfoForChannels(channelIds, client, context.botToken);
+      let errorChannelIds = [];
+  
+      channels.forEach((channel, index) => {
+        if (!channel.id && channel.id !== 'any_channel') {
+          errorChannelIds.push(channelIds[index]);
         }
-      } else { // User is setting workspace languages
-        await teamsDB.updateLanguageSettings([], languages, teamId);
+      })
+  
+      if (errorChannelIds.length > 0) { // error if the bot is not a member of the selected channels
+        let userData = await userDB.getUser(userId);
+        let errorChannels = await getInfoForChannels(errorChannelIds, client, userData.access_token);
+        let errorChannelNames = errorChannels.map(channel => channel.name);
+        let errorMessage = errorChannelNames.length > 0 ? 
+          `Translate Channels is not yet a member of the following private channels: ${errorChannelNames.join(', ')}. Please invite Translate Channels to these channels and try again.` : 
+          `Translate Channels is not yet a member of these private channels. Please invite Translate Channels to the private channels and try again.`;
+  
+        const errorView = {
+          "response_action": "errors",
+          "errors": {
+            "select_channel_block": errorMessage
+          }
+        }
+        await ack(errorView);
+        return null;
+      } else {
+        await ack();
+        const channelsForDB = channels.map(channel => ({ id: channel.id, name: channel.name, is_private: channel.is_private }));
+        console.log('channels! ', channels)
+        await teamsDB.updateLanguageSettings(channelsForDB, languages, teamId);
       }
-      
-      // Update home view at the end
-      let isSlackAdmin = await isAdmin(userId, context.botToken, client);
-      let redirect_url = process.env.REDIRECT_URL || 'https://translate-channels.herokuapp.com/auth_redirect';
-      let homeView = await buildHomeView(userId, teamId, redirect_url, isSlackAdmin, client);
-      homeView.token = context.botToken;
-      await client.views.publish(homeView);
-      
-    } catch (error) {
-      console.error('Error handling settings submission:', error);
+    } else { // User is setting workspace languages
+      await ack();
+      await teamsDB.updateLanguageSettings([], languages, teamId);
     }
+    
+
+    
+    // publishHomeView(userId, teamId, context, client);
+    let isSlackAdmin = await isAdmin(userId, context.botToken, client);
+    let redirect_url = process.env.REDIRECT_URL || 'https://translate-channels.herokuapp.com/auth_redirect';
+    /* view.publish is the method that your app uses to push a view to the Home tab */
+    let homeView = await buildHomeView(userId, teamId, redirect_url, isSlackAdmin, client);
+    homeView.token = context.botToken;
+    console.log('view config ', homeView.token, homeView.user_id);
+    await client.views.publish(homeView);
   });
 
   /**

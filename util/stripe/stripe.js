@@ -53,7 +53,9 @@ const subscriptionTierDetails = {
   }
 }
 
-export const meteredUsagePriceId = process.env.ENVIRONMENT === 'development' ? 'price_1OXdrQIEl24u0zqNCYgOkbM8' : 'price_1OZJRBIEl24u0zqNmISnjjkq';
+export const meteredUsagePriceId = process.env.ENVIRONMENT === 'development' 
+  ? 'price_1QO80aIEl24u0zqNQFUJbFz7'  // development price
+  : 'price_1QO8ilIEl24u0zqNoOmZyVRr'; // production price
 
 const getSubscriptionTierDetails = (pricing_id) => {
   const size = pricesToTiers[pricing_id];
@@ -90,7 +92,7 @@ const createCheckoutSession = async (stripeId, returnUrl) => {
     customer: stripeId,
     cancel_url: returnUrl,
     subscription_data: {
-      trial_period_days: 7
+      trial_period_days: 14
     }
   });
 };
@@ -123,6 +125,7 @@ const reportSubscriptionUsage = async (subscriptionData, user) => {
   const subscriptionItemId = subscriptionData?.items?.data[0].id;
   const lastActivityPeriod = user?.last_activity_period;
   const billingPeriod = subscriptionData.current_period_end;
+  
   // Check user's last activity period and compare to current billing period to see if the user has been active during current billing period
   // These timestamps should be the same
   if (lastActivityPeriod !== billingPeriod) { // if they're not the same, then we need to update user in Firebase and record usage

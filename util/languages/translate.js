@@ -17,16 +17,10 @@ class Translator {
     autoBind(this);
   }
 
-  async detectInputLanguage () {
-    let [detections] = await translate.detect(this.originalMessage.text);
-    detections = Array.isArray(detections) ? detections : [detections];
-    return detections[0].language;
-  }
-
   prepareTranslations () {
     this.translations = {};
     this.targetLanguages.forEach((item) => { this.translations[item] = null; });
-    this.translations[this.inputLanguage] = this.originalMessage.text;
+    this.originalText = this.originalMessage.text;
   }
 
   textsToBeTranslated () {
@@ -34,11 +28,18 @@ class Translator {
   }
 
   async translateText (text, target) {
-    // Translates the text into the target language. "text" can be a string for
-    // translating a single piece of text, or an array of strings for translating
-    // multiple texts.
-    let [translations] = await translate.translate(text, target);
+    // Google Translate returns [translations, metadata]
+    // metadata contains info about the detection
+    let [translations, metadata] = await translate.translate(text, target);
     translations = Array.isArray(translations) ? translations : [translations];
+    
+    // Store the detected language from the first translation
+    if (!this.inputLanguage && metadata?.data?.translations?.[0]?.detectedSourceLanguage) {
+      this.inputLanguage = metadata.data.translations[0].detectedSourceLanguage;
+      // Now that we know the source language, we can store the original text
+      this.translations[this.inputLanguage] = this.originalText;
+    }
+    
     return translations[0];
   }
 
@@ -64,18 +65,17 @@ class Translator {
   }
 
   async getTranslatedData () {
-    // give full message, receive full message -> all the translation logic will be abstracted into this
-    // use .characterCount to see how much was translated
-    // use .response to show User
     const undefinedResponse = null;
     if (!Array.isArray(this.targetLanguages) || this.targetLanguages.length === 0) { return undefinedResponse; }
     this.translatableString = this.stringOperator.getTranslateString();
     if (this.translatableString == null) { return undefinedResponse; }
-    this.inputLanguage = await this.detectInputLanguage();
-    if (this.inputLanguage === 'und') { return undefinedResponse; }
+    
     this.prepareTranslations();
     const toBeTranslated = this.textsToBeTranslated();
     await this.translateTexts(toBeTranslated);
+    
+    if (!this.inputLanguage || this.inputLanguage === 'und') { return undefinedResponse; }
+    
     this.constructTextOutput();
     return {
       response: this.response,

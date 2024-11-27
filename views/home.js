@@ -429,7 +429,7 @@ const buildGetStartedSection = (checkoutUrl, userIsAdmin) => {
       type: 'section',
       text: {
         type: 'mrkdwn',
-        text: '*Try Translate Channels free for 7 days*\n\n_$4/user/month after_'
+        text: '*Try Translate Channels free for 14 days*\n\n_$5/user/month after_'
       }
     },
     {
@@ -457,7 +457,7 @@ const buildGetStartedSection = (checkoutUrl, userIsAdmin) => {
 
   let priceUrl = addPlanToCheckoutUrl(checkoutUrl, meteredUsagePriceId);
 
-  if (userIsAdmin) {
+  // if (userIsAdmin) {
     getStartedSection[0].accessory = {
       type: "button",
       action_id: "unlimited_plan_click",
@@ -467,7 +467,7 @@ const buildGetStartedSection = (checkoutUrl, userIsAdmin) => {
       },
       url: priceUrl
     }
-  }
+  // }
 
   return getStartedSection;
 }

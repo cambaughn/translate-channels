@@ -1,5 +1,7 @@
 // Import required libraries
-import { App, ExpressReceiver } from "@slack/bolt";
+
+import bolt from '@slack/bolt';
+const { App, ExpressReceiver } = bolt;
 import dotenv from 'dotenv';
 dotenv.config();
 

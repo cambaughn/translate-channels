@@ -1,23 +1,22 @@
-Bolt app template
+Translate Channels
 =================
 
-[Bolt](https://slack.dev/bolt) is our framework that lets you build JavaScript-based Slack apps in a flash.
+Translate Channels utilizes [Bolt](https://slack.dev/bolt), Slack's framework that helps you build JavaScript-based Slack apps in a flash.
+Read our [Getting Started with Bolt](https://api.slack.com/start/building/bolt) guide for an in-depth tutorial.
+Read the [Getting Started guide](https://api.slack.com/start/building/bolt) for an easy start.
+Read the [Bolt documentation](https://slack.dev/bolt) for all documentation.
 
-This project is a simple app template to make it easy to create your first Bolt app. Read our [Getting Started with Bolt](https://api.slack.com/start/building/bolt) guide for a more in-depth tutorial
-
-Your Project
-------------
-
+File locations:
 - `app.js` contains the primary Bolt app. It imports the Bolt package (`@slack/bolt`) and starts the Bolt app's server. It's where you'll add your app's listeners.
 - `.env` is where you'll put your Slack app's authorization token and signing secret.
-- The `examples/` folder contains a couple of other sample apps that you can peruse to your liking. They show off a few platform features that your app may want to use.
 
-
-Read the [Getting Started guide](https://api.slack.com/start/building/bolt)
 -------------------
 
-Read the [Bolt documentation](https://slack.dev/bolt)
--------------------
+# First-time set up
+From the terminal, run:
+- `yarn` to install all packages
+- `brew install ngrok/ngrok/ngrok` to install ngrok (creates a secure tunnel for the local development server)
+- `ngrok config add-authtoken 2oMsFdLSJ6fq6HtQkR8gICmV466_3vDW9GQWt3WCCEfEGDUun` to set up ngrok. This auth token may expire or change. You can get a new one at [ngrok.com](https://ngrok.com/), where **team@translatechannels.com** has an account.
 
 # Set up
 From the terminal, run:

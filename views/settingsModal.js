@@ -27,13 +27,13 @@ const buildSettingsModal = (value) => {
   if (value.id !== 'any_channel') {
     blocks.unshift(
       {
-        type: 'input',
+        type: 'section',
         block_id: 'select_channel_block',
-        label: {
-          type: 'plain_text',
+        text: {
+          type: 'mrkdwn',
           text: 'Select channels to translate'
         },
-        element: {
+        accessory: {
           type: 'multi_conversations_select',
           action_id: 'select_channel',
           initial_conversations: [],
@@ -42,10 +42,9 @@ const buildSettingsModal = (value) => {
             type: 'plain_text',
             text: 'Select channels',
             emoji: true
-          },
+          }
         }
-      },
-      { type: 'divider' }
+      }
     );
   }
 
@@ -88,14 +87,14 @@ const buildSettingsModal = (value) => {
     if (value.id === 'any_channel') {
       modal.blocks[0].element.initial_options = preselectedLanguages;
     } else {
-      modal.blocks[2].element.initial_options = preselectedLanguages;
+      modal.blocks[1].element.initial_options = preselectedLanguages;
     }
   }
 
   if (value.id === 'any_channel') {
     modal.blocks[0].element.options = selectableLanguages;
   } else {
-    modal.blocks[2].element.options = selectableLanguages;
+    modal.blocks[1].element.options = selectableLanguages;
   }
   
   return modal;

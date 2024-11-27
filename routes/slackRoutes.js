@@ -229,30 +229,48 @@ const slackRoutes = (app) => {
      * @returns {Promise<void>} A promise that resolves when the operation is complete.
    */
   app.action('overflow_selected', async ({ ack, action, body, context, client }) => {
-    console.log('overflow_selected event ');
+    console.log('overflow_selected event');
     await ack();
 
-    let actionValue = JSON.parse(action.selected_option.value);
-    const teamId = context.teamId;
-    const userId = body.user.id;
-
     try {
-      if (actionValue.type === 'edit_settings') { // open the settings modal
-        await openSettingsModal(actionValue, body, context);
-      } else { // delete channel from settings
-        await teamsDB.removeChannelSettings(actionValue.id, context.teamId);
-        // publishHomeView(userId, teamId, context, client);
+      let actionValue = JSON.parse(action.selected_option.value);
+      const teamId = context.teamId;
+      const userId = body.user.id;
 
+      if (actionValue.type === 'edit_settings') {
+        await openSettingsModal(actionValue, body, context);
+      } else if (actionValue.type === 'remove_channel_settings') {
+        console.log('Removing channel settings for:', actionValue.id);
+        
+        // Remove settings
+        await teamsDB.removeChannelSettings(actionValue.id, teamId);
+        console.log('Channel settings removed');
+        
+        // Immediately update home view
         let isSlackAdmin = await isAdmin(userId, context.botToken, client);
         let redirect_url = process.env.REDIRECT_URL || 'https://translate-channels.herokuapp.com/auth_redirect';
-        /* view.publish is the method that your app uses to push a view to the Home tab */
-        let homeView = await buildHomeView(userId, teamId, redirect_url, isSlackAdmin, client);
+        let homeView = await buildHomeView(userId, teamId, redirect_url, isSlackAdmin);
+        
+        // Use the homeView directly since it should already be properly formatted
         homeView.token = context.botToken;
-        console.log('view config ', homeView.token, homeView.user_id);
+        homeView.user_id = userId;
         await client.views.publish(homeView);
+        
+        console.log('Home view updated');
       }
     } catch (error) {
-      console.error(error);
+      console.error('Error in overflow_selected:', error);
+      // Try to update the home view even if there was an error
+      try {
+        let isSlackAdmin = await isAdmin(body.user.id, context.botToken, client);
+        let redirect_url = process.env.REDIRECT_URL || 'https://translate-channels.herokuapp.com/auth_redirect';
+        let homeView = await buildHomeView(body.user.id, context.teamId, redirect_url, isSlackAdmin);
+        homeView.token = context.botToken;
+        homeView.user_id = body.user.id;
+        await client.views.publish(homeView);
+      } catch (viewError) {
+        console.error('Error updating view after error:', viewError);
+      }
     }
   });
 
@@ -476,6 +494,99 @@ const slackRoutes = (app) => {
     // We just need ack() here to respond to the action, even though we're redirecting to a url
     await ack();
   })
+
+  // Handle the initial selection
+  app.action('select_channel', async ({ ack, body, client, context }) => {
+    console.log('select_channel action triggered');
+    await ack();
+    await checkChannelAndUpdateWarning(body, client, context);
+  });
+
+  // Handle when user selects from the conversations list
+  app.action('conversations_select', async ({ ack, body, client, context }) => {
+    console.log('conversations_select action triggered');
+    await ack();
+    await checkChannelAndUpdateWarning(body, client, context);
+  });
+
+  // Helper function to check channel and update warning
+  const checkChannelAndUpdateWarning = async (body, client, context) => {
+    try {
+      console.log('Checking channel selection');
+      const selectedChannels = body.view.state.values.select_channel_block.select_channel.selected_conversations;
+      console.log('Selected channels:', selectedChannels);
+      
+      if (!selectedChannels || selectedChannels.length === 0) return;
+
+      const lastSelectedChannel = selectedChannels[selectedChannels.length - 1];
+      console.log('Last selected channel:', lastSelectedChannel);
+      
+      try {
+        // Try to get channel info
+        const channelInfo = await client.conversations.info({
+          channel: lastSelectedChannel,
+          token: context.botToken
+        });
+        console.log('Got channel info:', channelInfo);
+        
+      } catch (channelError) {
+        // If we can't get channel info, assume it's a private channel we're not in
+        console.log('Could not get channel info, updating modal with warning');
+        
+        let currentBlocks = [...body.view.blocks];
+        console.log('Current blocks:', currentBlocks);
+        
+        // Remove any existing warning
+        currentBlocks = currentBlocks.filter(block => block.block_id !== 'private_channel_warning');
+        console.log('Blocks after removing warning:', currentBlocks);
+        
+        // Add new warning
+        currentBlocks.splice(1, 0, {
+          type: "context",
+          block_id: "private_channel_warning",
+          elements: [
+            {
+              type: "mrkdwn",
+              text: `:warning: Please invite the app to <#${lastSelectedChannel}> for translations to work.`
+            }
+          ]
+        });
+        console.log('Blocks after adding warning:', currentBlocks);
+        
+        // Update the modal
+        console.log('Updating modal view...');
+        const result = await client.views.update({
+          view_id: body.view.id,
+          hash: body.view.hash,
+          view: {
+            type: body.view.type,
+            callback_id: body.view.callback_id,
+            title: body.view.title,
+            submit: body.view.submit,
+            close: body.view.close,
+            blocks: currentBlocks.map(block => {
+              if (block.block_id === 'select_channel_block') {
+                return {
+                  ...block,
+                  accessory: {
+                    ...block.accessory,
+                    initial_conversations: selectedChannels
+                  }
+                };
+              }
+              return block;
+            }),
+            private_metadata: body.view.private_metadata
+          }
+        });
+        console.log('Modal update result:', result);
+      }
+      
+    } catch (error) {
+      console.error('Error handling channel selection:', error);
+      console.error('Error details:', error.data || error);
+    }
+  };
 }
 
 export default slackRoutes;

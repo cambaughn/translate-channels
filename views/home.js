@@ -3,6 +3,7 @@ import userDB from "../util/firebaseAPI/users.js";
 import { getSettingsString } from '../util/languages/languageHelpers.js';
 import { getSubscriptionData, getSubscriptionUsage, getSubscriptionTierDetails, subscriptionTierDetails, meteredUsagePriceId } from "../util/stripe/stripe.js";
 import { getUserInfo } from "../util/slack/slackUser.js";
+import { getChannelInfo } from "../util/slack/slackHelpers.js";
 
 // NOTE: Only putting dividers at the BOTTOM of each section
 
@@ -85,7 +86,7 @@ const buildHomeView = async (userId, teamId, redirect_url, userIsAdmin, client) 
 
   // Channel Translation Settings Section
   if (subscriptionActive) { // only show translation settings section if the team has an active subscription
-    let channelTranslationSettings = buildTranslationSettingsSection(team, userIsAdmin, nonAdminAllowSettings);
+    let channelTranslationSettings = await buildTranslationSettingsSection(team, userIsAdmin, nonAdminAllowSettings, client);
     home.view.blocks.push(...channelTranslationSettings);
   }
 
@@ -162,7 +163,7 @@ const buildAuthSection = (auth_url) => {
 
 
 
-const buildTranslationSettingsSection = (team, userIsAdmin, nonAdminAllowSettings) => {
+const buildTranslationSettingsSection = async (team, userIsAdmin, nonAdminAllowSettings, client) => {
   let settingsSection = [];
 
   settingsSection.push({
@@ -173,7 +174,7 @@ const buildTranslationSettingsSection = (team, userIsAdmin, nonAdminAllowSetting
     }
   });
 
-  // Overall workspace settings that apply to every channel - holding it here until after sorting the channel settings alphabetically
+  // Overall workspace settings that apply to every channel
   let everyChannel = {
     name: 'All Channels', 
     id: 'any_channel', 
@@ -186,9 +187,22 @@ const buildTranslationSettingsSection = (team, userIsAdmin, nonAdminAllowSetting
   for (const key in team.channel_language_settings) {
     let channelSetting = team.channel_language_settings[key];
     if (channelSetting.languages?.length > 0) {
-      settings.push(
-        { name: channelSetting.name, id: channelSetting.id, languages: channelSetting.languages }
-      );
+      let channelInfo = { is_private: true, is_member: false }; // default values
+      try {
+        // Try to get channel info, but don't fail if we can't
+        channelInfo = await getChannelInfo(channelSetting.id, client, team.bot_access_token);
+      } catch (error) {
+        console.error('Error getting channel info:', error);
+        // Keep default values if we can't get channel info
+      }
+      
+      settings.push({
+        name: channelSetting.name, 
+        id: channelSetting.id, 
+        languages: channelSetting.languages,
+        is_private: channelInfo.is_private,
+        is_member: channelInfo.is_member
+      });
     }
   }
 
@@ -206,16 +220,19 @@ const buildTranslationSettingsSection = (team, userIsAdmin, nonAdminAllowSetting
   settings.unshift(everyChannel);
 
   for (const setting of settings) {
-    // the languages length of 0 should be only possible for workspace settings which must exist by schema
-
     let channelName = setting.id === 'any_channel' ? 'Every Channel' : `<#${setting.id}>`
+    let warningText = '';
+    
+    if (setting.is_private && !setting.is_member) {
+      warningText = '\n:warning: _Please invite Translate Channels to this private channel_';
+    }
     
     if (!setting.languages || setting.languages.length === 0) {
       const settingsBlock = {
         type: 'section',
         text: {
           type: 'mrkdwn',
-          text: `\`${channelName}\` No translation set`
+          text: `\`${channelName}\` No translation set${warningText}`
         }
       };
       if (userIsAdmin || nonAdminAllowSettings) {
@@ -236,34 +253,18 @@ const buildTranslationSettingsSection = (team, userIsAdmin, nonAdminAllowSetting
 
     // Map language strings to array
     let languages = setting.languages.map(language => getSettingsString(language));
-    // Pop the last item, so we can add "and" before it
     let lastLanguage = languages.pop();
-    // Format the full string correctly
-    // Need trailing space for Slack to render flag emoji properly
     let languagesString = languages.length > 0 ? `${languages.join(', ')}${languages.length > 1 ? ',' : ''} & ${lastLanguage} ` : `${lastLanguage} `;
 
     const settingsBlock = {
       type: 'section',
       text: {
         type: 'mrkdwn',
-        text: `\`${channelName}\` translate any language :arrow_right: ${languagesString.slice(0, -1)}`
+        text: `\`${channelName}\` translate any language :arrow_right: ${languagesString.slice(0, -1)}${warningText}`
       }
     };
 
-    // if (userIsAdmin || nonAdminAllowSettings) {
-    //   settingsBlock.accessory = {
-    //     type: 'button',
-    //     text: {
-    //       type: 'plain_text',
-    //       text: 'Edit'
-    //     },
-    //     action_id: 'settings_modal_opened',
-    //     value: JSON.stringify({ id: setting.id, lang: setting.languages })
-    //   };    
-      
-      if (userIsAdmin || nonAdminAllowSettings) {
-
-        
+    if (userIsAdmin || nonAdminAllowSettings) {
       settingsBlock.accessory = {
         type: "overflow",
         options: [
@@ -283,8 +284,6 @@ const buildTranslationSettingsSection = (team, userIsAdmin, nonAdminAllowSetting
           }
         ],
         action_id: "overflow_selected"
-        // action_id: 'settings_modal_opened',
-        // value: JSON.stringify({ id: setting.id, lang: setting.languages })
       };
     }
 

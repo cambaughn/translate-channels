@@ -19,7 +19,7 @@ const buildSettingsModal = (value) => {
           text: 'Select languages',
           emoji: true
         },
-        options: []
+        options: getSelectableLanguages()
       }
     }
   ];
@@ -36,18 +36,26 @@ const buildSettingsModal = (value) => {
         accessory: {
           type: 'multi_conversations_select',
           action_id: 'select_channel',
-          initial_conversations: [],
+          initial_conversations: value.id !== 'none' ? [value.id] : [],
           filter: { include: ['public', 'private']},
           placeholder: {
             type: 'plain_text',
             text: 'Select channels',
             emoji: true
-          }
+          },
+          focus_on_load: false
         }
+      },
+      {
+        type: "context",
+        block_id: "private_channel_warning",
+        elements: [{
+          type: "mrkdwn",
+          text: "‎"
+        }]
       }
     );
   }
-
 
   const modal = {
     type: 'modal',
@@ -69,7 +77,7 @@ const buildSettingsModal = (value) => {
     },
     blocks: blocks
   };
-  const preselectedChannel = (['none', 'any_channel'].includes(value.id)) ? [] : [value.id];
+
   const selectableLanguages = getSelectableLanguages();
   selectableLanguages.unshift({
     text: {
@@ -79,9 +87,7 @@ const buildSettingsModal = (value) => {
     },
     value: 'do_not_translate'
   });
-  if (value.id !== 'any_channel' && preselectedChannel.length > 0) {
-    modal.blocks[0].element.initial_conversations = preselectedChannel;
-  }
+
   if (value.lang.length > 0) {
     const preselectedLanguages = value.lang.map(langCode => getModalOption(langCode));
     if (value.id === 'any_channel') {
@@ -91,11 +97,9 @@ const buildSettingsModal = (value) => {
     }
   }
 
-  if (value.id === 'any_channel') {
-    modal.blocks[0].element.options = selectableLanguages;
-  } else {
-    modal.blocks[1].element.options = selectableLanguages;
-  }
+  // Set options for the language selector
+  const langBlockIndex = value.id === 'any_channel' ? 0 : 2; // Account for the warning block
+  modal.blocks[langBlockIndex].element.options = selectableLanguages;
   
   return modal;
 }

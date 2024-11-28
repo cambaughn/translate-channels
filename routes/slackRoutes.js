@@ -519,21 +519,67 @@ const slackRoutes = (app) => {
       if (!selectedChannels || selectedChannels.length === 0) return;
 
       const lastSelectedChannel = selectedChannels[selectedChannels.length - 1];
+      console.log('Last selected channel:', lastSelectedChannel);
       
       try {
         // Try to get channel info
-        await client.conversations.info({
+        const channelInfo = await client.conversations.info({
           channel: lastSelectedChannel,
           token: context.botToken
         });
+        console.log('Got channel info:', channelInfo);
+        
       } catch (channelError) {
-        // If we can't get channel info, send an ephemeral message to the user
-        await client.chat.postEphemeral({
-          channel: lastSelectedChannel,
-          user: body.user.id,
-          text: `:warning: Please invite the app to this channel for translations to work.`,
-          token: context.botToken
+        // If we can't get channel info, assume it's a private channel we're not in
+        console.log('Could not get channel info, updating modal with warning');
+        
+        let currentBlocks = [...body.view.blocks];
+        console.log('Current blocks:', currentBlocks);
+        
+        // Remove any existing warning
+        currentBlocks = currentBlocks.filter(block => block.block_id !== 'private_channel_warning');
+        console.log('Blocks after removing warning:', currentBlocks);
+        
+        // Add new warning
+        currentBlocks.splice(1, 0, {
+          type: "context",
+          block_id: "private_channel_warning",
+          elements: [
+            {
+              type: "mrkdwn",
+              text: `:warning: Please invite the app to <#${lastSelectedChannel}> for translations to work.`
+            }
+          ]
         });
+        console.log('Blocks after adding warning:', currentBlocks);
+        
+        // Update the modal
+        console.log('Updating modal view...');
+        const result = await client.views.update({
+          view_id: body.view.id,
+          hash: body.view.hash,
+          view: {
+            type: body.view.type,
+            callback_id: body.view.callback_id,
+            title: body.view.title,
+            submit: body.view.submit,
+            close: body.view.close,
+            blocks: currentBlocks.map(block => {
+              if (block.block_id === 'select_channel_block') {
+                return {
+                  ...block,
+                  accessory: {
+                    ...block.accessory,
+                    initial_conversations: selectedChannels
+                  }
+                };
+              }
+              return block;
+            }),
+            private_metadata: body.view.private_metadata
+          }
+        });
+        console.log('Modal update result:', result);
       }
       
     } catch (error) {

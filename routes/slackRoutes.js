@@ -270,7 +270,6 @@ const slackRoutes = (app) => {
      * @returns {Promise<void>} A promise that resolves when the operation is complete.
   */
   app.view('settings_modal_submitted', async ({ ack, view, context, body, client }) => {
-    // Acknowledge immediately
     await ack();
     
     try {
@@ -278,39 +277,22 @@ const slackRoutes = (app) => {
       const teamId = context.teamId;
       const settingsModal = view.state.values;
       const languages = settingsModal.select_lang_block.select_lang.selected_options.map(x => x.value);
-      console.log('select_channel_block :::::: ', !!settingsModal.select_channel_block)
 
       if (settingsModal.select_channel_block) { // User is setting channel-specific languages
         const channelIds = settingsModal.select_channel_block.select_channel.selected_conversations;
-        console.log('channelIds ', channelIds)
-        let channels = await getInfoForChannels(channelIds, client, context.botToken);
-        let errorChannelIds = [];
-    
-        channels.forEach((channel, index) => {
-          if (!channel.id && channel.id !== 'any_channel') {
-            errorChannelIds.push(channelIds[index]);
-          }
-        })
-    
-        if (errorChannelIds.length > 0) { // error if the bot is not a member of the selected channels
-          let userData = await userDB.getUser(userId);
-          let errorChannels = await getInfoForChannels(errorChannelIds, client, userData.access_token);
-          let errorChannelNames = errorChannels.map(channel => channel.name);
-          let errorMessage = errorChannelNames.length > 0 ? 
-            `Translate Channels is not yet a member of the following private channels: ${errorChannelNames.join(', ')}. Please invite Translate Channels to these channels and try again.` : 
-            `Translate Channels is not yet a member of these private channels. Please invite Translate Channels to the private channels and try again.`;
-    
-          throw new Error(errorMessage);
-        } else {
-          const channelsForDB = channels.map(channel => ({ id: channel.id, name: channel.name, is_private: channel.is_private }));
-          console.log('channels! ', channels)
-          await teamsDB.updateLanguageSettings(channelsForDB, languages, teamId);
-        }
+        // Simplified channel handling - just use the IDs directly
+        const channelsForDB = channelIds.map(id => ({ 
+          id: id,
+          name: id, // Using ID as name since we can't fetch private channel info
+          is_private: true // Assuming private for safety
+        }));
+        
+        await teamsDB.updateLanguageSettings(channelsForDB, languages, teamId);
       } else { // User is setting workspace languages
         await teamsDB.updateLanguageSettings([], languages, teamId);
       }
       
-      // Update home view at the end
+      // Update home view
       let isSlackAdmin = await isAdmin(userId, context.botToken, client);
       let redirect_url = process.env.REDIRECT_URL || 'https://translate-channels.herokuapp.com/auth_redirect';
       let homeView = await buildHomeView(userId, teamId, redirect_url, isSlackAdmin, client);

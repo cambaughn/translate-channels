@@ -85,7 +85,7 @@ const buildHomeView = async (userId, teamId, redirect_url, userIsAdmin, client) 
 
   // Channel Translation Settings Section
   if (subscriptionActive) { // only show translation settings section if the team has an active subscription
-    let channelTranslationSettings = buildTranslationSettingsSection(team, userIsAdmin, nonAdminAllowSettings);
+    let channelTranslationSettings = await buildTranslationSettingsSection(team, userIsAdmin, nonAdminAllowSettings, client);
     home.view.blocks.push(...channelTranslationSettings);
   }
 
@@ -162,7 +162,7 @@ const buildAuthSection = (auth_url) => {
 
 
 
-const buildTranslationSettingsSection = (team, userIsAdmin, nonAdminAllowSettings) => {
+const buildTranslationSettingsSection = async (team, userIsAdmin, nonAdminAllowSettings, client) => {
   let settingsSection = [];
 
   settingsSection.push({
@@ -173,152 +173,94 @@ const buildTranslationSettingsSection = (team, userIsAdmin, nonAdminAllowSetting
     }
   });
 
-  // Overall workspace settings that apply to every channel - holding it here until after sorting the channel settings alphabetically
-  let everyChannel = {
-    name: 'All Channels', 
-    id: 'any_channel', 
-    languages: team?.workspace_languages || []
-  }
+  // Handle workspace-wide settings first
+  const workspaceSettings = {
+    id: 'any_channel',
+    languages: team.workspace_languages || []
+  };
 
-  let settings = [];
-
-  // Go through the custom settings defined for each channel and push those to the settings array
-  for (const key in team.channel_language_settings) {
-    let channelSetting = team.channel_language_settings[key];
-    if (channelSetting.languages?.length > 0) {
-      settings.push(
-        { name: channelSetting.name, id: channelSetting.id, languages: channelSetting.languages }
-      );
-    }
-  }
-
-  // Sort channels alphabetically
-  settings = settings.sort((a, b) => {
-    if (a.name < b.name) {
-      return -1;
-    } else if (a.name > b.name) {
-      return 1;
-    } else {
-      return 0;
-    }
-  })
-  // console.log('everyChannel: ', everyChannel);
-  settings.unshift(everyChannel);
+  // Then handle channel-specific settings
+  const channelSettings = team.channel_language_settings || {};
+  const settings = [
+    workspaceSettings,
+    ...Object.entries(channelSettings).map(([id, data]) => ({
+      id,
+      languages: data.languages || []
+    }))
+  ];
 
   for (const setting of settings) {
-    // the languages length of 0 should be only possible for workspace settings which must exist by schema
-
-    let channelName = setting.id === 'any_channel' ? 'Every Channel' : `<#${setting.id}>`
+    let settingText = '';
     
-    if (!setting.languages || setting.languages.length === 0) {
-      const settingsBlock = {
-        type: 'section',
-        text: {
-          type: 'mrkdwn',
-          text: `\`${channelName}\` No translation set`
+    if (setting.id === 'any_channel') {
+      settingText = `*Every Channel*`;
+    } else {
+      settingText = `*<#${setting.id}>*`;
+      
+      // Check if it's a private channel and if the app is a member
+      try {
+        const channelInfo = await client.conversations.info({
+          channel: setting.id
+        });
+        
+        if (channelInfo.channel.is_private && !channelInfo.channel.is_member) {
+          settingText += `\n:warning: _App needs to be invited to this private channel_`;
         }
-      };
-      if (userIsAdmin || nonAdminAllowSettings) {
-        settingsBlock.accessory = {
-          type: 'button',
-          text: {
-            type: 'plain_text',
-            text: 'Edit'
-          },
-          action_id: 'settings_modal_opened',
-          value: JSON.stringify({ id: setting.id, lang: setting.languages })
-        };
+      } catch (error) {
+        // If we can't get channel info, assume it's a private channel we're not in
+        settingText += `\n:warning: _App needs to be invited to this private channel_`;
       }
-
-      settingsSection.push(settingsBlock);
-      continue;
     }
 
-    // Map language strings to array
-    let languages = setting.languages.map(language => getSettingsString(language));
-    // Pop the last item, so we can add "and" before it
-    let lastLanguage = languages.pop();
-    // Format the full string correctly
-    // Need trailing space for Slack to render flag emoji properly
-    let languagesString = languages.length > 0 ? `${languages.join(', ')}${languages.length > 1 ? ',' : ''} & ${lastLanguage} ` : `${lastLanguage} `;
+    settingText += `\nTranslates to: ${setting.languages.join(', ') || 'No translation set'}`;
 
     const settingsBlock = {
       type: 'section',
       text: {
         type: 'mrkdwn',
-        text: `\`${channelName}\` translate any language :arrow_right: ${languagesString.slice(0, -1)}`
+        text: settingText
       }
     };
 
-    // if (userIsAdmin || nonAdminAllowSettings) {
-    //   settingsBlock.accessory = {
-    //     type: 'button',
-    //     text: {
-    //       type: 'plain_text',
-    //       text: 'Edit'
-    //     },
-    //     action_id: 'settings_modal_opened',
-    //     value: JSON.stringify({ id: setting.id, lang: setting.languages })
-    //   };    
-      
-      if (userIsAdmin || nonAdminAllowSettings) {
-
-        
+    if (userIsAdmin || nonAdminAllowSettings) {
       settingsBlock.accessory = {
-        type: "overflow",
-        options: [
-          {
-            text: {
-              type: "plain_text",
-              text: "Edit Settings"
-            },
-            value: JSON.stringify({ type: 'edit_settings', id: setting.id, lang: setting.languages })
-          },
-          {
-            text: {
-              type: "plain_text",
-              text: "Remove Channel"
-            },
-            value: JSON.stringify({ type: 'remove_channel_settings', id: setting.id, lang: setting.languages })
-          }
-        ],
-        action_id: "overflow_selected"
-        // action_id: 'settings_modal_opened',
-        // value: JSON.stringify({ id: setting.id, lang: setting.languages })
+        type: 'button',
+        text: {
+          type: 'plain_text',
+          text: 'Edit'
+        },
+        action_id: 'settings_modal_opened',
+        value: JSON.stringify({ id: setting.id, lang: setting.languages })
       };
     }
 
     settingsSection.push(settingsBlock);
   }
+
+  // Add the "Add Setting" button if user has permission
   if (userIsAdmin || nonAdminAllowSettings) {
-    settingsSection.push(
-      {
-        type: 'section',
+    settingsSection.push({
+      type: 'section',
+      text: {
+        type: 'mrkdwn',
+        text: 'Add translation settings for any channel'
+      },
+      accessory: {
+        type: 'button',
+        style: 'primary',
         text: {
-          type: 'mrkdwn',
-          text: 'Add translation settings for any channel :point_right:'
+          type: 'plain_text',
+          text: 'Add Setting'
         },
-        accessory: {
-          type: 'button',
-          style: 'primary',
-          text: {
-            type: 'plain_text',
-            text: 'Add Setting'
-          },
-          action_id: 'settings_modal_opened',
-          value: JSON.stringify({ id: 'none', lang: [] })
-        },
-      });
+        action_id: 'settings_modal_opened',
+        value: JSON.stringify({ id: 'none', lang: [] })
+      }
+    });
   }
 
-  settingsSection.push(
-    {
-      type: 'divider'
-    }
-  )
-
+  settingsSection.push({ type: 'divider' });
   return settingsSection;
-}
+};
 
 
 const configureSlashCommandsSection = () => {
